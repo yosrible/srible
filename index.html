@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Srible</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .message {
+        margin-top: 10px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Srible</h1>
+        <p class="tagline">Just content. We handle the rest.</p>
+        <p class="description">
+          Create and manage content your way with Srible — the smart, headless
+          CMS that makes building websites effortless. Designed for developers
+          and creators, Srible keeps things simple.
+        </p>
+      </header>
+
+      <main>
+        <form id="waitlist-form" class="waitlist-form">
+          <div class="input-group">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              required
+            />
+            <button type="submit" id="submit-btn">Join waitlist</button>
+          </div>
+          <p id="message" class="message"></p>
+        </form>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-content">
+          <div class="social-links">
+            <a href="https://x.com/yosrible" target="_blank" class="x-link">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                />
+              </svg>
+            </a>
+          </div>
+          <div class="footer-info">
+            <p>
+              Srible is a project by
+              <a href="https://x.com/yosrible" target="_blank">@yosrible</a>
+            </p>
+            <p class="copyright">© 2025 Srible. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="notification-modal" id="notification">
+      <div class="notification-content">
+        <div class="scribble"></div>
+        <p class="success-message">Welcome to Srible ✨</p>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("waitlist-form");
+      const emailInput = document.getElementById("email");
+      const submitBtn = document.getElementById("submit-btn");
+      const notification = document.getElementById("notification");
+      const scriptURL =
+        "https://script.google.com/macros/s/AKfycbyu4dZ2pfzXQsaFQbHT7KBvQKgpouM3QygBqj68H36AImR7DWyW1Bk0j9V6e51zrKkV/exec";
+
+      function showNotification() {
+        notification.classList.add("show");
+        setTimeout(() => {
+          notification.classList.remove("show");
+        }, 3000);
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+
+        if (!email || !email.includes("@")) {
+          alert("Please enter a valid email.");
+          return;
+        }
+
+        // Disable the button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Joining...";
+
+        try {
+          const response = await fetch(scriptURL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+            mode: "cors",
+            body: JSON.stringify({
+              email: email,
+              action: "join",
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Show success notification
+            showNotification();
+            emailInput.value = "";
+          } else {
+            throw new Error(data.message || "Failed to join waitlist");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Oops! Something went wrong. Please try again.");
+        }
+
+        // Re-enable the button
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Join waitlist";
+      });
+    </script>
+  </body>
+</html>
