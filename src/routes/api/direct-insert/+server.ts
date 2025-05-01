@@ -7,11 +7,30 @@ export const POST = async ({ request }: RequestEvent) => {
     const email = data.email;
     const syncFromLocal = data.syncFromLocal || false; // Flag to handle synced data
     
-    // Simplified implementation with clear logging
-    console.log('🔷 DIRECT INSERT API CALLED');
+    // DETAILED DEBUG LOGGING
+    console.log('🔷 DIRECT INSERT API CALLED', new Date().toISOString());
     console.log('Email to insert:', email);
     if (syncFromLocal) {
       console.log('This is a sync from localStorage');
+    }
+    
+    // Validate environment variables are set
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+    
+    console.log('SUPABASE_URL defined:', !!supabaseUrl);
+    console.log('SUPABASE_SERVICE_ROLE_KEY defined:', !!supabaseServiceKey);
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('⚠️ CRITICAL ERROR: Missing Supabase environment variables');
+      return json({
+        success: false,
+        message: 'Server configuration error. Please contact admin.',
+        debug: { 
+          hasUrl: !!supabaseUrl, 
+          hasKey: !!supabaseServiceKey 
+        }
+      }, { status: 500 });
     }
     
     if (!email || !email.includes('@')) {
@@ -27,6 +46,21 @@ export const POST = async ({ request }: RequestEvent) => {
       console.log('Creating server Supabase client with admin rights...');
       const adminClient = createServerSupabaseClient();
       
+      // Test that we can properly connect to Supabase
+      console.log('Testing Supabase connection...');
+      const { data: testData, error: testError } = await adminClient.from('waitlist_emails').select('count', { count: 'exact', head: true });
+      
+      if (testError) {
+        console.error('⚠️ SUPABASE CONNECTION TEST FAILED:', testError);
+        return json({
+          success: false,
+          message: 'Database connection error. Please try again later.',
+          debug: { error: testError }
+        }, { status: 500 });
+      }
+      
+      console.log('✅ Supabase connection test passed', testData);
+      
       // First check if email already exists
       console.log('Checking if email already exists...');
       const { data: existingData, error: checkError } = await adminClient
@@ -36,10 +70,11 @@ export const POST = async ({ request }: RequestEvent) => {
         .limit(1);
         
       if (checkError) {
-        console.log('❌ ERROR CHECKING FOR DUPLICATE:', checkError);
+        console.error('❌ ERROR CHECKING FOR DUPLICATE:', checkError);
         return json({
           success: false,
-          message: `Database error: ${checkError.message}`
+          message: `Database error: ${checkError.message}`,
+          debug: { error: checkError }
         }, { status: 500 });
       }
       
@@ -63,7 +98,8 @@ export const POST = async ({ request }: RequestEvent) => {
         .select();
       
       if (error) {
-        console.log('❌ DATABASE ERROR:', error);
+        console.error('❌ DATABASE ERROR:', error);
+        
         // Check for specific error types
         if (error.code === '23505' || error.message.includes('duplicate')) {
           return json({
@@ -74,7 +110,8 @@ export const POST = async ({ request }: RequestEvent) => {
         
         return json({
           success: false,
-          message: `Database error: ${error.message}`
+          message: `Database error: ${error.message}`,
+          debug: { error }
         }, { status: 500 });
       }
       
@@ -85,17 +122,19 @@ export const POST = async ({ request }: RequestEvent) => {
         data: insertData
       });
     } catch (err) {
-      console.log('❌ EXCEPTION DURING INSERT:', err);
+      console.error('❌ EXCEPTION DURING INSERT:', err);
       return json({
         success: false,
-        message: 'Server error during database operation'
+        message: 'Server error during database operation',
+        debug: { error: err instanceof Error ? err.message : String(err) }
       }, { status: 500 });
     }
   } catch (err) {
-    console.log('❌ REQUEST PARSING ERROR:', err);
+    console.error('❌ REQUEST PARSING ERROR:', err);
     return json({
       success: false,
-      message: 'Invalid request format'
+      message: 'Invalid request format',
+      debug: { error: err instanceof Error ? err.message : String(err) }
     }, { status: 400 });
   }
 };

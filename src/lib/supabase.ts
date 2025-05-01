@@ -54,20 +54,24 @@ export const createServerSupabaseClient = () => {
 
   // Handle missing URL and service role key
   if (!supabaseUrl) {
-    console.error('Missing VITE_SUPABASE_URL environment variable');
+    console.error('⚠️ CRITICAL ERROR: Missing VITE_SUPABASE_URL environment variable');
     return createDummyClient();
   }
 
+  // Be very explicit about the service role key
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
-                         import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
-                         '';
+                      import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
+                      '';
   
   if (!serviceRoleKey) {
-    console.warn('Missing SUPABASE_SERVICE_ROLE_KEY - falling back to anonymous client');
+    console.error('⚠️ CRITICAL ERROR: Missing SUPABASE_SERVICE_ROLE_KEY - falling back to anonymous client');
+    console.error('This will prevent writing to Supabase tables with RLS enabled!');
+    console.error('Check your .env file and make sure VITE_SUPABASE_SERVICE_ROLE_KEY is set');
     return supabase;
   }
   
   try {
+    console.log('Creating Supabase admin client with service role...');
     return createClient(supabaseUrl, serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
@@ -75,7 +79,7 @@ export const createServerSupabaseClient = () => {
       }
     });
   } catch (err) {
-    console.error('Error creating Supabase admin client:', err);
+    console.error('⚠️ CRITICAL ERROR creating Supabase admin client:', err);
     return createDummyClient();
   }
 };
