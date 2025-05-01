@@ -64,13 +64,9 @@
 		cursor: pointer;
 		padding: 0.4em;
 		border-radius: 50%;
-		transition: background 0.2s;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-	.theme-toggle:hover {
-		background: rgba(0, 0, 0, 0.07);
 	}
 	.theme-toggle svg {
 		display: block;

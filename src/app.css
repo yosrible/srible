@@ -2,7 +2,7 @@
 
 :root {
 	--primary-black: #000000;
-	--primary-white: #ffffff;
+	--primary-white: #f8f8f5;
 	--gray-light: #f7f7fa;
 	--gray-medium: #e5e7eb;
 	--gray-dark: #666666;
@@ -187,39 +187,7 @@ h6,
 	border-color: var(--primary-black);
 }
 
-.scribble {
-	position: absolute;
-	z-index: 0;
-	pointer-events: none;
-	opacity: 0.1;
-}
-
-.scribble-1 {
-	top: 10%;
-	left: 5%;
-	width: 200px;
-	height: 200px;
-	background: var(--primary-black);
-	border-radius: 50%;
-}
-
-.scribble-2 {
-	bottom: 10%;
-	right: 5%;
-	width: 150px;
-	height: 150px;
-	background: var(--primary-black);
-	border-radius: 30%;
-}
-
-.scribble-3 {
-	top: 50%;
-	left: 50%;
-	width: 100px;
-	height: 100px;
-	background: var(--primary-black);
-	border-radius: 40%;
-}
+/* Scribble styles removed for a more minimal design */
 
 @media (max-width: 1024px) {
 	.container {
@@ -234,10 +202,6 @@ h6,
 
 	.section-subtitle {
 		font-size: clamp(0.9rem, 2vw, 1.1rem);
-	}
-
-	.scribble {
-		display: none;
 	}
 
 	.container {

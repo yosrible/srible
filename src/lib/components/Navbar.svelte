@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	let isScrolled = false;
 	let isMenuOpen = false;
+	let windowWidth = 0;
 
 	function handleScroll() {
 		requestAnimationFrame(() => {
@@ -14,6 +15,13 @@
 	function toggleMenu() {
 		isMenuOpen = !isMenuOpen;
 		document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+	}
+
+	function closeMenu() {
+		if (isMenuOpen) {
+			isMenuOpen = false;
+			document.body.style.overflow = '';
+		}
 	}
 
 	function goBack() {
@@ -27,79 +35,135 @@
 			const element = document.getElementById(section);
 			if (element) {
 				element.scrollIntoView({ behavior: 'smooth' });
+				closeMenu();
 			}
 		}
 	}
 
+	function handleResize() {
+		windowWidth = window.innerWidth;
+		if (windowWidth > 768 && isMenuOpen) {
+			closeMenu();
+		}
+	}
+
 	onMount(() => {
+		windowWidth = window.innerWidth;
 		window.addEventListener('scroll', handleScroll, { passive: true });
+		window.addEventListener('resize', handleResize, { passive: true });
+		
+		// Close menu when clicking outside
+		const handleClickOutside = (event: MouseEvent) => {
+			const navElement = document.querySelector('nav');
+			const menuToggle = document.querySelector('.menu-toggle');
+			const target = event.target as Element;
+			
+			if (isMenuOpen && 
+				navElement && 
+				menuToggle && 
+				!target.closest('.nav-links') && 
+				!menuToggle.contains(target)) {
+				closeMenu();
+			}
+		};
+		
+		document.addEventListener('click', handleClickOutside);
+		
 		return () => {
 			window.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleResize);
+			document.removeEventListener('click', handleClickOutside);
 			document.body.style.overflow = '';
 		};
 	});
 
 	$: isCreatePage = false;
+	$: isLoginOrSignup = $page.url.pathname === '/login' || $page.url.pathname === '/signup';
+	$: isMobile = windowWidth <= 768;
 </script>
 
 <nav class:scrolled={isScrolled}>
 	<div class="container">
 		<div class="nav-content">
-			<a href="/" class="logo">
-				<span class="logo-text">Srible</span>
-			</a>
+			<div class="left-section">
+				<a href="/" class="logo" on:click={closeMenu}>
+					<span class="logo-text">Srible</span>
+				</a>
+			</div>
 
 			{#if !isCreatePage}
-				<div class="nav-links" class:active={isMenuOpen}>
-					<button class="nav-link" on:click={() => navigateToSection('why')}>Why Srible?</button>
-					<button class="nav-link" on:click={() => navigateToSection('pricing')}>Pricing</button>
-					<a href="/docs" class="nav-link">Docs</a>
-					<button class="nav-link" on:click={() => navigateToSection('faq')}>FAQ</button>
+				<div class="center-section">
+					<div class="nav-links" class:active={isMenuOpen} role="navigation" aria-label="Main navigation" id="mobile-nav-links">
+						<button class="nav-link" on:click={() => navigateToSection('why')}>Why Srible?</button>
+						<button class="nav-link" on:click={() => navigateToSection('pricing')}>Pricing</button>
+						<a href="/docs" class="nav-link" on:click={closeMenu}>Docs</a>
+						<button class="nav-link" on:click={() => navigateToSection('faq')}>FAQ</button>
+						
+						{#if isMobile}
+							<div class="mobile-buttons">
+								<a href="/login" class="btn btn-outline" on:click={closeMenu}>Log in</a>
+								<a href="/signup" class="btn btn-primary-mobile" on:click={closeMenu}>
+									<span>Create a Blog</span>
+								</a>
+							</div>
+						{/if}
+					</div>
 				</div>
 
-				<div class="nav-buttons">
-					{#if $page.url.pathname !== '/'}
-						<button class="btn btn-back" on:click={goBack}>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="M19 12H5M12 19l-7-7 7-7" />
-							</svg>
-							<span>Back</span>
+				<div class="right-section">
+					{#if !isMobile}
+						<div class="nav-buttons">
+							{#if $page.url.pathname !== '/' && windowWidth > 1024}
+								<button class="btn btn-back" on:click={goBack}>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 12H5M12 19l-7-7 7-7" />
+									</svg>
+									<span>Back</span>
+								</button>
+							{/if}
+							<a href="/login" class="btn btn-outline">Log in</a>
+							<a href="/signup" class="btn {isLoginOrSignup ? 'btn-transparent' : 'btn-primary'}">
+								<span>Create a Blog</span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="arrow-icon"
+								>
+									<path d="M5 12h14M12 5l7 7-7 7" />
+								</svg>
+							</a>
+						</div>
+					{/if}
+
+					{#if isMobile}
+						<button 
+							class="menu-toggle" 
+							on:click={toggleMenu} 
+							aria-label="Toggle menu"
+							aria-expanded={isMenuOpen}
+							aria-controls="mobile-nav-links"
+						>
+							<span class="hamburger" class:active={isMenuOpen}></span>
 						</button>
 					{/if}
-					<a href="/login" class="btn btn-outline">Log in</a>
-					<a href="/signup" class="btn btn-primary">
-						<span>Create a Blog</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="arrow-icon"
-						>
-							<line x1="5" y1="12" x2="19" y2="12"></line>
-							<polyline points="12 5 19 12 12 19"></polyline>
-						</svg>
-					</a>
 				</div>
-
-				<button class="menu-toggle" on:click={toggleMenu} aria-label="Toggle menu">
-					<span class="hamburger" class:active={isMenuOpen}></span>
-				</button>
 			{:else}
 				<div class="nav-buttons nav-buttons-minimal">
 					<button class="btn btn-back" on:click={goBack}>
@@ -137,14 +201,12 @@
 			padding 0.3s ease;
 		background-color: transparent;
 		padding: 1rem 0;
-		will-change: background-color, padding;
 	}
 
 	nav.scrolled {
-		background-color: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(10px);
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-		padding: 0.75rem 0;
+		background-color: var(--primary-white);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		padding: 0.5rem 0;
 	}
 
 	.container {
@@ -157,7 +219,25 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		position: relative;
+	}
+
+	.left-section {
+		flex: 1;
+		display: flex;
+		align-items: center;
+	}
+
+	.center-section {
+		flex: 2;
+		display: flex;
+		justify-content: center;
+	}
+
+	.right-section {
+		flex: 1;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
 	}
 
 	.logo {
@@ -166,7 +246,7 @@
 		font-weight: 700;
 		color: var(--primary-black);
 		position: relative;
-		will-change: transform;
+		z-index: 1001;
 	}
 
 	.logo-text {
@@ -178,10 +258,7 @@
 		display: flex;
 		gap: 2rem;
 		align-items: center;
-		position: absolute;
-		left: 50%;
-		transform: translateX(-50%);
-		will-change: transform;
+		justify-content: center;
 	}
 
 	.nav-link {
@@ -195,7 +272,7 @@
 		cursor: pointer;
 		font-size: inherit;
 		font-family: inherit;
-		will-change: transform;
+		white-space: nowrap;
 	}
 
 	.nav-link::after {
@@ -205,20 +282,23 @@
 		left: 0;
 		width: 0;
 		height: 2px;
-		background: var(--primary-black);
+		background-color: var(--primary-black);
 		transition: width 0.3s ease;
-		will-change: width;
 	}
 
 	.nav-link:hover::after {
 		width: 100%;
 	}
 
+	.mobile-buttons {
+		display: none;
+	}
+
 	.nav-buttons {
 		display: flex;
 		gap: 1rem;
 		align-items: center;
-		margin-left: auto;
+		justify-content: flex-end;
 	}
 
 	.nav-buttons-minimal {
@@ -230,13 +310,16 @@
 		padding: 0.6rem 1.2rem;
 		border-radius: 6px;
 		font-weight: 500;
-		transition:
-			transform 0.2s ease,
-			box-shadow 0.2s ease;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		will-change: transform, box-shadow;
+		font-size: 0.9rem;
+		white-space: nowrap;
+		transition: transform 0.2s ease;
+	}
+	
+	.btn:active {
+		transform: scale(0.98);
 	}
 
 	.btn-back {
@@ -258,30 +341,28 @@
 	}
 
 	.btn-outline:hover {
-		background-color: var(--primary-black);
-		color: var(--primary-white);
+		color: var(--primary-black);
 	}
 
-	.btn-primary {
-		background: linear-gradient(90deg, #ff6ec4, #7873f5);
+	.btn-primary, .btn-primary-mobile {
+		background-color: var(--primary-black);
 		color: var(--primary-white);
 		border: none;
 	}
 
-	.btn-primary:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 6px 12px rgba(120, 115, 245, 0.3);
+	.btn-primary:hover, .btn-primary-mobile:hover {
+		background-color: var(--primary-black);
+	}
+
+	.btn-transparent {
+		background-color: transparent;
+		color: var(--primary-black);
+		border: none;
 	}
 
 	.arrow-icon {
 		width: 16px;
 		height: 16px;
-		transition: transform 0.3s ease;
-		will-change: transform;
-	}
-
-	.btn-primary:hover .arrow-icon {
-		transform: translateX(3px);
 	}
 
 	.menu-toggle {
@@ -290,7 +371,8 @@
 		border: none;
 		cursor: pointer;
 		padding: 0.5rem;
-		margin-left: auto;
+		z-index: 1002;
+		position: relative;
 	}
 
 	.hamburger {
@@ -300,7 +382,6 @@
 		background-color: var(--primary-black);
 		position: relative;
 		transition: background-color 0.3s ease;
-		will-change: transform;
 	}
 
 	.hamburger::before,
@@ -311,7 +392,6 @@
 		height: 2px;
 		background-color: var(--primary-black);
 		transition: transform 0.3s ease;
-		will-change: transform;
 	}
 
 	.hamburger::before {
@@ -336,60 +416,167 @@
 		bottom: 0;
 	}
 
-	@media (max-width: 1200px) {
-		.nav-container {
-			padding: 0 2rem;
+	/* Large desktop styles */
+	@media (min-width: 1400px) {
+		.container {
+			max-width: 1320px;
 		}
-	}
-
-	@media (max-width: 768px) {
-		.nav-container {
-			padding: 0 1.5rem;
-		}
-
+		
 		.nav-links {
-			display: none;
+			gap: 2.5rem;
 		}
-
-		.mobile-menu-btn {
-			display: block;
-		}
-
-		.mobile-menu {
-			display: flex;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.nav-container {
-			padding: 0 1rem;
-		}
-
-		.logo {
-			font-size: 1.5rem;
-		}
-
-		.mobile-menu {
-			padding: 1rem;
-		}
-
-		.mobile-menu a {
-			padding: 0.75rem 1rem;
+		
+		.btn {
+			padding: 0.7rem 1.4rem;
 			font-size: 1rem;
 		}
 	}
 
-	@media (max-width: 320px) {
+	/* Tablet and smaller desktop styles */
+	@media (max-width: 1200px) {
+		.container {
+			padding: 0 1.25rem;
+		}
+		
+		.nav-links {
+			gap: 1.75rem;
+		}
+	}
+
+	@media (max-width: 1024px) {
+		.nav-links {
+			gap: 1.5rem;
+		}
+		
+		.center-section {
+			flex: 3;
+		}
+		
+		.right-section {
+			flex: 1;
+		}
+	}
+
+	/* Mobile styles */
+	@media (max-width: 768px) {
+		.container {
+			padding: 0 1rem;
+		}
+		
+		.nav-content {
+			position: relative;
+			justify-content: space-between;
+		}
+		
+		.center-section {
+			position: static;
+			flex: auto;
+		}
+		
+		.left-section, .right-section {
+			flex: auto;
+			z-index: 1002; /* Above the menu overlay */
+		}
+		
+		.menu-toggle {
+			display: block;
+			margin-left: 1rem;
+		}
+		
+		.nav-buttons {
+			display: none; /* Hide desktop nav buttons on mobile */
+		}
+		
+		.mobile-buttons {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			gap: 1rem;
+			margin-top: 2rem;
+			max-width: 300px;
+		}
+		
+		.nav-links {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			transform: translateY(-100%);
+			background-color: var(--primary-white);
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 2rem;
+			transition: transform 0.3s ease;
+			z-index: 1001;
+			padding: 4rem 2rem;
+			box-sizing: border-box;
+		}
+		
+		.nav-links.active {
+			transform: translateY(0);
+			overflow-y: auto;
+		}
+		
+		.nav-link {
+			font-size: 1.25rem;
+			padding: 0.75rem 0;
+		}
+		
+		.btn {
+			padding: 0.75rem 1.5rem;
+			font-size: 1rem;
+			justify-content: center;
+			width: 100%;
+			min-height: 44px; /* Better touch target */
+		}
+		
+		.btn-primary-mobile {
+			width: 100%;
+		}
+	}
+
+	/* Small mobile styles */
+	@media (max-width: 480px) {
 		.logo {
 			font-size: 1.25rem;
 		}
-
-		.mobile-menu {
-			padding: 0.75rem;
+		
+		.container {
+			padding: 0 0.75rem;
 		}
+		
+		.nav-link {
+			font-size: 1.1rem;
+		}
+		
+		.nav-links {
+			padding: 4rem 1rem;
+			gap: 1.5rem;
+		}
+		
+		.mobile-buttons {
+			gap: 0.75rem;
+		}
+	}
 
-		.mobile-menu a {
-			padding: 0.5rem 0.75rem;
+	/* Extra small mobile styles */
+	@media (max-width: 360px) {
+		.logo {
+			font-size: 1.15rem;
+		}
+		
+		.hamburger, .hamburger::before, .hamburger::after {
+			width: 22px;
+		}
+		
+		.nav-link {
+			font-size: 1rem;
+		}
+		
+		.btn {
+			padding: 0.6rem 1rem;
 			font-size: 0.9rem;
 		}
 	}

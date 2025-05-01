@@ -39,9 +39,15 @@
 	<div class="content">
 		{#if showSuccessMessage}
 			<div class="success-message">
-				<h1>Thank you for your interest!</h1>
-				<p>We're launching soon. We'll notify you when we're ready to go.</p>
-				<button class="back-button" on:click={() => goto('/')}>Back to Home</button>
+				<svg class="success-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<circle cx="12" cy="12" r="10" fill="#4ade80" />
+					<path d="M8 12l3 3 5-5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<h1>Thank you for joining!</h1>
+				<p>We'll notify you as soon as Srible launches. We're excited to have you on board.</p>
+				<button class="back-button" on:click={() => goto('/')}>
+					<span>Back to Home</span>
+				</button>
 			</div>
 		{:else}
 			<h1>Join the waitlist</h1>
@@ -112,14 +118,13 @@
 
 	.content {
 		width: 100%;
-		max-width: 520px;
+		max-width: 480px;
 		background-color: white;
-		padding: 3rem;
-		border-radius: 16px;
+		padding: 2.5rem;
+		border-radius: 12px;
 		box-shadow:
-			0 4px 6px -1px rgba(0, 0, 0, 0.1),
-			0 2px 4px -1px rgba(0, 0, 0, 0.06),
-			0 20px 25px -5px rgba(0, 0, 0, 0.02);
+			0 2px 4px rgba(0, 0, 0, 0.06),
+			0 1px 3px rgba(0, 0, 0, 0.1);
 		margin-bottom: 2rem;
 	}
 
@@ -178,7 +183,7 @@
 		font-size: 1rem;
 		font-weight: 500;
 		color: white;
-		background: linear-gradient(90deg, #ff6ec4, #7873f5);
+		background-color: var(--primary-black);
 		border: none;
 		border-radius: 6px;
 		cursor: pointer;
@@ -187,34 +192,10 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.signup-button::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(
-			90deg,
-			rgba(255, 255, 255, 0.1),
-			rgba(255, 255, 255, 0.2),
-			rgba(255, 255, 255, 0.1)
-		);
-		transform: translateX(-100%);
-		transition: transform 0.6s ease;
-	}
-
-	.signup-button:hover:not(:disabled)::before {
-		transform: translateX(100%);
 	}
 
 	.signup-button:hover:not(:disabled) {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(120, 115, 245, 0.3);
+		background-color: var(--primary-black);
 	}
 
 	.signup-button:disabled {
@@ -225,11 +206,6 @@
 	.signup-button .arrow-icon {
 		width: 1.2em;
 		height: 1.2em;
-		transition: transform 0.3s ease;
-	}
-
-	.signup-button:hover:not(:disabled) .arrow-icon {
-		transform: translateX(3px);
 	}
 
 	.loading-spinner {
@@ -250,6 +226,39 @@
 	.success-message {
 		text-align: center;
 		animation: fadeIn 0.5s ease-out;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.success-message p {
+		color: var(--gray-dark);
+		margin-bottom: 2rem;
+		line-height: 1.6;
+		font-size: 1.1rem;
+	}
+
+	.success-icon {
+		width: 4rem;
+		height: 4rem;
+		margin: 0 auto 1.5rem;
+		animation: scaleIn 0.5s ease-out forwards;
+	}
+
+	@keyframes scaleIn {
+		0% {
+			transform: scale(0);
+			opacity: 0;
+		}
+		70% {
+			transform: scale(1.1);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
 	}
 
 	@keyframes fadeIn {
@@ -268,15 +277,26 @@
 		font-size: 1rem;
 		font-weight: 500;
 		color: white;
-		background-color: #7873f5;
+		background-color: var(--primary-black);
 		border: none;
 		border-radius: 6px;
 		cursor: pointer;
-		transition: background-color 0.2s ease;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 180px;
 	}
 
 	.back-button:hover {
-		background-color: #6661e8;
+		background-color: var(--primary-black);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.back-button:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
 	.minimal-footer {
@@ -306,23 +326,19 @@
 		color: var(--gray-medium);
 	}
 
-	@media (max-width: 1200px) {
-		.signup-container {
-			padding: 0 2rem;
-		}
-	}
-
 	@media (max-width: 768px) {
 		.signup-container {
 			padding: 0 1.5rem;
 		}
 
-		.signup-content {
-			padding: 2rem;
+		.content {
+			padding: 1.75rem;
+			max-width: 420px;
 		}
 
 		h1 {
-			font-size: 2.5rem;
+			font-size: 1.75rem;
+			margin-bottom: 1.5rem;
 		}
 	}
 
@@ -331,26 +347,35 @@
 			padding: 0 1rem;
 		}
 
-		.signup-content {
-			padding: 1.5rem;
+		.content {
+			padding: 1.25rem;
+			max-width: 100%;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 		}
 
 		h1 {
-			font-size: 2rem;
+			font-size: 1.5rem;
+			margin-bottom: 1rem;
 		}
 
-		.btn {
-			width: 100%;
-			justify-content: center;
+		.success-message p {
+			font-size: 1rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.success-icon {
+			width: 3.5rem;
+			height: 3.5rem;
+			margin-bottom: 1rem;
 		}
 	}
 
 	@media (max-width: 320px) {
 		h1 {
-			font-size: 1.75rem;
+			font-size: 1.25rem;
 		}
 
-		.signup-content {
+		.content {
 			padding: 1rem;
 		}
 	}

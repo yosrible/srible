@@ -1,41 +1,67 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	onMount(() => {
-		const observer = new IntersectionObserver((entries) => {
-			entries.forEach((entry) => {
-				if (entry.isIntersecting) {
-					entry.target.classList.add('visible');
-				}
-			});
-		});
+	let displayText = '';
+	const targetText = 'Personal.';
+	let cursorVisible = true;
+	let typingComplete = false;
+	let windowWidth = 0;
 
-		document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+	// Typing animation
+	function typeText() {
+		let charIndex = 0;
+		const typingSpeed = 120; // ms per character
+		const typingInterval = setInterval(() => {
+			if (charIndex < targetText.length) {
+				displayText += targetText[charIndex];
+				charIndex++;
+			} else {
+				clearInterval(typingInterval);
+				typingComplete = true;
+			}
+		}, typingSpeed);
+
+		// Blinking cursor animation
+		setInterval(() => {
+			cursorVisible = !cursorVisible;
+		}, 500);
+	}
+
+	function handleResize() {
+		windowWidth = window.innerWidth;
+	}
+
+	onMount(() => {
+		windowWidth = window.innerWidth;
+		window.addEventListener('resize', handleResize);
+
+		setTimeout(() => {
+			typeText();
+		}, 800); // Start typing after a short delay
 
 		return () => {
-			document.querySelectorAll('.fade-in').forEach((el) => observer.unobserve(el));
+			window.removeEventListener('resize', handleResize);
 		};
 	});
+
+	$: isMobile = windowWidth <= 480;
+	$: isTablet = windowWidth > 480 && windowWidth <= 768;
 </script>
 
 <section class="hero">
-	<div class="hero-background">
-		<div class="gradient-blob blob-1"></div>
-		<div class="gradient-blob blob-2"></div>
-		<div class="gradient-blob blob-3"></div>
-		<div class="pen-scribble"></div>
-	</div>
 	<div class="container">
 		<div class="hero-content">
-			<h1 class="scroll-animate">
-				Clean. Simple. <span class="highlight">Personal.</span>
-				<span class="scribble-dot dot-1"></span>
-				<span class="scribble-dot dot-2"></span>
-				<span class="scribble-dot dot-3"></span>
+			<h1 class:mobile={isMobile} class:tablet={isTablet}>
+				Clean. Simple. <span class="highlight typing-container">
+					<span class="typed-text">{displayText}</span><span
+						class="cursor"
+						class:hidden={!cursorVisible || typingComplete}>|</span
+					>
+				</span>
 			</h1>
-			<p class="subheading scroll-animate">
+			<p class="subheading" class:mobile={isMobile}>
 				Write without chasing likes. Create without competing for attention. Srible gives you your
-				space to express yourself freely.
+				space
 			</p>
 			<div class="cta-buttons">
 				<a href="/signup" class="btn primary-btn">
@@ -62,189 +88,126 @@
 </section>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@700&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@700&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 	.hero {
-		min-height: 70vh;
+		min-height: min(70vh, 650px);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		text-align: center;
-		padding: 2rem 1rem;
+		padding: clamp(1rem, 5vh, 2rem) 1rem;
 		background-color: var(--primary-white);
 		position: relative;
 		overflow: hidden;
-	}
-
-	.hero-background {
-		position: absolute;
-		top: 0;
-		left: 0;
 		width: 100%;
-		height: 100%;
-		overflow: hidden;
-		z-index: 0;
-		opacity: 0.6;
+		box-sizing: border-box;
 	}
 
-	.gradient-blob {
-		position: absolute;
-		border-radius: 50%;
-		filter: blur(60px);
-		opacity: 0.5;
-		animation: float-blob 20s infinite ease-in-out;
-	}
-
-	.blob-1 {
-		top: 10%;
-		left: 10%;
-		width: 300px;
-		height: 300px;
-		background: linear-gradient(135deg, #ff6ec4, #7873f5);
-		animation-delay: 0s;
-	}
-
-	.blob-2 {
-		top: 50%;
-		right: 10%;
-		width: 250px;
-		height: 250px;
-		background: linear-gradient(135deg, #7873f5, #42e695);
-		animation-delay: -5s;
-	}
-
-	.blob-3 {
-		bottom: 10%;
-		left: 50%;
-		width: 200px;
-		height: 200px;
-		background: linear-gradient(135deg, #42e695, #ff6ec4);
-		animation-delay: -10s;
-	}
-
-	.pen-scribble {
-		position: absolute;
-		top: 20%;
-		right: 15%;
-		width: 120px;
-		height: 120px;
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23ff6ec4' stroke='%23ff6ec4' stroke-width='2' d='M20,80 L30,70 L40,80 L50,70 L60,80 L70,70 L80,80 M30,70 L30,40 L70,40 L70,70 M20,20 L30,30 L40,20 L50,30 L60,20 L70,30 L80,20'/%3E%3C/svg%3E");
-		background-size: contain;
-		background-repeat: no-repeat;
-		opacity: 0.2;
-		animation: float-pen 18s infinite ease-in-out;
-		animation-delay: -3s;
-		transform-origin: center;
-	}
-
-	@keyframes float-pen {
-		0%,
-		100% {
-			transform: translate(0, 0) rotate(0deg);
-		}
-		25% {
-			transform: translate(15px, -15px) rotate(5deg);
-		}
-		50% {
-			transform: translate(0, 0) rotate(0deg);
-		}
-		75% {
-			transform: translate(-15px, 15px) rotate(-5deg);
-		}
-	}
-
-	@keyframes float-blob {
-		0%,
-		100% {
-			transform: translate(0, 0) scale(1);
-		}
-		25% {
-			transform: translate(20px, -20px) scale(1.1);
-		}
-		50% {
-			transform: translate(0, 0) scale(1);
-		}
-		75% {
-			transform: translate(-20px, 20px) scale(0.9);
-		}
+	.container {
+		width: 100%;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 max(1rem, 5%);
+		box-sizing: border-box;
 	}
 
 	.hero-content {
 		position: relative;
 		z-index: 1;
-		max-width: 800px;
+		max-width: min(800px, 90%);
 		margin: 0 auto;
 		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 	h1 {
 		font-family: 'Poppins', sans-serif;
-		font-size: clamp(2.5rem, 5vw, 4rem);
+		font-size: clamp(2.25rem, 7vw, 4rem);
 		font-weight: 700;
-		margin-bottom: 1.5rem;
+		margin-bottom: clamp(1rem, 3vh, 1.5rem);
 		line-height: 1.2;
 		color: var(--primary-black);
 		letter-spacing: -0.02em;
 		position: relative;
 	}
+	
+	h1.tablet {
+		font-size: clamp(2rem, 6vw, 3rem);
+		margin-bottom: 1.25rem;
+	}
+	
+	h1.mobile {
+		font-size: clamp(1.75rem, 8vw, 2.5rem);
+		margin-bottom: 1rem;
+		line-height: 1.3;
+	}
 
 	.highlight {
-		background: linear-gradient(90deg, #ff6ec4, #7873f5);
+		background: linear-gradient(90deg, #ff6ec4, #7873f5, #42e695);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
 		position: relative;
 	}
-
-	.scribble-dot {
-		position: absolute;
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: #ff6ec4;
-		opacity: 0.8;
-		animation: float-dot 3s infinite ease-in-out;
+	
+	.typing-container {
+		display: inline-block;
+		min-width: clamp(140px, 18vw, 180px);
+		text-align: left;
+		font-family: 'Space Mono', monospace;
+		font-size: 0.95em;
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		margin-top: 0.1em;
+		position: relative;
 	}
-
-	.dot-1 {
-		top: -10px;
-		right: -15px;
-		animation-delay: 0s;
+	
+	.typed-text {
+		display: inline;
 	}
-
-	.dot-2 {
-		bottom: -5px;
-		left: -10px;
-		background: #7873f5;
-		animation-delay: -1s;
+	
+	.cursor {
+		display: inline-block;
+		font-weight: 700;
+		font-size: 1.05em;
+		margin-left: 1px;
+		animation: blink 1s infinite;
+		color: var(--primary-black);
+		-webkit-text-fill-color: var(--primary-black);
+		font-family: 'Space Mono', monospace;
 	}
-
-	.dot-3 {
-		top: 50%;
-		right: -20px;
-		background: #42e695;
-		animation-delay: -2s;
+	
+	.cursor.hidden {
+		opacity: 0;
 	}
-
-	@keyframes float-dot {
-		0%,
-		100% {
-			transform: translate(0, 0);
-		}
-		50% {
-			transform: translate(5px, -5px);
-		}
+	
+	@keyframes blink {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0; }
 	}
 
 	.subheading {
 		font-family: 'Inter', sans-serif;
-		font-size: clamp(1.1rem, 2.5vw, 1.25rem);
+		font-size: clamp(1.15rem, 3vw, 1.35rem);
 		color: var(--gray-dark);
-		margin-bottom: 2.5rem;
-		max-width: 600px;
+		margin-bottom: clamp(1.5rem, 5vh, 2.5rem);
+		max-width: min(650px, 95%);
 		margin-left: auto;
 		margin-right: auto;
 		line-height: 1.6;
+		font-weight: 400;
+		letter-spacing: 0.01em;
+	}
+	
+	.subheading.mobile {
+		font-size: clamp(1rem, 4.5vw, 1.2rem);
+		line-height: 1.5;
+		margin-bottom: 1.75rem;
+		max-width: 100%;
+		padding: 0 0.5rem;
 	}
 
 	.cta-buttons {
@@ -253,93 +216,121 @@
 		justify-content: center;
 		margin-bottom: 1.5rem;
 		flex-wrap: wrap;
+		width: 100%;
 	}
 
 	.primary-btn {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: 0.5rem;
-		padding: 0.75rem 1.5rem;
+		padding: clamp(0.65rem, 2vw, 0.75rem) clamp(1rem, 4vw, 1.5rem);
 		border-radius: 0.5rem;
-		background: linear-gradient(90deg, #ff6ec4, #7873f5);
+		background-color: var(--primary-black);
 		color: var(--primary-white);
 		font-family: 'Inter', sans-serif;
-		font-size: 1rem;
+		font-size: clamp(0.9rem, 3vw, 1rem);
 		font-weight: 500;
 		text-decoration: none;
-		transition: all 0.3s ease;
-		position: relative;
-		overflow: hidden;
+		min-height: 44px;
+		touch-action: manipulation;
+		transition: transform 0.2s ease;
+		-webkit-tap-highlight-color: transparent;
 	}
-
-	.primary-btn::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(
-			90deg,
-			rgba(255, 255, 255, 0.1),
-			rgba(255, 255, 255, 0.2),
-			rgba(255, 255, 255, 0.1)
-		);
-		transform: translateX(-100%);
-		transition: transform 0.6s ease;
-	}
-
-	.primary-btn:hover::before {
-		transform: translateX(100%);
-	}
-
-	.primary-btn:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(120, 115, 245, 0.3);
+	
+	.primary-btn:active {
+		transform: scale(0.98);
 	}
 
 	.primary-btn .arrow-icon {
-		width: 1.2em;
-		height: 1.2em;
+		width: clamp(1em, 3vw, 1.2em);
+		height: clamp(1em, 3vw, 1.2em);
 		stroke: currentColor;
-		transition: transform 0.3s ease;
 	}
 
-	.primary-btn:hover .arrow-icon {
-		transform: translateX(3px);
-	}
-
-	.fade-in {
-		opacity: 0;
-		transform: translateY(20px);
-		transition:
-			opacity 0.6s ease-out,
-			transform 0.6s ease-out;
-	}
-
-	.fade-in.visible {
-		opacity: 1;
-		transform: translateY(0);
-	}
-
+	/* Tablet styles */
 	@media (max-width: 768px) {
 		.hero {
-			padding: 4rem 1rem 2rem;
+			padding: 5rem 1rem 2rem;
 			min-height: auto;
+		}
+		
+		.container {
+			padding: 0 1rem;
 		}
 
 		.cta-buttons {
 			flex-direction: column;
-			padding: 0 1rem;
+			align-items: center;
+			padding: 0 max(1rem, 5%);
 		}
 
 		.primary-btn {
-			width: 100%;
-			justify-content: center;
+			width: min(100%, 300px);
 		}
+		
+		.typing-container {
+			font-size: 0.9em;
+		}
+	}
 
-		.gradient-blob {
-			filter: blur(40px);
+	/* Mobile styles */
+	@media (max-width: 480px) {
+		.hero {
+			padding: 4.5rem 0.75rem 1.5rem;
+		}
+		
+		.container {
+			padding: 0 0.75rem;
+		}
+		
+		.hero-content {
+			max-width: 100%;
+		}
+		
+		.primary-btn {
+			width: 100%;
+			padding: 0.65rem 1rem;
+		}
+		
+		.typing-container {
+			font-size: 0.85em;
+			min-width: 130px;
+		}
+	}
+
+	/* Small mobile styles */
+	@media (max-width: 360px) {
+		.hero {
+			padding: 4rem 0.5rem 1.25rem;
+		}
+		
+		.typing-container {
+			min-width: 110px;
+		}
+		
+		.subheading {
+			font-size: 1rem;
+			line-height: 1.4;
+		}
+	}
+	
+	/* Landscape mode optimization */
+	@media (max-height: 500px) and (orientation: landscape) {
+		.hero {
+			min-height: auto;
+			padding: 5rem 1rem 1.5rem;
+		}
+		
+		h1 {
+			font-size: clamp(1.75rem, 5vw, 2.5rem);
+			margin-bottom: 0.75rem;
+		}
+		
+		.subheading {
+			font-size: 1.1rem;
+			margin-bottom: 1.25rem;
+			max-width: 80%;
 		}
 	}
 </style>
