@@ -7,6 +7,19 @@
 	import { page } from '$app/stores';
 
 	let observer: IntersectionObserver;
+	let email = '';
+	
+	// Updated waitlistStatus type to include isWarning property
+	let waitlistStatus: { 
+		message: string; 
+		success: boolean; 
+		visible: boolean; 
+		isWarning?: boolean;
+	} = { 
+		message: '', 
+		success: false, 
+		visible: false 
+	};
 
 	onMount(() => {
 		setupIntersectionObserver();
@@ -45,6 +58,62 @@
 		setTimeout(() => {
 			setupIntersectionObserver();
 		}, 100);
+	}
+
+	async function handleWaitlistSubmit() {
+		if (!email || !email.includes('@')) {
+			waitlistStatus = {
+				message: 'Please enter a valid email address',
+				success: false,
+				visible: true
+			};
+			return;
+		}
+
+		try {
+			console.log('Submitting email to waitlist:', email);
+			const response = await fetch('/api/direct-insert', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email })
+			});
+
+			const result = await response.json();
+			console.log('Waitlist submission result:', result);
+			
+			// Special case for already on waitlist
+			if (result.success && result.message && result.message.includes('already on our waitlist')) {
+				waitlistStatus = {
+					message: result.message,
+					success: false, // Display in error style (soft red)
+					isWarning: true, // Add this flag for special styling
+					visible: true
+				};
+			} else {
+				waitlistStatus = {
+					message: result.message || 'Thanks for joining the waitlist!',
+					success: response.ok,
+					visible: true
+				};
+			}
+
+			if (response.ok) {
+				email = '';
+				// Hide success message after 5 seconds
+				setTimeout(() => {
+					waitlistStatus.visible = false;
+				}, 5000);
+			}
+		} catch (error) {
+			console.error('Error submitting to waitlist:', error);
+			waitlistStatus = {
+				message: 'Something went wrong. Please try again later.',
+				success: false,
+				visible: true
+			};
+		}
 	}
 </script>
 
@@ -124,6 +193,31 @@
 			<button class="btn btn-secondary">Coming Soon</button>
 		</div>
 	</div>
+</section>
+
+<section class="waitlist-section scroll-animate" id="waitlist">
+	<div class="section-decoration"></div>
+	<h2 class="waitlist-title">Join Our Waitlist</h2>
+	<p class="waitlist-subtitle">Be the first to know when we launch</p>
+	
+	<div class="waitlist-form">
+		<input 
+			type="email" 
+			bind:value={email} 
+			placeholder="Your email address" 
+			class="waitlist-input"
+			aria-label="Email address for waitlist"
+		/>
+		<button class="waitlist-btn btn btn-primary" on:click={() => handleWaitlistSubmit()}>
+			Join Waitlist
+		</button>
+	</div>
+	
+	{#if waitlistStatus.visible}
+		<div class="waitlist-message" class:success={waitlistStatus.success} class:error={!waitlistStatus.success} class:warning={waitlistStatus.isWarning}>
+			{waitlistStatus.message}
+		</div>
+	{/if}
 </section>
 
 <Footer />
@@ -415,6 +509,109 @@
 		opacity: 0.6;
 	}
 
+	.waitlist-section {
+		max-width: 680px;
+		margin: 2.5rem auto;
+		padding: clamp(1.25rem, 5vw, 1.75rem) clamp(0.75rem, 3vw, 1rem);
+		background: #f8f8f5;
+		position: relative;
+		border-radius: clamp(0.75rem, 2vw, 1rem);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+		text-align: center;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.waitlist-title {
+		font-family: 'Poppins', sans-serif;
+		font-size: clamp(1.5rem, 5vw, 2.5rem);
+		font-weight: 700;
+		text-align: center;
+		margin-bottom: clamp(0.25rem, 1vw, 0.5rem);
+		color: #000;
+		line-height: 1.2;
+	}
+
+	.waitlist-subtitle {
+		text-align: center;
+		color: #666;
+		font-size: clamp(0.85rem, 3vw, 1.1rem);
+		margin-bottom: clamp(1rem, 4vw, 1.5rem);
+		font-family: 'Inter', sans-serif;
+		line-height: 1.4;
+		max-width: 90%;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.waitlist-form {
+		display: flex;
+		flex-direction: row;
+		gap: clamp(0.5rem, 2vw, 0.75rem);
+		width: 100%;
+		max-width: 500px;
+		margin: 0 auto clamp(0.75rem, 3vw, 1rem);
+	}
+
+	.waitlist-input {
+		flex: 1;
+		padding: clamp(0.6rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
+		border: 1px solid #eee;
+		border-radius: clamp(0.375rem, 1.5vw, 0.5rem);
+		font-family: 'Inter', sans-serif;
+		font-size: clamp(0.875rem, 3vw, 1rem);
+		min-height: 48px;
+		background: white;
+		-webkit-appearance: none;
+		appearance: none;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.waitlist-input:focus {
+		outline: none;
+		border-color: #d1d1d1;
+	}
+
+	.waitlist-btn {
+		min-height: 48px;
+		min-width: clamp(100px, 30%, 120px);
+		white-space: nowrap;
+		font-size: clamp(0.875rem, 3vw, 1rem);
+		padding: clamp(0.6rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
+		border-radius: clamp(0.375rem, 1.5vw, 0.5rem);
+		touch-action: manipulation;
+	}
+
+	.waitlist-message {
+		margin-top: clamp(0.5rem, 2vw, 0.75rem);
+		padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.5rem, 2vw, 0.75rem);
+		border-radius: clamp(0.375rem, 1.5vw, 0.5rem);
+		font-family: 'Inter', sans-serif;
+		font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+		max-width: 500px;
+		margin-left: auto;
+		margin-right: auto;
+		line-height: 1.4;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.waitlist-message.success {
+		background-color: #e6f7ed;
+		color: #107a42;
+	}
+
+	.waitlist-message.error {
+		background-color: #ffefef;
+		color: #d32f2f;
+	}
+
+	.waitlist-message.warning {
+		background-color: #fff6f6;
+		color: #d32f2f;
+	}
+
 	@media (max-width: 768px) {
 		.pricing-cards {
 			flex-direction: column;
@@ -440,6 +637,30 @@
 		.faq-list p {
 			padding: 0 0.5rem 0.5rem 1.5rem;
 			margin: 0;
+		}
+		.waitlist-section {
+			margin: 1.75rem auto;
+			padding: 1.25rem 0.75rem;
+			width: calc(100% - 2rem);
+		}
+		.waitlist-form {
+			flex-direction: column;
+			gap: 0.75rem;
+			align-items: stretch;
+		}
+		.waitlist-input {
+			width: 100%;
+			min-height: 50px; /* Slightly taller on mobile for better touch targets */
+		}
+		.waitlist-btn {
+			width: 100%;
+			min-height: 50px;
+			justify-content: center;
+			display: flex;
+			align-items: center;
+		}
+		.waitlist-message {
+			max-width: 100%;
 		}
 	}
 
@@ -504,6 +725,24 @@
 			font-size: 1.1rem;
 			margin-right: 0.5rem;
 		}
+		.waitlist-section {
+			margin: 1.25rem auto;
+			padding: 1rem 0.5rem;
+			border-radius: 0.75rem;
+			width: calc(100% - 1.5rem);
+		}
+		.waitlist-title {
+			margin-bottom: 0.3rem;
+			font-size: 1.8rem;
+		}
+		.waitlist-subtitle {
+			margin-bottom: 1rem;
+			font-size: 0.9rem;
+			max-width: 95%;
+		}
+		.waitlist-input, .waitlist-btn {
+			min-height: 54px; /* Even larger touch targets on small devices */
+		}
 	}
 
 	@media (max-width: 320px) {
@@ -541,6 +780,54 @@
 		}
 		.faq-list p {
 			font-size: 0.85rem;
+		}
+		.waitlist-title {
+			font-size: 1.5rem;
+		}
+		.waitlist-subtitle {
+			font-size: 0.85rem;
+			max-width: 100%;
+			margin-bottom: 0.875rem;
+		}
+		.waitlist-input, .waitlist-btn {
+			font-size: 0.9rem;
+			padding: 0.6rem 1rem;
+			min-height: 52px;
+		}
+		.waitlist-form {
+			gap: 0.625rem;
+		}
+		.waitlist-message {
+			font-size: 0.8rem;
+			padding: 0.5rem 0.625rem;
+		}
+	}
+	
+	/* Handle landscape orientation on mobile */
+	@media (max-height: 500px) and (orientation: landscape) {
+		.waitlist-section {
+			padding: 1rem 0.75rem;
+			margin: 1rem auto;
+		}
+		.waitlist-title {
+			font-size: 1.5rem;
+			margin-bottom: 0.25rem;
+		}
+		.waitlist-subtitle {
+			font-size: 0.85rem;
+			margin-bottom: 0.75rem;
+		}
+		.waitlist-form {
+			flex-direction: row;
+			max-width: 90%;
+		}
+		.waitlist-input, .waitlist-btn {
+			min-height: 44px;
+		}
+		.waitlist-btn {
+			min-width: auto;
+			padding-left: 1rem;
+			padding-right: 1rem;
 		}
 	}
 </style>

@@ -1,64 +1,79 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import fs from 'fs/promises';
-import path from 'path';
+import { createServerSupabaseClient } from '$lib/supabase';
 
-const waitlistPath = path.join(process.cwd(), 'src/data/waitlist.json');
-
-// Define an interface for email entries
-interface EmailEntry {
-	email: string;
-	timestamp: string;
-}
+// This is an updated version of the signup endpoint that uses Supabase
+// instead of the local JSON file for storage
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const { email } = await request.json();
 		
 		if (!email || typeof email !== 'string' || !email.includes('@')) {
+			console.log('❌ Invalid email format');
 			return json({ success: false, error: 'Invalid email provided' }, { status: 400 });
 		}
 		
-		console.log('Signup received:', email);
+		console.log('📝 Signup received at /signup endpoint:', email);
 
-		// Ensure the waitlist file exists
-		let data: { emails: EmailEntry[] };
-		try {
-			const fileContent = await fs.readFile(waitlistPath, 'utf-8');
-			data = JSON.parse(fileContent);
+		// Use the Supabase client with admin rights to bypass RLS
+		console.log('Creating server Supabase client...');
+		const supabase = createServerSupabaseClient();
+		
+		// First check if email already exists
+		console.log('Checking if email already exists...');
+		const { data: existingEmails, error: checkError } = await supabase
+			.from('waitlist_emails')
+			.select('email')
+			.eq('email', email)
+			.limit(1);
 			
-			// Validate structure
-			if (!data.emails || !Array.isArray(data.emails)) {
-				data = { emails: [] };
-			}
-		} catch (readError) {
-			// If file doesn't exist or has invalid JSON, initialize with empty structure
-			console.log('Creating new waitlist file');
-			data = { emails: [] };
+		if (checkError) {
+			console.error('❌ Error checking for existing email:', checkError);
+			return json(
+				{ success: false, error: 'Database error when checking email' }, 
+				{ status: 500 }
+			);
 		}
-
-		// Check if email already exists
-		const emailExists = data.emails.some((entry: EmailEntry) => entry.email === email);
-		if (emailExists) {
-			return json({ success: true, message: 'Email already registered' });
+		
+		if (existingEmails && existingEmails.length > 0) {
+			console.log('✅ Email already exists in database');
+			return json({ 
+				success: true, 
+				message: 'You\'re already on our waitlist! We\'ll notify you when we launch.' 
+			});
 		}
 
 		// Add new email with timestamp
-		data.emails.push({
-			email,
-			timestamp: new Date().toISOString()
-		});
-
-		// Make sure the directory exists
-		const dir = path.dirname(waitlistPath);
-		await fs.mkdir(dir, { recursive: true });
-
-		// Write back to file
-		await fs.writeFile(waitlistPath, JSON.stringify(data, null, 2));
-
-		return json({ success: true });
+		console.log('✏️ Inserting new email into Supabase...');
+		const { data, error: insertError } = await supabase
+			.from('waitlist_emails')
+			.insert([{ 
+				email,
+				created_at: new Date().toISOString()
+			}])
+			.select();
+			
+		if (insertError) {
+			console.error('❌ Error inserting email:', insertError);
+			// Check for specific error types
+			if (insertError.code === '23505' || insertError.message.includes('duplicate')) {
+				return json(
+					{ success: true, message: 'You\'re already on our waitlist! We\'ll notify you when we launch.' }, 
+					{ status: 200 }
+				);
+			}
+			
+			return json(
+				{ success: false, error: `Database error: ${insertError.message}` }, 
+				{ status: 500 }
+			);
+		}
+		
+		console.log('✅ Email successfully added to waitlist in Supabase');
+		return json({ success: true, message: 'Email successfully added to waitlist!' });
 	} catch (error) {
-		console.error('Error storing signup data:', error);
+		console.error('❌ Unexpected error storing signup data:', error);
 		return json({ success: false, error: 'Failed to store signup data' }, { status: 500 });
 	}
 };

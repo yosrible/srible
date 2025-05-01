@@ -5,6 +5,8 @@
 	let termsAccepted = false;
 	let isSubmitting = false;
 	let showSuccessMessage = false;
+	let showAlreadyRegisteredMessage = false;
+	let resultMessage = '';
 
 	$: isFormValid = email.trim() !== '' && termsAccepted;
 
@@ -21,10 +23,20 @@
 				body: JSON.stringify({ email })
 			});
 
+			const result = await response.json();
+			console.log('Signup result:', result);
+			
 			if (response.ok) {
-				showSuccessMessage = true;
+				if (result.message && result.message.includes('already on our waitlist')) {
+					// Show already registered message
+					showAlreadyRegisteredMessage = true;
+					resultMessage = result.message;
+				} else {
+					// Show success message for new registrations
+					showSuccessMessage = true;
+				}
 			} else {
-				throw new Error('Failed to submit form');
+				throw new Error(result.error || 'Failed to submit form');
 			}
 		} catch (error) {
 			console.error('Error submitting form:', error);
@@ -45,6 +57,18 @@
 				</svg>
 				<h1>Thank you for joining!</h1>
 				<p>We'll notify you as soon as Srible launches. We're excited to have you on board.</p>
+				<button class="back-button" on:click={() => goto('/')}>
+					<span>Back to Home</span>
+				</button>
+			</div>
+		{:else if showAlreadyRegisteredMessage}
+			<div class="already-registered-message">
+				<svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<circle cx="12" cy="12" r="10" fill="#f76363" />
+					<path d="M12 8v4M12 16h.01" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<h1>Already registered</h1>
+				<p>{resultMessage}</p>
 				<button class="back-button" on:click={() => goto('/')}>
 					<span>Back to Home</span>
 				</button>
@@ -223,13 +247,20 @@
 		}
 	}
 
-	.success-message {
+	.success-message, .already-registered-message {
 		text-align: center;
 		animation: fadeIn 0.5s ease-out;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.already-registered-message p {
+		color: #d32f2f;
+		margin-bottom: 2rem;
+		line-height: 1.6;
+		font-size: 1.1rem;
 	}
 
 	.success-message p {
@@ -239,7 +270,7 @@
 		font-size: 1.1rem;
 	}
 
-	.success-icon {
+	.success-icon, .info-icon {
 		width: 4rem;
 		height: 4rem;
 		margin: 0 auto 1.5rem;
@@ -358,12 +389,12 @@
 			margin-bottom: 1rem;
 		}
 
-		.success-message p {
+		.success-message p, .already-registered-message p {
 			font-size: 1rem;
 			margin-bottom: 1.5rem;
 		}
 
-		.success-icon {
+		.success-icon, .info-icon {
 			width: 3.5rem;
 			height: 3.5rem;
 			margin-bottom: 1rem;

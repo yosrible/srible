@@ -2,10 +2,11 @@
 	const currentYear = new Date().getFullYear();
 
 	const footerLinks = [
-		{ text: 'FAQ', href: '/faq' },
+		{ text: 'FAQ', href: '#faq' },
 		{ text: 'Docs', href: '/docs' },
 		{ text: 'Privacy', href: '/privacy' },
 		{ text: 'About', href: '/about' },
+		{ text: 'Community', href: '/community' },
 		{ text: 'Blog', href: '/blog' },
 		{ text: 'Security', href: '/security' }
 	];
