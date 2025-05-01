@@ -38,7 +38,7 @@
 				space to express yourself freely.
 			</p>
 			<div class="cta-buttons">
-				<a href="/create" class="btn primary-btn">
+				<a href="/signup" class="btn primary-btn">
 					<span>Create a blog</span>
 					<svg
 						class="arrow-icon"

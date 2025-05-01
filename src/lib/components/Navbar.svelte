@@ -39,7 +39,7 @@
 		};
 	});
 
-	$: isCreatePage = $page.url.pathname === '/create';
+	$: isCreatePage = false;
 </script>
 
 <nav class:scrolled={isScrolled}>
@@ -77,7 +77,7 @@
 						</button>
 					{/if}
 					<a href="/login" class="btn btn-outline">Log in</a>
-					<a href="/create" class="btn btn-primary">
+					<a href="/signup" class="btn btn-primary">
 						<span>Create a Blog</span>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -336,60 +336,61 @@
 		bottom: 0;
 	}
 
-	@media (max-width: 1024px) {
-		.nav-links {
-			gap: 1.5rem;
+	@media (max-width: 1200px) {
+		.nav-container {
+			padding: 0 2rem;
 		}
 	}
 
 	@media (max-width: 768px) {
-		.container {
-			padding-left: 1rem;
-			padding-right: 1rem;
+		.nav-container {
+			padding: 0 1.5rem;
 		}
 
 		.nav-links {
-			position: fixed;
-			top: 0;
-			right: -100%;
-			width: 80%;
-			height: 100vh;
-			background-color: var(--primary-white);
-			flex-direction: column;
-			padding: 5rem 2rem;
-			transition: right 0.3s ease;
-			will-change: right;
-		}
-
-		.nav-links.active {
-			right: 0;
-		}
-
-		.nav-buttons {
 			display: none;
 		}
 
-		.menu-toggle {
+		.mobile-menu-btn {
 			display: block;
 		}
 
-		.nav-buttons-minimal {
+		.mobile-menu {
 			display: flex;
 		}
 	}
 
 	@media (max-width: 480px) {
-		.container {
-			padding-left: 0.75rem;
-			padding-right: 0.75rem;
+		.nav-container {
+			padding: 0 1rem;
 		}
 
-		.nav-links {
-			width: 100%;
+		.logo {
+			font-size: 1.5rem;
 		}
 
-		.btn {
-			padding: 0.5rem 1rem;
+		.mobile-menu {
+			padding: 1rem;
+		}
+
+		.mobile-menu a {
+			padding: 0.75rem 1rem;
+			font-size: 1rem;
+		}
+	}
+
+	@media (max-width: 320px) {
+		.logo {
+			font-size: 1.25rem;
+		}
+
+		.mobile-menu {
+			padding: 0.75rem;
+		}
+
+		.mobile-menu a {
+			padding: 0.5rem 0.75rem;
+			font-size: 0.9rem;
 		}
 	}
 </style>

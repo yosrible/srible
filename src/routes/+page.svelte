@@ -98,19 +98,7 @@
 	<h2 class="pricing-title">Simple, Transparent Pricing</h2>
 	<p class="pricing-subtitle">Choose the plan that fits your writing journey. No hidden fees.</p>
 	<div class="pricing-cards">
-		<div class="pricing-card">
-			<div class="card-decoration"></div>
-			<h3>Free</h3>
-			<p class="price">$0<span>/month</span></p>
-			<ul>
-				<li>Unlimited posts</li>
-				<li>Basic themes</li>
-				<li>Srible sub domain</li>
-				<li>Community support</li>
-			</ul>
-			<button class="btn btn-primary">Get Started</button>
-		</div>
-		<div class="pricing-card pricing-card--pro">
+		<div class="pricing-card faded">
 			<div class="card-decoration"></div>
 			<h3>Pro <span class="badge">Coming Soon</span></h3>
 			<p class="price">$5.99<span>/month</span></p>
@@ -121,9 +109,21 @@
 				<li>Advanced analytics</li>
 				<li>Priority support</li>
 			</ul>
-			<a href="/signup?plan=pro" class="btn btn-primary">Get Started</a>
+			<a href="/signup?plan=pro" class="btn btn-secondary">Coming Soon</a>
 		</div>
-		<div class="pricing-card">
+		<div class="pricing-card pricing-card--free">
+			<div class="card-decoration"></div>
+			<h3>Free</h3>
+			<p class="price">$0<span>/month</span></p>
+			<ul>
+				<li>Unlimited posts</li>
+				<li>Basic themes</li>
+				<li>Srible sub domain</li>
+				<li>Community support</li>
+			</ul>
+			<a href="/signup" class="btn btn-primary">Get Started</a>
+		</div>
+		<div class="pricing-card faded">
 			<div class="card-decoration"></div>
 			<h3>Enterprise <span class="badge">Custom</span></h3>
 			<p class="price">Contact Us</p>
@@ -132,7 +132,7 @@
 				<li>Dedicated support</li>
 				<li>Custom integrations</li>
 			</ul>
-			<button class="btn btn-secondary">Contact Sales</button>
+			<button class="btn btn-secondary">Coming Soon</button>
 		</div>
 	</div>
 </section>
@@ -598,14 +598,14 @@
 		}
 	}
 
-	.pricing-card--pro {
+	.pricing-card--free {
 		position: relative;
 		z-index: 1;
 		background: #fff;
 		border: 2.5px solid transparent;
 		border-radius: 0.75rem;
 	}
-	.pricing-card--pro::before {
+	.pricing-card--free::before {
 		content: '';
 		position: absolute;
 		inset: 0;
@@ -631,6 +631,113 @@
 		}
 		100% {
 			background-position: 0% 50%;
+		}
+	}
+
+	.pricing-card.faded {
+		opacity: 0.4;
+		pointer-events: none;
+		transform: scale(0.95);
+	}
+
+	.pricing-card.faded:hover {
+		transform: scale(0.95);
+		box-shadow: none;
+	}
+
+	.pricing-card.faded .btn {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.pricing-card.faded .badge {
+		opacity: 0.6;
+	}
+
+	@media (max-width: 1200px) {
+		.container {
+			padding: 0 2rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.container {
+			padding: 0 1.5rem;
+		}
+
+		.hero h1 {
+			font-size: 2.5rem;
+		}
+
+		.hero p {
+			font-size: 1.1rem;
+		}
+
+		.pricing-cards {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.pricing-card {
+			max-width: 100%;
+		}
+
+		.features-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.demo-container {
+			padding: 1rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.container {
+			padding: 0 1rem;
+		}
+
+		.hero h1 {
+			font-size: 2rem;
+		}
+
+		.hero p {
+			font-size: 1rem;
+		}
+
+		.cta-buttons {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.btn {
+			width: 100%;
+			justify-content: center;
+		}
+
+		.pricing-card {
+			padding: 1.5rem;
+		}
+
+		.pricing-card h3 {
+			font-size: 1.5rem;
+		}
+
+		.pricing-card .price {
+			font-size: 2rem;
+		}
+	}
+
+	@media (max-width: 320px) {
+		.hero h1 {
+			font-size: 1.75rem;
+		}
+
+		.hero p {
+			font-size: 0.9rem;
+		}
+
+		.pricing-card {
+			padding: 1rem;
 		}
 	}
 </style>
