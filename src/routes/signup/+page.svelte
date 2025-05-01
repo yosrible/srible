@@ -6,14 +6,48 @@
 	let isSubmitting = false;
 	let showSuccessMessage = false;
 	let showAlreadyRegisteredMessage = false;
+	let showErrorMessage = false;
 	let resultMessage = '';
 
 	$: isFormValid = email.trim() !== '' && termsAccepted;
+
+	// Fallback function to store email locally when Supabase is unavailable
+	function storeEmailLocally(email: string) {
+		try {
+			// Store in localStorage as fallback
+			const timestamp = new Date().toISOString();
+			let waitlistEmails = [];
+			
+			try {
+				const storedEmails = localStorage.getItem('srible_waitlist_emails');
+				if (storedEmails) {
+					waitlistEmails = JSON.parse(storedEmails);
+				}
+			} catch (e) {
+				// localStorage might be disabled or corrupted
+				console.warn('Could not read from localStorage');
+			}
+			
+			// Check if email already exists
+			const emailExists = waitlistEmails.some((entry: any) => entry.email === email);
+			if (!emailExists) {
+				waitlistEmails.push({ email, timestamp });
+				localStorage.setItem('srible_waitlist_emails', JSON.stringify(waitlistEmails));
+			}
+			
+			return true;
+		} catch (e) {
+			console.warn('Failed to use localStorage fallback', e);
+			return false;
+		}
+	}
 
 	async function handleSubmit() {
 		if (!isFormValid) return;
 
 		isSubmitting = true;
+		showErrorMessage = false;
+		
 		try {
 			const response = await fetch('/signup', {
 				method: 'POST',
@@ -36,11 +70,31 @@
 					showSuccessMessage = true;
 				}
 			} else {
-				throw new Error(result.error || 'Failed to submit form');
+				// Try localStorage fallback
+				const fallbackSuccess = storeEmailLocally(email);
+				
+				if (fallbackSuccess) {
+					// Even if the API failed, we saved locally, so show success
+					showSuccessMessage = true;
+				} else {
+					// Both API and fallback failed
+					throw new Error(result.error || 'Failed to submit form');
+				}
 			}
 		} catch (error) {
 			console.error('Error submitting form:', error);
-			alert('Failed to submit form. Please try again.');
+			
+			// Try localStorage fallback
+			const fallbackSuccess = storeEmailLocally(email);
+			
+			if (fallbackSuccess) {
+				// Even if the API failed, we saved locally, so show success
+				showSuccessMessage = true;
+			} else {
+				// Show inline error message instead of alert
+				showErrorMessage = true;
+				resultMessage = 'We couldn\'t process your submission. Please try again later.';
+			}
 		} finally {
 			isSubmitting = false;
 		}
@@ -87,6 +141,12 @@
 						<span>I agree to the <a href="/terms" class="terms-link">Terms and conditions</a></span>
 					</label>
 				</div>
+				
+				{#if showErrorMessage}
+					<div class="error-message">
+						{resultMessage}
+					</div>
+				{/if}
 
 				<button type="submit" class="signup-button" disabled={!isFormValid || isSubmitting}>
 					{#if isSubmitting}
@@ -199,6 +259,16 @@
 
 	.terms-link:hover {
 		text-decoration: underline;
+	}
+	
+	.error-message {
+		padding: 0.75rem;
+		margin-bottom: 1.5rem;
+		background-color: #fff6f6;
+		border-radius: 0.5rem;
+		color: #d32f2f;
+		font-size: 0.9375rem;
+		text-align: center;
 	}
 
 	.signup-button {

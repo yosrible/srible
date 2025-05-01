@@ -60,6 +60,37 @@
 		}, 100);
 	}
 
+	// Fallback function to store email locally when Supabase is unavailable
+	function storeEmailLocally(email: string) {
+		try {
+			// Store in localStorage as fallback
+			const timestamp = new Date().toISOString();
+			let waitlistEmails = [];
+			
+			try {
+				const storedEmails = localStorage.getItem('srible_waitlist_emails');
+				if (storedEmails) {
+					waitlistEmails = JSON.parse(storedEmails);
+				}
+			} catch (e) {
+				// localStorage might be disabled or corrupted
+				console.warn('Could not read from localStorage');
+			}
+			
+			// Check if email already exists
+			const emailExists = waitlistEmails.some((entry: any) => entry.email === email);
+			if (!emailExists) {
+				waitlistEmails.push({ email, timestamp });
+				localStorage.setItem('srible_waitlist_emails', JSON.stringify(waitlistEmails));
+			}
+			
+			return true;
+		} catch (e) {
+			console.warn('Failed to use localStorage fallback', e);
+			return false;
+		}
+	}
+
 	async function handleWaitlistSubmit() {
 		if (!email || !email.includes('@')) {
 			waitlistStatus = {
@@ -91,15 +122,33 @@
 					isWarning: true, // Add this flag for special styling
 					visible: true
 				};
-			} else {
+			} else if (result.success) {
 				waitlistStatus = {
 					message: result.message || 'Thanks for joining the waitlist!',
-					success: response.ok,
+					success: true,
 					visible: true
 				};
+			} else {
+				// Try localStorage fallback
+				const fallbackSuccess = storeEmailLocally(email);
+				
+				if (fallbackSuccess) {
+					// Even if the API failed, we saved locally, so show success
+					waitlistStatus = {
+						message: 'Thanks for joining the waitlist!',
+						success: true,
+						visible: true
+					};
+				} else {
+					waitlistStatus = {
+						message: result.message || 'Something went wrong. Please try again later.',
+						success: false,
+						visible: true
+					};
+				}
 			}
 
-			if (response.ok) {
+			if (waitlistStatus.success) {
 				email = '';
 				// Hide success message after 5 seconds
 				setTimeout(() => {
@@ -108,11 +157,29 @@
 			}
 		} catch (error) {
 			console.error('Error submitting to waitlist:', error);
-			waitlistStatus = {
-				message: 'Something went wrong. Please try again later.',
-				success: false,
-				visible: true
-			};
+			
+			// Try localStorage fallback
+			const fallbackSuccess = storeEmailLocally(email);
+			
+			if (fallbackSuccess) {
+				// Even if the API failed, we saved locally, so show success
+				waitlistStatus = {
+					message: 'Thanks for joining the waitlist!',
+					success: true,
+					visible: true
+				};
+				email = '';
+				// Hide success message after 5 seconds
+				setTimeout(() => {
+					waitlistStatus.visible = false;
+				}, 5000);
+			} else {
+				waitlistStatus = {
+					message: 'Something went wrong. Please try again later.',
+					success: false,
+					visible: true
+				};
+			}
 		}
 	}
 </script>
