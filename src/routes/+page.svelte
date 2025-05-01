@@ -5,20 +5,21 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
+	import { syncWaitlistToSupabase } from '$lib/waitlistSync';
 
 	let observer: IntersectionObserver;
 	let email = '';
-	
-	// Updated waitlistStatus type to include isWarning property
-	let waitlistStatus: { 
-		message: string; 
-		success: boolean; 
-		visible: boolean; 
+	let waitlistStatus: WaitlistStatus = {
+		message: '',
+		success: false,
+		visible: false
+	};
+
+	type WaitlistStatus = {
+		message: string;
+		success: boolean;
+		visible: boolean;
 		isWarning?: boolean;
-	} = { 
-		message: '', 
-		success: false, 
-		visible: false 
 	};
 
 	onMount(() => {
@@ -26,6 +27,15 @@
 
 		// Handle browser navigation events
 		window.addEventListener('popstate', handleNavigation);
+
+		// Attempt to sync any locally stored emails to Supabase
+		syncWaitlistToSupabase().then(result => {
+			if (result.success && result.results && result.results.length > 0) {
+				console.log('🔄 Synced waitlist emails:', result.message);
+			}
+		}).catch(err => {
+			console.warn('Failed to sync waitlist emails:', err);
+		});
 
 		return () => {
 			window.removeEventListener('popstate', handleNavigation);

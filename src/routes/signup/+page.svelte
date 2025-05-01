@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { syncWaitlistToSupabase } from '$lib/waitlistSync';
 
 	let email = '';
 	let termsAccepted = false;
@@ -10,6 +12,18 @@
 	let resultMessage = '';
 
 	$: isFormValid = email.trim() !== '' && termsAccepted;
+
+	// Try to sync any local emails when component mounts
+	onMount(() => {
+		// Attempt to sync any locally stored emails to Supabase
+		syncWaitlistToSupabase().then(result => {
+			if (result.success && result.results && result.results.length > 0) {
+				console.log('🔄 Synced waitlist emails:', result.message);
+			}
+		}).catch(err => {
+			console.warn('Failed to sync waitlist emails:', err);
+		});
+	});
 
 	// Fallback function to store email locally when Supabase is unavailable
 	function storeEmailLocally(email: string) {

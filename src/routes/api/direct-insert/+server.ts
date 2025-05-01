@@ -3,11 +3,16 @@ import { createServerSupabaseClient } from '$lib/supabase';
 
 export const POST = async ({ request }: RequestEvent) => {
   try {
-    const { email } = await request.json();
+    const data = await request.json();
+    const email = data.email;
+    const syncFromLocal = data.syncFromLocal || false; // Flag to handle synced data
     
     // Simplified implementation with clear logging
     console.log('🔷 DIRECT INSERT API CALLED');
     console.log('Email to insert:', email);
+    if (syncFromLocal) {
+      console.log('This is a sync from localStorage');
+    }
     
     if (!email || !email.includes('@')) {
       console.log('❌ Invalid email format');
@@ -22,9 +27,34 @@ export const POST = async ({ request }: RequestEvent) => {
       console.log('Creating server Supabase client with admin rights...');
       const adminClient = createServerSupabaseClient();
       
+      // First check if email already exists
+      console.log('Checking if email already exists...');
+      const { data: existingData, error: checkError } = await adminClient
+        .from('waitlist_emails')
+        .select('email')
+        .eq('email', email)
+        .limit(1);
+        
+      if (checkError) {
+        console.log('❌ ERROR CHECKING FOR DUPLICATE:', checkError);
+        return json({
+          success: false,
+          message: `Database error: ${checkError.message}`
+        }, { status: 500 });
+      }
+      
+      // If email already exists, return a success message
+      if (existingData && existingData.length > 0) {
+        console.log('📝 Email already exists in waitlist:', email);
+        return json({
+          success: true,
+          message: 'You\'re already on our waitlist! We\'ll notify you when we launch.'
+        }, { status: 200 });
+      }
+      
       // Attempt the insert
       console.log('Attempting direct insert into waitlist_emails table...');
-      const { data, error } = await adminClient
+      const { data: insertData, error } = await adminClient
         .from('waitlist_emails')
         .insert([{ 
           email, 
@@ -48,11 +78,11 @@ export const POST = async ({ request }: RequestEvent) => {
         }, { status: 500 });
       }
       
-      console.log('✅ SUCCESS! Email inserted:', data);
+      console.log('✅ SUCCESS! Email inserted:', insertData);
       return json({
         success: true,
         message: 'Email successfully added to waitlist!',
-        data
+        data: insertData
       });
     } catch (err) {
       console.log('❌ EXCEPTION DURING INSERT:', err);
