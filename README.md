@@ -1,38 +1,94 @@
-# sv
+# Srible Frontend
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Modern, minimalist blogging platform built with SvelteKit
 
-## Creating a project
+![Srible](https://srible.com/logo.png)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Overview
 
+Srible is a clean, distraction-free blogging platform designed for writers who value simplicity and elegance. Built with SvelteKit and featuring a minimalist UI, Srible enables users to focus on what matters most: their content.
+
+## Key Features
+
+- **Minimalist Design:** Soft off-white (#f8f8f5) background with clean typography and minimal UI elements
+- **Distraction-Free Editor:** Full-viewport Quill.js editor with automatic sidebar hiding for immersive writing
+- **Dashboard Experience:** Color-coded sections for easy navigation:
+  - Overview (Blue)
+  - Posts (Green)
+  - Analytics (Purple)
+  - Settings (Amber)
+  - Themes (Pink)
+- **Fully Responsive:** Optimized for all devices from mobile to desktop
+- **Modern Authentication:** Secure login and signup flow with Supabase integration
+
+## Design Philosophy
+
+Srible embraces minimalism by:
+- Eliminating unnecessary animations and decorative elements
+- Using intentional whitespace and clean typography
+- Focusing on content with a distraction-free editor experience
+- Implementing intuitive navigation with modern icon choices
+
+## Tech Stack
+
+- **Frontend Framework:** SvelteKit 2.x
+- **Styling:** TailwindCSS
+- **Editor:** Quill.js
+- **Authentication:** Supabase
+- **Deployment:** Vercel/Netlify
+- **Analytics:** Vercel Analytics
+
+## Getting Started
+
+1. Clone the repository
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+git clone https://github.com/yosrible/srible_frontend.git
+cd srible_frontend
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
+2. Install dependencies
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm install
 ```
 
-## Building
-
-To create a production version of your app:
-
+3. Start the development server
 ```bash
-npm run build
+pnpm dev
 ```
 
-You can preview the production build with `npm run preview`.
+4. Open your browser at `http://localhost:5173`
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Building for Production
+
+```bash
+pnpm build
+```
+
+## Environment Variables
+
+Create a `.env` file in the project root with:
+
+```
+PUBLIC_SUPABASE_URL=your_supabase_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+Yos - [@yosrible](https://twitter.com/yosrible)
+
+Project Link: [https://github.com/yosrible/srible_frontend](https://github.com/yosrible/srible_frontend)
