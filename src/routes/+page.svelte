@@ -2,6 +2,7 @@
 	import Hero from '$lib/components/Hero.svelte';
 	import ProductDemo from '$lib/components/ProductDemo.svelte';
 	import Features from '$lib/components/Features.svelte';
+	import FAQ from '$lib/components/FAQ.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
@@ -197,36 +198,7 @@
 <Hero />
 <ProductDemo />
 <Features />
-
-<section class="faq-section scroll-animate" id="faq">
-	<div class="section-decoration"></div>
-	<h2 class="faq-title">Everything You Need to Know About Srible</h2>
-	<p class="faq-subtitle">Find answers to your questions below</p>
-	<div class="faq-list">
-		<details class="faq-item">
-			<summary>What is Srible?</summary>
-			<p>
-				Srible is a platform for personal blogging, focused on clean design and distraction-free
-				writing.
-			</p>
-		</details>
-		<details class="faq-item">
-			<summary>How do I create a blog?</summary>
-			<p>Click the "Create a blog" button on the homepage and follow the signup process.</p>
-		</details>
-		<details class="faq-item">
-			<summary>Is Srible free to use?</summary>
-			<p>
-				Yes, Srible offers a free plan for all users. Premium features may be available in the
-				future.
-			</p>
-		</details>
-		<details class="faq-item">
-			<summary>Can I customize my blog?</summary>
-			<p>Yes! You can personalize your blog with themes and custom settings.</p>
-		</details>
-	</div>
-</section>
+<FAQ />
 
 <section class="pricing-section scroll-animate" id="pricing">
 	<div class="section-decoration"></div>
@@ -302,90 +274,7 @@
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@700&display=swap');
 
-	.faq-section {
-		max-width: 680px;
-		margin: 2.5rem auto;
-		padding: 1.75rem 1rem;
-		background: #f8f8f5;
-		position: relative;
-		border-radius: 1rem;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-	}
-
-	.faq-title {
-		font-family: 'Poppins', sans-serif;
-		font-size: clamp(1.4rem, 4vw, 1.7rem);
-		font-weight: 700;
-		text-align: center;
-		margin-bottom: 0.4rem;
-		color: #000;
-	}
-
-	.faq-subtitle {
-		text-align: center;
-		color: #666;
-		font-size: clamp(0.85rem, 2.5vw, 1rem);
-		margin-bottom: 2rem;
-	}
-
-	.faq-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-
-	.faq-item {
-		border-bottom: 1px solid #eee;
-		padding-bottom: 0.75rem;
-	}
-
-	.faq-item:last-child {
-		border-bottom: none;
-	}
-
-	.faq-list summary {
-		display: flex;
-		align-items: center;
-		font-weight: 500;
-		cursor: pointer;
-		font-size: clamp(0.95rem, 3vw, 1.1rem);
-		padding: 0.75rem;
-		min-height: 44px;
-		color: #000;
-		position: relative;
-		transition: color 0.2s ease;
-	}
-
-	.faq-list summary:hover {
-		color: #7873f5;
-	}
-
-	.faq-list p {
-		margin: 0 0.75rem 0.75rem 0.75rem;
-		color: #666;
-		font-size: clamp(0.9rem, 3vw, 1rem);
-		line-height: 1.5;
-		padding-right: 0.5rem;
-	}
-
-	.faq-list details > summary {
-		list-style: none;
-	}
-
-	.faq-list details > summary::before {
-		content: '+';
-		margin-right: 0.75rem;
-		font-weight: 600;
-		font-size: 1.2rem;
-		min-width: 16px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.faq-list details[open] > summary::before {
-		content: '-';
-	}
+	/* Main page styles */
 
 	.pricing-section {
 		padding: 4rem 0;
@@ -536,7 +425,6 @@
 		background-color: #f5f5f5;
 	}
 
-	.btn[disabled],
 	.btn:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
@@ -701,20 +589,6 @@
 		.pricing-title {
 			font-size: 2rem;
 		}
-		.pricing-card {
-			max-width: 90%;
-		}
-		.faq-section {
-			margin: 1.75rem auto;
-			padding: 1.25rem 0.75rem;
-		}
-		.faq-list summary {
-			padding: 0.65rem;
-		}
-		.faq-list p {
-			padding: 0 0.5rem 0.5rem 1.5rem;
-			margin: 0;
-		}
 		.waitlist-section {
 			margin: 1.75rem auto;
 			padding: 1.25rem 0.75rem;
@@ -742,65 +616,9 @@
 	}
 
 	@media (max-width: 480px) {
-		.container {
-			padding: 0 1rem;
-		}
-
-		.hero h1 {
-			font-size: 2rem;
-		}
-
-		.hero p {
-			font-size: 1rem;
-		}
-
-		.cta-buttons {
-			flex-direction: column;
-			gap: 1rem;
-		}
-
 		.btn {
 			width: 100%;
 			justify-content: center;
-		}
-
-		.pricing-card {
-			padding: 1.5rem 1rem;
-			max-width: 95%;
-		}
-
-		.pricing-card h3 {
-			font-size: 1.4rem;
-		}
-
-		.pricing-card .price {
-			font-size: 1.8rem;
-		}
-		
-		.badge {
-			font-size: 0.7rem;
-			padding: 0.15em 0.5em;
-		}
-		.faq-section {
-			margin: 1.25rem auto;
-			padding: 1rem 0.5rem;
-			border-radius: 0.75rem;
-		}
-		.faq-title {
-			margin-bottom: 0.3rem;
-		}
-		.faq-subtitle {
-			margin-bottom: 1.5rem;
-		}
-		.faq-list {
-			gap: 0.5rem;
-		}
-		.faq-item {
-			padding-bottom: 0.5rem;
-		}
-		.faq-list details > summary::before {
-			font-size: 1.1rem;
-			margin-right: 0.5rem;
 		}
 		.waitlist-section {
 			margin: 1.25rem auto;
@@ -823,43 +641,10 @@
 	}
 
 	@media (max-width: 320px) {
-		.hero h1 {
-			font-size: 1.75rem;
-		}
-
-		.hero p {
-			font-size: 0.9rem;
-		}
-
-		.pricing-card {
-			padding: 1rem 0.75rem;
-		}
-		
-		.pricing-card h3 {
-			font-size: 1.3rem;
-		}
-		
 		.badge {
 			font-size: 0.65rem;
 			display: block;
 			margin: 0.3rem auto 0;
-		}
-		.faq-title {
-			font-size: 1.35rem;
-		}
-		.faq-subtitle {
-			font-size: 0.85rem;
-			margin-bottom: 1.5rem;
-		}
-		.faq-list summary {
-			font-size: 0.9rem;
-			padding: 0.5rem;
-		}
-		.faq-list p {
-			font-size: 0.85rem;
-		}
-		.waitlist-title {
-			font-size: 1.5rem;
 		}
 		.waitlist-subtitle {
 			font-size: 0.85rem;

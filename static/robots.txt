@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /blog
+Allow: /contact
+Allow: /docs
+Allow: /help
+Allow: /community
+Allow: /login
+Allow: /signup
+Allow: /terms
+Allow: /privacy
+Allow: /cookies
+Allow: /security
+
+# Disallow all dashboard and authenticated pages
+Disallow: /dashboard/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://srible.com/sitemap.xml

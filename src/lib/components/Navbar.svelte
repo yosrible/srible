@@ -12,15 +12,45 @@
 		});
 	}
 
-	function toggleMenu() {
-		isMenuOpen = !isMenuOpen;
-		document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+	function toggleMenu(event?: MouseEvent) {
+		// Prevent any parent click events from firing
+		if (event) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+		
+		// Toggle menu state with a small delay to ensure UI updates properly
+		window.setTimeout(() => {
+			isMenuOpen = !isMenuOpen;
+			
+			// Lock/unlock body scroll
+			document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+			
+			// Force update the menu active state in the DOM
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				if (isMenuOpen) {
+					navLinks.classList.add('active');
+				} else {
+					navLinks.classList.remove('active');
+				}
+			}
+			
+			// Log to verify it's working
+			console.log('Menu state:', isMenuOpen);
+		}, 10);
 	}
 
 	function closeMenu() {
 		if (isMenuOpen) {
 			isMenuOpen = false;
 			document.body.style.overflow = '';
+			
+			// Force update the DOM
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				navLinks.classList.remove('active');
+			}
 		}
 	}
 
@@ -58,6 +88,7 @@
 			const menuToggle = document.querySelector('.menu-toggle');
 			const target = event.target as Element;
 			
+			// Only process if menu is open and we're not clicking within the menu content or toggle button
 			if (isMenuOpen && 
 				navElement && 
 				menuToggle && 
@@ -67,12 +98,29 @@
 			}
 		};
 		
+		// Add a touch handler for mobile devices to ensure menu works properly
+		const handleTouch = (event: TouchEvent) => {
+			const menuToggle = document.querySelector('.menu-toggle');
+			if (menuToggle && event.target instanceof Element && menuToggle.contains(event.target)) {
+				event.preventDefault();
+				toggleMenu();
+			}
+		};
+		
 		document.addEventListener('click', handleClickOutside);
+		document.addEventListener('touchend', handleTouch, { passive: false });
+		
+		// Apply initial state to menu
+		const navLinks = document.querySelector('.nav-links');
+		if (navLinks) {
+			navLinks.classList.toggle('active', isMenuOpen);
+		}
 		
 		return () => {
 			window.removeEventListener('scroll', handleScroll);
 			window.removeEventListener('resize', handleResize);
 			document.removeEventListener('click', handleClickOutside);
+			document.removeEventListener('touchend', handleTouch);
 			document.body.style.overflow = '';
 		};
 	});
@@ -101,10 +149,8 @@
 						
 						{#if isMobile}
 							<div class="mobile-buttons">
-								<a href="/login" class="btn btn-outline" on:click={closeMenu}>Log in</a>
-								<a href="/signup" class="btn btn-primary-mobile" on:click={closeMenu}>
-									<span>Create a Blog</span>
-								</a>
+								<a href="/login" class="nav-link mobile-login" on:click={closeMenu}>Log in</a>
+								<a href="/signup" class="nav-link mobile-signup" on:click={closeMenu}>Create a Blog</a>
 							</div>
 						{/if}
 					</div>
@@ -154,13 +200,23 @@
 
 					{#if isMobile}
 						<button 
-							class="menu-toggle" 
-							on:click={toggleMenu} 
-							aria-label="Toggle menu"
+							class="menu-toggle {isMenuOpen ? 'active' : ''}" 
+							on:click|preventDefault|stopPropagation|capture={toggleMenu} 
+							aria-label="Toggle mobile menu"
 							aria-expanded={isMenuOpen}
 							aria-controls="mobile-nav-links"
+							style="touch-action: manipulation;"
 						>
-							<span class="hamburger" class:active={isMenuOpen}></span>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon">
+								{#if isMenuOpen}
+									<line x1="18" y1="6" x2="6" y2="18"></line>
+									<line x1="6" y1="6" x2="18" y2="18"></line>
+								{:else}
+									<line x1="3" y1="12" x2="21" y2="12"></line>
+									<line x1="3" y1="6" x2="21" y2="6"></line>
+									<line x1="3" y1="18" x2="21" y2="18"></line>
+								{/if}
+							</svg>
 						</button>
 					{/if}
 				</div>
@@ -199,12 +255,13 @@
 		transition:
 			background-color 0.3s ease,
 			padding 0.3s ease;
-		background-color: transparent;
+		background-color: var(--primary-white, #f8f8f5);
 		padding: 1rem 0;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
 	}
 
 	nav.scrolled {
-		background-color: var(--primary-white);
+		background-color: var(--primary-white, #f8f8f5);
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 		padding: 0.5rem 0;
 	}
@@ -259,6 +316,7 @@
 		gap: 2rem;
 		align-items: center;
 		justify-content: center;
+		transition: all 0.3s ease-in-out;
 	}
 
 	.nav-link {
@@ -285,13 +343,18 @@
 		background-color: var(--primary-black);
 		transition: width 0.3s ease;
 	}
-
 	.nav-link:hover::after {
 		width: 100%;
 	}
 
 	.mobile-buttons {
-		display: none;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		gap: 1rem;
+		margin-top: 2rem;
+		max-width: 300px;
+		align-items: center;
 	}
 
 	.nav-buttons {
@@ -344,13 +407,13 @@
 		color: var(--primary-black);
 	}
 
-	.btn-primary, .btn-primary-mobile {
+	.btn-primary {
 		background-color: var(--primary-black);
 		color: var(--primary-white);
 		border: none;
 	}
 
-	.btn-primary:hover, .btn-primary-mobile:hover {
+	.btn-primary:hover {
 		background-color: var(--primary-black);
 	}
 
@@ -366,54 +429,35 @@
 	}
 
 	.menu-toggle {
-		display: none;
-		background: none;
-		border: none;
+		background: transparent;
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		border-radius: 8px;
 		cursor: pointer;
+		display: none;
 		padding: 0.5rem;
-		z-index: 1002;
-		position: relative;
+		transition: all 0.2s ease;
+		line-height: 0;
+		width: 48px; /* Even larger touch target */
+		height: 48px; /* Even larger touch target */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 2000; /* Ensure the button is always clickable */
+		position: relative; /* Establish stacking context */
+		margin-left: 5px;
+		background-color: rgba(248, 248, 245, 0.95);
 	}
 
-	.hamburger {
-		display: block;
-		width: 24px;
-		height: 2px;
-		background-color: var(--primary-black);
-		position: relative;
-		transition: background-color 0.3s ease;
-	}
-
-	.hamburger::before,
-	.hamburger::after {
-		content: '';
-		position: absolute;
-		width: 24px;
-		height: 2px;
-		background-color: var(--primary-black);
+	.menu-icon {
+		color: var(--primary-black);
+		stroke-width: 2;
 		transition: transform 0.3s ease;
 	}
-
-	.hamburger::before {
-		top: -8px;
-	}
-
-	.hamburger::after {
-		bottom: -8px;
-	}
-
-	.hamburger.active {
-		background-color: transparent;
-	}
-
-	.hamburger.active::before {
-		transform: rotate(45deg);
-		top: 0;
-	}
-
-	.hamburger.active::after {
-		transform: rotate(-45deg);
-		bottom: 0;
+	
+	/* Add a subtle box shadow to the menu toggle for better visibility */
+	.menu-toggle:hover, .menu-toggle.active {
+		background-color: rgba(0, 0, 0, 0.06);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	}
 
 	/* Large desktop styles */
@@ -475,53 +519,60 @@
 		
 		.left-section, .right-section {
 			flex: auto;
-			z-index: 1002; /* Above the menu overlay */
+			z-index: 1002;
 		}
 		
 		.menu-toggle {
-			display: block;
-			margin-left: 1rem;
+			display: flex;
+			z-index: 2001;
+			touch-action: manipulation;
 		}
 		
 		.nav-buttons {
-			display: none; /* Hide desktop nav buttons on mobile */
-		}
-		
-		.mobile-buttons {
-			display: flex;
-			flex-direction: column;
-			width: 100%;
-			gap: 1rem;
-			margin-top: 2rem;
-			max-width: 300px;
+			display: none;
 		}
 		
 		.nav-links {
+			display: flex;
+			flex-direction: column;
 			position: fixed;
 			top: 0;
 			left: 0;
-			right: 0;
-			bottom: 0;
+			width: 100%;
+			height: 100vh;
+			background-color: var(--primary-white, #f8f8f5);
+			z-index: 1000;
+			padding: 5rem 2rem 2rem;
 			transform: translateY(-100%);
-			background-color: var(--primary-white);
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			gap: 2rem;
-			transition: transform 0.3s ease;
-			z-index: 1001;
-			padding: 4rem 2rem;
-			box-sizing: border-box;
+			transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+			opacity: 0;
+			visibility: hidden;
+			align-items: flex-start;
+			gap: 1.5rem;
+			overflow-y: auto;
+			pointer-events: none;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 		}
 		
 		.nav-links.active {
 			transform: translateY(0);
-			overflow-y: auto;
+			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
+			backdrop-filter: blur(5px);
 		}
 		
 		.nav-link {
 			font-size: 1.25rem;
-			padding: 0.75rem 0;
+			padding: 0.75rem 1rem;
+			transition: all 0.2s ease;
+			border-radius: 6px;
+			text-align: left;
+			width: 100%;
+		}
+		
+		.nav-link:hover {
+			background-color: rgba(0, 0, 0, 0.03);
 		}
 		
 		.btn {
@@ -532,9 +583,31 @@
 			min-height: 44px; /* Better touch target */
 		}
 		
-		.btn-primary-mobile {
+		.mobile-login, .mobile-signup {
+			text-decoration: none;
+			text-align: left;
+			display: block;
 			width: 100%;
+			padding: 0.75rem 1rem;
+			min-height: 44px;
+			align-items: center;
 		}
+		
+		.mobile-login {
+			color: var(--primary-black);
+			border-radius: 6px;
+			background-color: transparent;
+			border: 1px solid var(--primary-black);
+		}
+		
+		.mobile-signup {
+			color: var(--primary-white);
+			font-weight: bold;
+			background-color: var(--primary-black);
+			border-radius: 6px;
+		}
+		
+
 	}
 
 	/* Small mobile styles */
@@ -557,7 +630,13 @@
 		}
 		
 		.mobile-buttons {
+			display: flex;
+			flex-direction: column;
 			gap: 0.75rem;
+			width: 100%;
+			margin-top: 1.5rem;
+			align-items: stretch;
+			text-align: left;
 		}
 	}
 
@@ -567,9 +646,7 @@
 			font-size: 1.15rem;
 		}
 		
-		.hamburger, .hamburger::before, .hamburger::after {
-			width: 22px;
-		}
+		/* Mobile menu icon styles are now handled by SVG */
 		
 		.nav-link {
 			font-size: 1rem;

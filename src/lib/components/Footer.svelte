@@ -34,9 +34,10 @@
 							viewBox="0 0 24 24"
 							fill="currentColor"
 							stroke="none"
-						><path
-							d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-						/></svg>
+							><path
+								d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+							/></svg
+						>
 					</a>
 					<a
 						href="https://discord.gg/Q8y4VAThFm"
@@ -53,14 +54,14 @@
 					</a>
 				</div>
 			</div>
-			
+
 			<div class="footer-links">
 				{#each footerLinks as link}
 					<a href={link.href}>{link.text}</a>
 				{/each}
 			</div>
 		</div>
-		
+
 		<p class="copyright">&copy; {currentYear} Srible</p>
 	</div>
 </footer>
@@ -85,7 +86,7 @@
 		align-items: center;
 		margin-bottom: 1rem;
 	}
-	
+
 	.footer-left {
 		display: flex;
 		align-items: center;
@@ -114,7 +115,8 @@
 		gap: 0.75rem;
 	}
 
-	.social-links a, .x-logo {
+	.social-links a,
+	.x-logo {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -151,7 +153,7 @@
 	.footer-links a:hover {
 		color: var(--primary-black);
 	}
-	
+
 	.copyright {
 		text-align: center;
 		color: var(--gray-dark);
@@ -166,12 +168,12 @@
 			align-items: center;
 			text-align: center;
 		}
-		
+
 		.footer-left {
 			flex-direction: column;
 			gap: 0.75rem;
 		}
-		
+
 		.footer-links {
 			flex-wrap: wrap;
 			justify-content: center;
@@ -183,11 +185,11 @@
 		footer {
 			padding: 1.25rem 0 0.75rem;
 		}
-		
+
 		.footer-links {
 			gap: 0.75rem 1rem;
 		}
-		
+
 		.footer-links a {
 			font-size: 0.8rem;
 		}

@@ -162,7 +162,7 @@
 					</div>
 				{/if}
 
-				<button type="submit" class="signup-button" disabled={!isFormValid || isSubmitting}>
+				<button type="submit" class="signup-button waitlist-button" disabled={!isFormValid || isSubmitting}>
 					{#if isSubmitting}
 						<div class="loading-spinner"></div>
 						<span>Submitting...</span>
@@ -309,6 +309,21 @@
 	.signup-button:disabled {
 		opacity: 0.7;
 		cursor: not-allowed;
+	}
+
+	.waitlist-button {
+		background-color: #7873f5;
+		box-shadow: 0 4px 12px rgba(120, 115, 245, 0.2);
+		font-size: 1.1rem;
+		padding: 1rem 1.25rem;
+		margin-top: 0.5rem;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.waitlist-button:hover:not(:disabled) {
+		background-color: #6560e4;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(120, 115, 245, 0.3);
 	}
 
 	.signup-button .arrow-icon {
