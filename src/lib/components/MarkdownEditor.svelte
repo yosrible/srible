@@ -5,21 +5,38 @@
 	export const placeholder = 'Start writing...';
 	export let height = '500px';
 
-	// State for Add menu
+	// State for Add menu and modals
 	let showAddMenu = false;
 	let addMenuPosition = { x: 0, y: 0 };
+	let showImageModal = false;
+	let showLinkDialog = false;
+	let linkUrl = 'https://'; // Default value for link
+	let linkText = ''; // Text to link
+	let imageType = 'online'; // 'online' or 'system'
+	
+	// Mutation observer for tracking changes
+	let observer = null;
+	
+	// History tracking for undo/redo
+	let editorHistory = [];
+	let historyIndex = -1;
+	let isUndoRedoOperation = false;
+	
+	// Selection state
+	let savedSelection = null;
 
 	// Editor state
 	let editor;
 	let renderedHTML = '';
 	let preview;
-	let selectionRange = { start: 0, end: 0 };
+	let selectionRange = null;
 	let headingDropdownOpen = false;
 	let lastSavedTime = null;
 	let editableDiv; // Reference to contenteditable div
 	let isComposing = false; // For handling IME input
 	let isInEditMode = true; // Control whether we're in edit mode or preview mode
 	let wordCount = 0; // Track word count
+	let markdownValue = ''; // Internal markdown representation
 
 	const dispatch = createEventDispatcher();
 
@@ -59,9 +76,12 @@
 			.replace(/^### (.*$)/gim, '<h3>$1</h3>')
 			.replace(/^## (.*$)/gim, '<h2>$1</h2>')
 			.replace(/^# (.*$)/gim, '<h1>$1</h1>')
-			// Bold and italic
+			// Bold and italic - handle bold first because it has more asterisks
 			.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
 			.replace(/\*(.*?)\*/gim, '<em>$1</em>')
+			// Underline and strikethrough
+			.replace(/__(.*?)__/gim, '<u>$1</u>')
+			.replace(/~~(.*?)~~/gim, '<s>$1</s>')
 			// Links
 			.replace(
 				/\[([^\]]+)\]\(([^)]+)\)/gim,
@@ -117,20 +137,81 @@
 
 	// Save selection range
 	function saveSelection() {
-		if (!isInEditMode || !editor) return;
-
-		selectionRange = {
-			start: editor.selectionStart,
-			end: editor.selectionEnd
-		};
+		if (!isInEditMode || !editableDiv) return;
+		
+		const selection = window.getSelection();
+		if (selection.rangeCount > 0) {
+			selectionRange = selection.getRangeAt(0).cloneRange();
+			savedSelection = selectionRange;
+		}
 	}
 
 	// Restore selection
 	function restoreSelection() {
-		if (!isInEditMode || !editor) return;
+		if (!isInEditMode || !editableDiv || !selectionRange) return;
 
-		editor.focus();
-		editor.setSelectionRange(selectionRange.start, selectionRange.end);
+		// Make sure we have focus
+		editableDiv.focus();
+		
+		try {
+			const selection = window.getSelection();
+			selection.removeAllRanges();
+			selection.addRange(selectionRange);
+		} catch (e) {
+			console.error('Error restoring selection:', e);
+		}
+	}
+
+	// Handle paste events to preserve formatting
+	function handlePaste(e) {
+		// Prevent the default paste
+		e.preventDefault();
+		
+		// Get text representation
+		const text = e.clipboardData.getData('text/plain');
+		const html = e.clipboardData.getData('text/html');
+		
+		// If we have HTML, use it (with sanitization)
+		if (html) {
+			// Use the cleanHTML function to sanitize the pasted HTML
+			const cleanHtml = html
+				.replace(/<\/?(meta|script|link|xml|script)[^>]*>/gi, '') // Remove dangerous tags
+				.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); // Remove style tags
+				
+			// Insert at cursor
+			document.execCommand('insertHTML', false, cleanHtml);
+		} else {
+			// Fall back to plain text
+			document.execCommand('insertText', false, text);
+		}
+		
+		// Make sure to update our storage
+		handleChange();
+	}
+
+	// Convert HTML content to markdown for storage
+	function htmlToMarkdown(html) {
+		// This is a simple conversion - in production you'd want a more robust solution
+		let markdown = html
+			.replace(/<strong>(.*?)<\/strong>/gim, '**$1**')
+			.replace(/<em>(.*?)<\/em>/gim, '*$1*')
+			.replace(/<h1>(.*?)<\/h1>/gim, '# $1')
+			.replace(/<h2>(.*?)<\/h2>/gim, '## $1')
+			.replace(/<h3>(.*?)<\/h3>/gim, '### $1')
+			.replace(/<a href="(.*?)".*?>(.*?)<\/a>/gim, '[$2]($1)')
+			.replace(/<img src="(.*?)".*?>/gim, '![]($1)')
+			.replace(/<pre><code>(.*?)<\/code><\/pre>/gims, '```$1```')
+			.replace(/<code>(.*?)<\/code>/gim, '`$1`')
+			.replace(/<ul><li>(.*?)<\/li><\/ul>/gim, '* $1')
+			.replace(/<ol><li>(.*?)<\/li><\/ol>/gim, '1. $1')
+			.replace(/<blockquote>(.*?)<\/blockquote>/gim, '> $1')
+			.replace(/<hr>/gim, '---')
+			.replace(/<p>(.*?)<\/p>/gim, '$1\n\n')
+			.replace(/<br>/gim, '\n');
+		
+		// Clean up any remaining HTML tags and entities
+		markdown = markdown.replace(/<[^>]*>/g, '');
+		return markdown.trim();
 	}
 
 	// Handle content change and dispatch events
@@ -145,7 +226,7 @@
 		saveStatusText = formatLastSaved();
 		saveInterval = setInterval(() => {
 			if (!isSaving) {
-				saveStatusText = formatLastSaved();
+					saveStatusText = formatLastSaved();
 			}
 		}, 10000); // Update every 10 seconds
 
@@ -155,15 +236,73 @@
 		};
 	});
 
+	// Custom undo operation that works consistently
+	function undoOperation() {
+		if (historyIndex > 0) {
+			isUndoRedoOperation = true;
+			historyIndex--;
+			if (editableDiv && editorHistory[historyIndex]) {
+				editableDiv.innerHTML = editorHistory[historyIndex];
+			}
+			isUndoRedoOperation = false;
+			handleChange();
+		}
+	}
+	
+	// Custom redo operation that works consistently
+	function redoOperation() {
+		if (historyIndex < editorHistory.length - 1) {
+			isUndoRedoOperation = true;
+			historyIndex++;
+			if (editableDiv && editorHistory[historyIndex]) {
+				editableDiv.innerHTML = editorHistory[historyIndex];
+			}
+			isUndoRedoOperation = false;
+			handleChange();
+		}
+	}
+
 	function handleChange() {
-		// Update rendered HTML
-		renderedHTML = renderMarkdown(value);
-
-		// Update word count
-		wordCount = countWords(value);
-
-		// Dispatch change event
-		dispatch('change', value);
+		// When editableDiv content changes, convert HTML to markdown for storage
+		if (editableDiv) {
+			// Get the HTML content from the editable div
+			const htmlContent = editableDiv.innerHTML;
+			
+			// Don't process empty content
+			if (!htmlContent.trim()) {
+				value = '';
+				markdownValue = '';
+				wordCount = 0;
+				dispatch('change', value);
+				return;
+			}
+			
+			// Add to history if this is not an undo/redo operation
+			if (!isUndoRedoOperation) {
+				// If we're in the middle of the history, truncate
+				if (historyIndex < editorHistory.length - 1) {
+					editorHistory = editorHistory.slice(0, historyIndex + 1);
+				}
+				
+				// Add current state to history
+				editorHistory.push(htmlContent);
+				historyIndex = editorHistory.length - 1;
+			}
+			
+			// Convert HTML to markdown for storage
+			try {
+				markdownValue = htmlToMarkdown(htmlContent);
+				value = markdownValue; // Update the bound value
+				
+				// Update word count
+				wordCount = countWords(markdownValue);
+				
+				// Dispatch change event
+				dispatch('change', value);
+			} catch (e) {
+				console.error('Error converting HTML to markdown:', e);
+			}
+		}
 
 		// Set saving status
 		isSaving = true;
@@ -196,275 +335,166 @@
 
 	// Apply formatting to selected text
 	function insertFormatting(type) {
-		if (!isInEditMode || !editor) return;
+		if (!isInEditMode || !editableDiv) return;
 
-		// Save current selection
-		saveSelection();
-
-		const selectedText = value.substring(selectionRange.start, selectionRange.end);
-		let newText = '';
-		let cursorPos = selectionRange.end;
-
+		// Make sure the editor has focus
+		editableDiv.focus();
+		
+		// Get selected text and range
+		const selection = window.getSelection();
+		let selectedText = '';
+		
+		if (selection.rangeCount > 0) {
+			selectedText = selection.toString();
+		}
+		
+		// Apply formatting based on type using document.execCommand
+		console.log('Applying formatting:', type, 'to selection:', selectedText);
 		switch (type) {
 			case 'h1':
-			case 'h2':
-			case 'h3':
+				// Only apply to selection or current line
 				if (selectedText) {
-					// Check if the selection starts at beginning of line
-					const beforeSelection = value.substring(0, selectionRange.start);
-					const lastNewline = beforeSelection.lastIndexOf('\n');
-					const isStartOfLine =
-						lastNewline === selectionRange.start - 1 || selectionRange.start === 0;
-
-					// Create heading with appropriate number of #
-					const headingPrefix = type === 'h1' ? '# ' : type === 'h2' ? '## ' : '### ';
-
-					if (isStartOfLine) {
-						newText = `${headingPrefix}${selectedText}`;
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					} else {
-						// If not at start of line, add a newline before
-						newText = `\n${headingPrefix}${selectedText}`;
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					}
+					// If text is selected, wrap it in h1 tags
+					const h1Element = document.createElement('h1');
+					h1Element.textContent = selectedText;
+					
+					// Replace the selection with the h1 element
+					selection.deleteFromDocument();
+					selection.getRangeAt(0).insertNode(h1Element);
 				} else {
-					// If no selection, just insert heading prefix
-					const headingPrefix = type === 'h1' ? '# ' : type === 'h2' ? '## ' : '### ';
-					newText = headingPrefix;
-					value =
-						value.substring(0, selectionRange.start) +
-						newText +
-						value.substring(selectionRange.end);
-					cursorPos = selectionRange.start + newText.length;
+					// If no selection, apply to current line/paragraph
+					document.execCommand('formatBlock', false, '<h1>');
 				}
 				break;
-
+			case 'h2':
+				if (selectedText) {
+					// If text is selected, wrap it in h2 tags
+					const h2Element = document.createElement('h2');
+					h2Element.textContent = selectedText;
+					
+					// Replace the selection with the h2 element
+					selection.deleteFromDocument();
+					selection.getRangeAt(0).insertNode(h2Element);
+				} else {
+					// If no selection, apply to current line/paragraph
+					document.execCommand('formatBlock', false, '<h2>');
+				}
+				break;
+			case 'h3':
+				if (selectedText) {
+					// If text is selected, wrap it in h3 tags
+					const h3Element = document.createElement('h3');
+					h3Element.textContent = selectedText;
+					
+					// Replace the selection with the h3 element
+					selection.deleteFromDocument();
+					selection.getRangeAt(0).insertNode(h3Element);
+				} else {
+					// If no selection, apply to current line/paragraph
+					document.execCommand('formatBlock', false, '<h3>');
+				}
+				break;
 			case 'normal':
 				if (selectedText) {
-					// Remove heading markdown from the beginning if it exists
-					const headingMatch = selectedText.match(/^(#{1,6})\s+(.+)$/);
-
-					if (headingMatch) {
-						// Extract the text without the heading markdown
-						newText = headingMatch[2];
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					} else {
-						// If there's no heading, do nothing
-						newText = selectedText;
-						cursorPos = selectionRange.end;
-					}
-				}
-				break;
-
-			case 'h2':
-				if (selectedText) {
-					const beforeSelection = value.substring(0, selectionRange.start);
-					const lastNewline = beforeSelection.lastIndexOf('\n');
-					const isStartOfLine =
-						lastNewline === selectionRange.start - 1 || selectionRange.start === 0;
-
-					if (isStartOfLine) {
-						newText = `## ${selectedText}`;
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					} else {
-						// Add a newline before heading
-						newText = `\n## ${selectedText}`;
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					}
+					// If text is selected, wrap it in p tags
+					const pElement = document.createElement('p');
+					pElement.textContent = selectedText;
+					
+					// Replace the selection with the p element
+					selection.deleteFromDocument();
+					selection.getRangeAt(0).insertNode(pElement);
 				} else {
-					newText = '## Heading 2';
-					value =
-						value.substring(0, selectionRange.start) +
-						newText +
-						value.substring(selectionRange.end);
-					cursorPos = selectionRange.start + newText.length;
-				}
-				break;
-
-			case 'h3':
-				if (selectedText) {
-					const beforeSelection = value.substring(0, selectionRange.start);
-					const lastNewline = beforeSelection.lastIndexOf('\n');
-					const isStartOfLine =
-						lastNewline === selectionRange.start - 1 || selectionRange.start === 0;
-
-					if (isStartOfLine) {
-						newText = `### ${selectedText}`;
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					} else {
-						// Add a newline before heading
-						newText = `\n### ${selectedText}`;
-						value =
-							value.substring(0, selectionRange.start) +
-							newText +
-							value.substring(selectionRange.end);
-						cursorPos = selectionRange.start + newText.length;
-					}
-				} else {
-					newText = '### Heading 3';
-					value =
-						value.substring(0, selectionRange.start) +
-						newText +
-						value.substring(selectionRange.end);
-					cursorPos = selectionRange.start + newText.length;
+					// If no selection, apply to current line/paragraph
+					document.execCommand('formatBlock', false, '<p>');
 				}
 				break;
 
 			case 'bold':
-				newText = selectedText ? `**${selectedText}**` : '**bold text**';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText ? selectionRange.start + newText.length : selectionRange.start + 2;
+				document.execCommand('bold', false, null);
 				break;
 
 			case 'italic':
-				newText = selectedText ? `*${selectedText}*` : '*italic text*';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText ? selectionRange.start + newText.length : selectionRange.start + 1;
+				document.execCommand('italic', false, null);
 				break;
 
 			case 'strikethrough':
-				newText = selectedText ? `~~${selectedText}~~` : '~~strikethrough~~';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText ? selectionRange.start + newText.length : selectionRange.start + 2;
+				document.execCommand('strikeThrough', false, null);
 				break;
 
 			case 'underline':
-				newText = selectedText ? `<u>${selectedText}</u>` : '<u>underlined text</u>';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText ? selectionRange.start + newText.length : selectionRange.start + 3;
+				document.execCommand('underline', false, null);
 				break;
 
 			case 'link':
-				newText = selectedText ? `[${selectedText}](url)` : '[link text](url)';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText
-					? selectionRange.start + selectedText.length + 3
-					: selectionRange.start + 1;
+				// Use a better link dialog instead of prompt
+				showLinkDialog = true;
+				// Save selection state for when dialog completes
+				saveSelection();
 				break;
 
 			case 'image':
-				newText = selectedText ? `![${selectedText}](image-url)` : '![alt text](image-url)';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText
-					? selectionRange.start + selectedText.length + 4
-					: selectionRange.start + 2;
+				// Show the image selection modal instead of prompt
+				showImageModal = true;
 				break;
 
 			case 'code':
-				newText = selectedText ? `\`${selectedText}\`` : '\`code\`';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText ? selectionRange.start + newText.length : selectionRange.start + 1;
+				if (selection.toString()) {
+					// Inline code for selection
+					const codeElement = document.createElement('code');
+					codeElement.textContent = selection.toString();
+					
+					// Replace the selection with the code element
+					selection.deleteFromDocument();
+					selection.getRangeAt(0).insertNode(codeElement);
+				} else {
+					// Insert a new code element
+					const codeElement = document.createElement('code');
+					codeElement.textContent = 'code';
+					selection.getRangeAt(0).insertNode(codeElement);
+				}
 				break;
 
 			case 'codeblock':
-				newText = selectedText ? '```\n' + selectedText + '\n```' : '```\ncode block\n```';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectedText ? selectionRange.start + newText.length : selectionRange.start + 4;
+				// Create a pre element for code block
+				const preElement = document.createElement('pre');
+				const codeElement = document.createElement('code');
+				
+				if (selection.toString()) {
+					codeElement.textContent = selection.toString();
+				} else {
+					codeElement.textContent = 'Code block';
+				}
+				
+				preElement.appendChild(codeElement);
+				
+				// Replace the selection with the pre element
+				selection.deleteFromDocument();
+				selection.getRangeAt(0).insertNode(preElement);
 				break;
 
 			case 'quote':
-				if (selectedText) {
-					// Handle multi-line quotes
-					const quotedText = selectedText
-						.split('\n')
-						.map((line) => `> ${line}`)
-						.join('\n');
-					newText = quotedText;
-					value =
-						value.substring(0, selectionRange.start) +
-						newText +
-						value.substring(selectionRange.end);
-					cursorPos = selectionRange.start + newText.length;
-				} else {
-					newText = '> quoted text';
-					value =
-						value.substring(0, selectionRange.start) +
-						newText +
-						value.substring(selectionRange.end);
-					cursorPos = selectionRange.start + 2;
-				}
+				document.execCommand('formatBlock', false, 'blockquote');
 				break;
 
 			case 'ul':
-				// Handle multi-line lists
-				if (selectedText) {
-					const lines = selectedText.split('\n');
-					const listItems = lines.map((line) => `* ${line}`).join('\n');
-					newText = listItems;
-				} else {
-					newText = '* ';
-				}
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectionRange.start + newText.length;
+				document.execCommand('insertUnorderedList', false, null);
 				break;
 
 			case 'ol':
-				// Handle multi-line ordered lists
-				if (selectedText) {
-					const lines = selectedText.split('\n');
-					const listItems = lines.map((line, index) => `${index + 1}. ${line}`).join('\n');
-					newText = listItems;
-				} else {
-					newText = '1. ';
-				}
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectionRange.start + newText.length;
+				document.execCommand('insertOrderedList', false, null);
 				break;
 
 			case 'hr':
-				newText = '\n---\n';
-				value =
-					value.substring(0, selectionRange.start) + newText + value.substring(selectionRange.end);
-				cursorPos = selectionRange.start + newText.length;
+				document.execCommand('insertHorizontalRule', false, null);
 				break;
 		}
 
-		// Update the editor value
-		editor.value = value;
-
-		// Maintain focus and update cursor position
-		editor.focus();
-		editor.setSelectionRange(cursorPos, cursorPos);
-
-		// Update rendered HTML and word count
+		// Make sure the editable div has focus
+		editableDiv.focus();
+		
+		// This will trigger handleChange to update markdown and storage
 		handleChange();
 	}
-
-	// No duplicate function needed - handleChange is already defined above
 
 	// Handle focus event on editor
 	function handleFocus(event) {
@@ -480,8 +510,13 @@
 
 	// Handle keydown event on editor
 	function handleKeyDown(event) {
-		// Handle Enter key to insert line breaks
-		if (event.key === 'Enter') {
+		// Only need to handle special keys, normal typing works automatically
+		if (event.key === 'Enter' && !event.shiftKey) {
+			// Normal enter should create a new paragraph
+			event.preventDefault();
+			document.execCommand('insertParagraph', false, null);
+		} else if (event.key === 'Enter' && event.shiftKey) {
+			// Shift+Enter for line break
 			event.preventDefault();
 			document.execCommand('insertLineBreak', false, null);
 		}
@@ -493,17 +528,212 @@
 		saveSelection();
 	}
 
-	onMount(() => {
-		// Initial markdown processing
-		processMarkdown();
+	// Process the markdown to HTML when component initializes
+	function processMarkdown() {
+		if (value) {
+			renderedHTML = renderMarkdown(value);
+			
+			// Important: Update the editableDiv with the rendered HTML if it exists
+			if (editableDiv) {
+				editableDiv.innerHTML = renderedHTML;
+				
+				// Add delete controls to images after rendering
+				addImageControls();
+			}
+		}
+	}
 
+	// Add delete controls to all images in the editor
+	function addImageControls() {
+		if (!editableDiv) return;
+		
+		const images = editableDiv.querySelectorAll('img:not(.has-controls)');
+		if (images.length === 0) return; // No new images to process
+		
+		console.log('Adding controls to', images.length, 'images');
+		
+		images.forEach(img => {
+			// Add control class
+			img.classList.add('has-controls');
+			
+			// Create container for image and controls
+			const container = document.createElement('div');
+			container.className = 'image-container';
+			
+			// Set image styling directly
+			img.style.maxWidth = '100%';
+			img.style.display = 'block';
+			img.style.cursor = 'pointer';
+			
+			// Create delete button
+			const deleteBtn = document.createElement('button');
+			deleteBtn.className = 'image-delete-btn';
+			deleteBtn.innerHTML = 'Delete';
+			deleteBtn.title = 'Delete image';
+			
+			// Add the event listener
+			deleteBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				container.remove();
+				handleChange();
+			});
+			
+			// Show delete button when image is clicked
+			let isDeleteVisible = false;
+			img.addEventListener('click', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				
+				// Toggle delete button visibility
+				isDeleteVisible = !isDeleteVisible;
+				deleteBtn.style.display = isDeleteVisible ? 'flex' : 'none';
+			});
+			
+			// Handle clicking outside to hide delete button
+			document.addEventListener('click', function(e) {
+				if (e.target !== img && e.target !== deleteBtn) {
+					isDeleteVisible = false;
+					deleteBtn.style.display = 'none';
+				}
+			});
+			
+			// Replace the image with our container
+			if (img.parentNode) {
+				// Apply container styles inline to ensure they're applied
+				container.style.display = 'inline-block';
+				container.style.position = 'relative';
+				container.style.margin = '5px 0';
+				
+				// Apply delete button styles inline for better visibility
+				deleteBtn.style.position = 'absolute';
+				deleteBtn.style.top = '0';
+				deleteBtn.style.right = '0';
+				deleteBtn.style.backgroundColor = 'red';
+				deleteBtn.style.color = 'white';
+				deleteBtn.style.border = 'none';
+				deleteBtn.style.padding = '4px 8px';
+				deleteBtn.style.fontSize = '12px';
+				deleteBtn.style.cursor = 'pointer';
+				deleteBtn.style.display = 'none'; // Initially hidden
+				deleteBtn.style.zIndex = '999';
+				
+				img.parentNode.insertBefore(container, img);
+				container.appendChild(img);
+				container.appendChild(deleteBtn);
+			}
+		});
+	}
+	
+	// Initialize the editor with the proper content
+	function initializeEditor() {
+		if (!editableDiv) return;
+		
+		// Make sure we use sanitized HTML
+		const sanitizeOptions = {
+			ALLOWED_TAGS: ['strong', 'em', 'p', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'a', 'img', 'hr', 'br', 'div', 'span', 'u', 's'],
+			ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'style']
+		};
+		
+		// Start with clean slate
+		editableDiv.innerHTML = '';
+		
+		// If there's saved content, render it
+		if (value) {
+			console.log('Initializing editor with value:', value);
+			editableDiv.innerHTML = renderMarkdown(value);
+		}
+		
+		// Make sure paste events also work with formatting
+		editableDiv.addEventListener('paste', handlePaste);
+		
+		// Use the existing saveSelection function defined at the top level
+		
+		// Use the existing restoreSelection function defined at the top level
+
+		// Add mutation observer to keep markdown sync with HTML
+		function setupMutationObserver() {
+			if (!editableDiv) return;
+			
+			// Disconnect any existing observer
+			if (observer) {
+				observer.disconnect();
+			}
+			
+			// Create new mutation observer
+			observer = new MutationObserver((mutations) => {
+				// Process mutations
+				handleChange();
+				
+				// Look for images and add controls
+				addImageControls();
+			});
+			
+			// Start observing
+			observer.observe(editableDiv, {
+				childList: true,
+				subtree: true,
+				characterData: true,
+				attributes: true
+			});
+		}
+		
+		// Initialize mutation observer
+		setupMutationObserver();
+	}
+
+	onMount(async () => {
+		// Wait for the DOM to be ready
+		await tick();
+		
+		// Initialize the editor with content
+		initializeEditor();
+
+		// Force re-render to ensure proper initialization
+		await tick();
+		
 		// Apply saved content to editable div
 		if (editableDiv && value) {
 			// Convert markdown to HTML for the editable div
 			editableDiv.innerHTML = renderMarkdown(value);
 		}
 
+		// Apply keyboard shortcuts for formatting
+		if (editableDiv) {
+			// Make sure execCommand works by adding appropriate event handlers
+			editableDiv.addEventListener('keydown', (e) => {
+				// Bold: Ctrl+B
+				if (e.ctrlKey && e.key === 'b') {
+					e.preventDefault();
+					document.execCommand('bold', false, null);
+				}
+				// Italic: Ctrl+I
+				else if (e.ctrlKey && e.key === 'i') {
+					e.preventDefault();
+					document.execCommand('italic', false, null);
+				}
+				// Underline: Ctrl+U
+				else if (e.ctrlKey && e.key === 'u') {
+					e.preventDefault();
+					document.execCommand('underline', false, null);
+				}
+			});
+		}
+
 		console.log('Editor mounted, isInEditMode:', isInEditMode);
+	});
+
+	// Clean up event listeners on destroy
+	onDestroy(() => {
+		if (editableDiv) {
+			editableDiv.removeEventListener('paste', handlePaste);
+			editableDiv.removeEventListener('keydown', handleKeyDown);
+		}
+		
+		// Disconnect the mutation observer
+		if (observer) {
+			observer.disconnect();
+		}
 	});
 
 	// Get any previously saved content
@@ -513,6 +743,10 @@
 			const savedData = JSON.parse(savedContent);
 			value = savedData.content || '';
 			lastSavedTime = savedData.timestamp || null;
+			
+			// Make sure to process the loaded markdown
+			markdownValue = value;
+			renderedHTML = renderMarkdown(value);
 		}
 	} catch (e) {
 		console.error('Error loading saved content:', e);
@@ -550,7 +784,13 @@
 				type="button"
 				class="toolbar-button"
 				on:click={() => {
-					/* Undo */
+					if (editableDiv) {
+						// Ensure focus before undo
+						editableDiv.focus();
+						
+						// Direct undo implementation that works consistently
+						undoOperation();
+					}
 				}}
 				title="Undo"
 				aria-label="Undo"
@@ -573,7 +813,13 @@
 				type="button"
 				class="toolbar-button"
 				on:click={() => {
-					/* Redo */
+					if (editableDiv) {
+						// Ensure focus before redo
+						editableDiv.focus();
+						
+						// Direct redo implementation that works consistently
+						redoOperation();
+					}
 				}}
 				title="Redo"
 				aria-label="Redo"
@@ -881,7 +1127,11 @@
 		<div class="title-area">
 			<input type="text" class="title-input" placeholder="Title" />
 			<input type="text" class="subtitle-input" placeholder="Subtitle" />
-			<button class="featured-image-button">
+			<button class="featured-image-button" on:click={() => {
+				// Show image upload modal for featured image
+				imageType = 'system'; // Default to file upload for featured images
+				showImageModal = true;
+			}}>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="16"
@@ -904,18 +1154,37 @@
 
 		<div class="editor-content" style="min-height: {height};">
 			{#if isInEditMode}
-				<textarea
-					bind:this={editor}
-					class="markdown-editor-input"
-					bind:value
+				<div
+					bind:this={editableDiv}
+					role="textbox"
+					tabindex="0"
+					aria-multiline="true"
+					aria-label="Text editor"
+					class="markdown-editor-contenteditable"
+					contenteditable="true"
 					on:input={handleChange}
-					on:focus={handleFocus}
-					on:blur={handleBlur}
+					on:focus={() => {
+						isEditing = true;
+						dispatch('focus');
+					}}
+					on:blur={() => {
+						isEditing = false;
+						dispatch('blur');
+					}}
 					on:keydown={handleKeyDown}
-					on:select={handleSelect}
-					placeholder="Start writing your story..."
+					on:keyup={() => {
+						// Check for key combos?
+					}}
+					on:mouseup={() => {
+						// Check selection?
+					}}
+					data-placeholder="Start writing your story..."
 					style="min-height: {height};"
-				></textarea>
+				></div>
+				<!-- Word count display -->
+				<div class="word-count">
+					Word count: {wordCount}
+				</div>
 			{:else}
 				<div class="markdown-viewer" transition:fade={{ duration: 150 }}>
 					{@html renderedHTML}
@@ -925,7 +1194,293 @@
 	</div>
 </div>
 
+<!-- Image Selection Modal - Simplified Version -->
+{#if showImageModal}
+<div class="modal-overlay">
+	<div class="image-modal simplified">
+		<div class="tabs">
+			<button class={imageType === 'online' ? 'active' : ''} on:click={() => imageType = 'online'}>URL</button>
+			<button class={imageType === 'system' ? 'active' : ''} on:click={() => imageType = 'system'}>Upload</button>
+		</div>
+		
+		<div class="modal-content">
+			{#if imageType === 'online'}
+				<input type="text" placeholder="Paste image URL here" id="image-url-input" autocomplete="off">
+			{:else}
+				<input type="file" accept="image/*" id="image-file-input">
+			{/if}
+		</div>
+		
+		<div class="modal-buttons">
+			<button class="cancel" on:click={() => showImageModal = false}>Cancel</button>
+			<button class="insert" on:click={() => {
+				// Make sure editor has focus first
+				editableDiv.focus();
+				
+				if (imageType === 'online') {
+					const imageUrl = document.getElementById('image-url-input').value;
+					if (imageUrl) {
+						// Instead of using execCommand, manually create and insert the image
+						const imgElement = document.createElement('img');
+						imgElement.src = imageUrl;
+						imgElement.alt = 'Inserted image';
+						imgElement.style.maxWidth = '100%';
+						
+						// Insert at cursor position
+						const selection = window.getSelection();
+						if (selection.rangeCount > 0) {
+							const range = selection.getRangeAt(0);
+							range.insertNode(imgElement);
+						}
+					}
+				} else {
+					// Handle file upload
+					const fileInput = document.getElementById('image-file-input');
+					if (fileInput.files && fileInput.files[0]) {
+						// Create a placeholder image with local URL
+						const file = fileInput.files[0];
+						const reader = new FileReader();
+						reader.onload = function(e) {
+							// Create and insert image element manually
+							const imgElement = document.createElement('img');
+							imgElement.src = e.target.result;
+							imgElement.alt = 'Uploaded image';
+							imgElement.style.maxWidth = '100%';
+							
+							// Insert at cursor position
+							const selection = window.getSelection();
+							if (selection.rangeCount > 0) {
+								const range = selection.getRangeAt(0);
+								range.insertNode(imgElement);
+							}
+							
+							// Trigger change event to save content
+							handleChange();
+						};
+						reader.readAsDataURL(file);
+					}
+				}
+				
+				// Trigger change event
+				handleChange();
+				showImageModal = false;
+			}}>Insert Image</button>
+		</div>
+	</div>
+</div>
+{/if}
+
+<!-- Link Dialog - Minimal Version -->
+{#if showLinkDialog}
+<div class="modal-overlay">
+	<div class="link-modal">
+		<input type="text" placeholder="Enter URL" bind:value={linkUrl} id="link-url-input">
+		<div class="modal-buttons">
+			<button on:click={() => showLinkDialog = false}>Cancel</button>
+			<button on:click={() => {
+				// Make sure the editor has focus first
+				editableDiv.focus();
+				
+				// Restore selection
+				restoreSelection();
+				
+				if (linkUrl) {
+					// Create link
+					document.execCommand('createLink', false, linkUrl);
+					
+					// Add target="_blank" to all links
+					const links = editableDiv.querySelectorAll('a');
+					links.forEach(link => {
+						link.setAttribute('target', '_blank');
+						link.setAttribute('rel', 'noopener noreferrer');
+					});
+					
+					// Update content
+					handleChange();
+				}
+				
+				// Reset and close dialog
+				linkUrl = 'https://';
+				showLinkDialog = false;
+			}}>Insert Link</button>
+		</div>
+	</div>
+</div>
+{/if}
+
 <style>
+	/* Minimal word count */
+	.word-count {
+		position: fixed;
+		bottom: 10px;
+		right: 10px;
+		background-color: rgba(0, 0, 0, 0.3);
+		color: white;
+		padding: 3px 8px;
+		border-radius: 10px;
+		font-size: 12px;
+		user-select: none;
+		opacity: 0.7;
+		transition: opacity 0.2s;
+	}
+	
+	.word-count:hover {
+		opacity: 1;
+	}
+	
+	/* Image styles applied inline for better compatibility */
+	:global(img.has-controls) {
+		max-width: 100%;
+		display: block;
+	}
+	
+	:global(.image-container) {
+		display: inline-block;
+		position: relative;
+		margin: 5px 0;
+	}
+	
+	:global(.image-delete-btn) {
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		background-color: rgba(0, 0, 0, 0.5);
+		color: white;
+		border: none;
+		border-radius: 50%;
+		width: 25px;
+		height: 25px;
+		font-size: 16px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		cursor: pointer;
+		opacity: 0;
+		transition: opacity 0.2s;
+	}
+	
+	:global(.image-container:hover .image-delete-btn) {
+		opacity: 1;
+	}
+
+	/* Overlay for modals */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 9999;
+	}
+	
+	/* Link dialog - ultra minimal */
+	.link-modal {
+		background-color: white;
+		border-radius: 8px;
+		width: 300px;
+		overflow: hidden;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+	}
+	
+	.link-modal input {
+		width: 100%;
+		padding: 12px 15px;
+		border: none;
+		border-bottom: 1px solid #eee;
+		font-size: 14px;
+		outline: none;
+	}
+	
+	.link-modal .modal-buttons {
+		display: flex;
+	}
+	
+	.link-modal .modal-buttons button {
+		flex: 1;
+		padding: 10px;
+		background: none;
+		border: none;
+		border-right: 1px solid #eee;
+		cursor: pointer;
+		font-size: 14px;
+	}
+	
+	.link-modal .modal-buttons button:last-child {
+		color: #4a90e2;
+		font-weight: bold;
+		border-right: none;
+	}
+	
+	.image-modal.simplified {
+		background-color: white;
+		border-radius: 8px;
+		padding: 0;
+		width: 300px;
+		overflow: hidden;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+	}
+	
+	.tabs {
+		display: flex;
+		width: 100%;
+		border-bottom: 1px solid #eee;
+	}
+	
+	.tabs button {
+		flex: 1;
+		padding: 10px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 14px;
+		color: #666;
+	}
+	
+	.tabs button.active {
+		background-color: #f9f9f9;
+		font-weight: bold;
+		color: #333;
+		border-bottom: 2px solid #4a90e2;
+	}
+	
+	.modal-content {
+		padding: 15px;
+	}
+	
+	.image-modal.simplified input[type="text"],
+	.image-modal.simplified input[type="file"] {
+		width: 100%;
+		padding: 8px;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		font-size: 14px;
+	}
+	
+	.modal-buttons {
+		display: flex;
+		border-top: 1px solid #eee;
+	}
+	
+	.modal-buttons button {
+		flex: 1;
+		padding: 10px;
+		background: none; 
+		border: none;
+		border-right: 1px solid #eee;
+		cursor: pointer;
+		font-size: 14px;
+	}
+	
+	.modal-buttons button:last-child {
+		border-right: none;
+		color: #4a90e2;
+		font-weight: bold;
+	}
+
 	/* Single canvas editor styles */
 	:global(body.immersive-editor-mode) {
 		margin: 0 !important;
@@ -1041,7 +1596,87 @@
 
 	/* We're now using markdown-editor-input instead of modern-textarea */
 
+	/* Placeholder styling for contenteditable */
+	.markdown-editor-contenteditable:empty:before {
+		content: attr(data-placeholder);
+		color: #aaa;
+		font-style: italic;
+		pointer-events: none;
+		display: block;
+	}
+	
+	/* Rich text formatting styles for contenteditable */
+	.markdown-editor-contenteditable strong {
+		font-weight: bold;
+	}
+	
+	.markdown-editor-contenteditable em {
+		font-style: italic;
+	}
+	
+	.markdown-editor-contenteditable h1 {
+		font-size: 2em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+		font-weight: bold;
+	}
+	
+	.markdown-editor-contenteditable h2 {
+		font-size: 1.5em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+		font-weight: bold;
+	}
+	
+	.markdown-editor-contenteditable h3 {
+		font-size: 1.17em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+		font-weight: bold;
+	}
+	
+	.markdown-editor-contenteditable ul,
+	.markdown-editor-contenteditable ol {
+		margin-left: 1.5em;
+		margin-bottom: 1em;
+	}
+	
+	.markdown-editor-contenteditable blockquote {
+		border-left: 3px solid #ccc;
+		padding-left: 1em;
+		margin-left: 0;
+		color: #777;
+	}
+	
+	.markdown-editor-contenteditable code {
+		font-family: monospace;
+		background-color: #f0f0f0;
+		padding: 0.1em 0.3em;
+		border-radius: 3px;
+	}
+	
+	.markdown-editor-contenteditable pre {
+		font-family: monospace;
+		background-color: #f0f0f0;
+		padding: 0.5em;
+		border-radius: 3px;
+		white-space: pre-wrap;
+		margin: 1em 0;
+	}
+	
+	.markdown-editor-contenteditable a {
+		color: #0366d6;
+		text-decoration: underline;
+	}
+	
+	.markdown-editor-contenteditable hr {
+		border: none;
+		border-top: 1px solid #ddd;
+		margin: 1em 0;
+	}
+
 	/* Editor input styles */
+	.markdown-editor-contenteditable,
 	.markdown-editor-input,
 	.markdown-viewer {
 		width: 100%;
@@ -1052,7 +1687,8 @@
 		flex-grow: 1;
 	}
 
-	.markdown-editor-input {
+	.markdown-editor-input,
+	.markdown-editor-contenteditable {
 		border: none;
 		outline: none;
 		resize: none;
@@ -1295,6 +1931,7 @@
 			BlinkMacSystemFont,
 			sans-serif;
 		min-width: 30px;
+		position: relative;
 	}
 
 	.heading-label {
@@ -1311,11 +1948,6 @@
 		height: 24px;
 		background-color: rgba(0, 0, 0, 0.15);
 		margin: 0 4px;
-	}
-
-	.heading-button {
-		min-width: 30px;
-		position: relative;
 	}
 
 	.add-button {

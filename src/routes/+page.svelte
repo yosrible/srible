@@ -23,30 +23,42 @@
 		isWarning?: boolean;
 	};
 
+	// Check if code is running in browser environment
+	const isBrowser = typeof window !== 'undefined';
+
 	onMount(() => {
-		setupIntersectionObserver();
+		// Only run browser-specific code in browser environment
+		if (isBrowser) {
+			setupIntersectionObserver();
 
-		// Handle browser navigation events
-		window.addEventListener('popstate', handleNavigation);
+			// Handle browser navigation events
+			window.addEventListener('popstate', handleNavigation);
 
-		// Attempt to sync any locally stored emails to Supabase
-		syncWaitlistToSupabase().then(result => {
-			if (result.success && result.results && result.results.length > 0) {
-				console.log('🔄 Synced waitlist emails:', result.message);
-			}
-		}).catch(err => {
-			console.warn('Failed to sync waitlist emails:', err);
-		});
+			// Attempt to sync any locally stored emails to Supabase
+			syncWaitlistToSupabase().then(result => {
+				if (result.success && result.results && result.results.length > 0) {
+					console.log('🔄 Synced waitlist emails:', result.message);
+				}
+			}).catch(err => {
+				console.warn('Failed to sync waitlist emails:', err);
+			});
+		}
+	});
 
-		return () => {
+	onDestroy(() => {
+		// Only run browser-specific cleanup in browser environment
+		if (isBrowser) {
 			window.removeEventListener('popstate', handleNavigation);
 			if (observer) {
 				observer.disconnect();
 			}
-		};
+		}
 	});
 
 	function setupIntersectionObserver() {
+		// Only run in browser environment
+		if (!isBrowser) return;
+
 		observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
@@ -58,13 +70,20 @@
 			{ rootMargin: '0px 0px -10% 0px' }
 		);
 
-		document.querySelectorAll('.scroll-animate').forEach((el) => {
-			el.classList.add('will-animate');
-			observer.observe(el);
-		});
+		// Safe DOM manipulation for browser environment
+		const animatedElements = document.querySelectorAll('.scroll-animate');
+		if (animatedElements && animatedElements.length) {
+			animatedElements.forEach((el) => {
+				el.classList.add('will-animate');
+				observer.observe(el);
+			});
+		}
 	}
 
 	function handleNavigation() {
+		// Only run in browser environment
+		if (!isBrowser) return;
+
 		// Re-initialize animations when navigating back/forward
 		setTimeout(() => {
 			setupIntersectionObserver();

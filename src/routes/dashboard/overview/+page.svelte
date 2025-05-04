@@ -2,8 +2,15 @@
 	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
 
-	// Get sidebar controls from context
-	const sidebar = getContext('sidebar');
+	// Define sidebar interface
+	interface Sidebar {
+		hide: () => void;
+		show: () => void;
+		toggle: () => void;
+	}
+
+	// Get sidebar controls from context with proper typing
+	const sidebar = getContext<Sidebar>('sidebar');
 
 	// Placeholder data for analytics
 	let pageViews = 1245;
