@@ -59,19 +59,7 @@
 	}
 
 	function navigateToSection(section: string) {
-		if (section === 'faq') {
-			closeMenu();
-			// If we're already on the help page, scroll to FAQ section
-			if ($page.url.pathname === '/help') {
-				const faqSection = document.getElementById('faq-section');
-				if (faqSection) {
-					faqSection.scrollIntoView({ behavior: 'smooth' });
-				}
-			} else {
-				// Otherwise, navigate to help page with hash
-				goto('/help#faq-section');
-			}
-		} else if ($page.url.pathname !== '/') {
+		if ($page.url.pathname !== '/') {
 			goto(`/#${section}`);
 		} else {
 			const element = document.getElementById(section);
