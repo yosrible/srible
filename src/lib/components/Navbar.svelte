@@ -59,13 +59,22 @@
 	}
 
 	function navigateToSection(section: string) {
+		// Close the mobile menu
+		closeMenu();
+		
+		// If we're not on the home page, navigate to home page with section hash
 		if ($page.url.pathname !== '/') {
-			goto(`/#${section}`);
+			// Special handling for FAQ to ensure it goes to home page
+			if (section === 'faq') {
+				goto('/#faq');
+			} else {
+				goto(`/#${section}`);
+			}
 		} else {
+			// On home page, scroll to the section
 			const element = document.getElementById(section);
 			if (element) {
 				element.scrollIntoView({ behavior: 'smooth' });
-				closeMenu();
 			}
 		}
 	}
