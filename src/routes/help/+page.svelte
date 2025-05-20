@@ -34,7 +34,7 @@
 			</div>
 		</section>
 
-		<section>
+		<section id="faq-section">
 			<h2>Frequently Asked Questions</h2>
 			<div class="faq-grid">
 				<div class="faq-item">
