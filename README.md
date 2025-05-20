@@ -89,6 +89,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Yos - [@yosrible](https://twitter.com/yosrible)
+X - [@yosrible](https://x.com/yosrible)
 
 Project Link: [https://github.com/yosrible/srible_frontend](https://github.com/yosrible/srible_frontend)
