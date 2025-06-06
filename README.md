@@ -31,11 +31,11 @@ Srible embraces minimalism by:
 
 ## Tech Stack
 
-- **Frontend Framework:** SvelteKit 2.x
+- **Frontend Framework:** SvelteKit
 - **Styling:** TailwindCSS
-- **Editor:** Quill.js
+- **Editor:** Custom
 - **Authentication:** Supabase
-- **Deployment:** Vercel/Netlify
+- **Deployment:** Vercel
 - **Analytics:** Vercel Analytics
 
 ## Getting Started
