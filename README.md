@@ -77,7 +77,7 @@ Srible emphasizes focus and elegance:
 | Frontend   | [SvelteKit](https://kit.svelte.dev) |
 | Styling    | [TailwindCSS](https://tailwindcss.com) |
 | Backend    | [Rust (Axum)](https://github.com/tokio-rs/axum), [FastAPI](https://fastapi.tiangolo.com) |
-| Editor     | Custom Quill.js Integration |
+| Editor     | Custom Editor |
 | Auth       | [Supabase](https://supabase.com) |
 | Analytics  | [Vercel Analytics](https://vercel.com/analytics) |
 | Deployment | [Vercel](https://vercel.com) |
