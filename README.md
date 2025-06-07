@@ -4,7 +4,7 @@ A **minimalist blogging platform** built with **SvelteKit**, powered by a **Rust
 Designed for writers, by developers who value simplicity.
 
 <div>
-  <img src="cropped_circle_image.png" alt="Srible Logo" width="50"> <strong>Srible</strong>
+  <img src="logo.jpg" alt="Srible Logo" width="50" style="border-radius: 50%; object-fit: cover;"> <strong>Srible</strong>
 </div>
 
 ---
