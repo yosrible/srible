@@ -3,7 +3,7 @@
 A **minimalist blogging platform** built with **SvelteKit**, powered by a **Rust backend** and a sleek, modern UI.  
 Designed for writers, by developers who value simplicity.
 
-<div align="center">
+<div>
   <img src="cropped_circle_image.png" alt="Srible Logo" width="50"> <strong>Srible</strong>
 </div>
 
