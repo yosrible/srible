@@ -119,31 +119,6 @@ pnpm build
 
 ---
 
-## ⚡ Frontend (Using `Bun`)
-
-1. **Install dependencies**  
-   ```bash
-   bun install
-   ```
-
-2. **Run the development server**  
-   ```bash
-   bun dev
-   ```
-
-3. **Open your browser**  
-   Visit: [http://localhost:5173](http://localhost:5173)
-
-### 📦 Build for Production
-
-```bash
-bun build
-```
-
-> `bun build` works if your `package.json` contains a valid `"build"` script, like `"build": "svelte-kit build"`. Confirm this exists before using Bun for production builds.
-
----
-
 ## 🦀 Backend (Using Rust)
 
 Ensure you have Rust and Cargo installed from [rustup.rs](https://rustup.rs).
