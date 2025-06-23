@@ -2,7 +2,7 @@
 	import { onMount, onDestroy, getContext } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+	import MarkdownEditor from '$lib/components/TiptapEditor.svelte';
 
 	// Get sidebar controls from context
 	const sidebar = getContext('sidebar');
