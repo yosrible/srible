@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher, tick } from 'svelte';
   import { Editor } from '@tiptap/core';
   import StarterKit from '@tiptap/starter-kit';
   import Underline from '@tiptap/extension-underline';
@@ -13,36 +13,89 @@
   import TaskItem from '@tiptap/extension-task-item';
   import BubbleMenu from '@tiptap/extension-bubble-menu';
 
+  // Make images draggable by default
+  const DraggableImage = Image.extend({ draggable: true });
+
   export let initialContent: string | null = null;
   export let onContentChange: ((html: string) => void) | null = null;
   export let readonly: boolean = false;
   export let characterLimit: number = 20000;
 
   let editor: Editor | null = null;
+  // Autosave state
+  let isSaving = false;
+  let saveMessage: string = '';
+  let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+  const AUTOSAVE_KEY = 'tiptap-draft';
+
+  function scheduleAutosave() {
+    isSaving = true;
+    saveMessage = 'Saving…';
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      // Persist HTML to localStorage; in real app replace with API call
+      try {
+        localStorage.setItem(AUTOSAVE_KEY, html);
+      } catch {}
+      isSaving = false;
+      saveMessage = 'Saved';
+    }, 1000); // 1-second debounce
+  }
   let html: string = initialContent ?? '';
   const dispatch = createEventDispatcher();
   let bubbleMenuEl: HTMLElement | null = null;
   let editorEl: HTMLDivElement;
 
+  // Link modal state
+  let linkModalOpen = false;
+  let linkUrl = '';
+
   // Theme logic
   let theme: 'dark' | 'light' = 'light';
-  function setHtmlTheme(t: 'dark' | 'light') {
-    if (typeof document !== 'undefined') {
-      // Clear all theme-related classes and enforce the chosen theme
-      document.documentElement.classList.remove('dark', 'light');
-      if (t === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-      document.documentElement.setAttribute('data-theme', t);
-    }
+  
+  // Reactive theme state
+  $: if (typeof document !== 'undefined') {
+    // Apply theme to html element
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    // Apply theme to body as well, so Tailwind `dark:` variant works regardless of root element
+    document.body.classList.toggle('dark', theme === 'dark');
+
+    // Persist preference
+    localStorage.setItem('srible-theme', theme);
   }
+  
+  // Initialize theme from localStorage or system preference
+  onMount(() => {
+    const savedTheme = localStorage.getItem('srible-theme') as 'dark' | 'light' | null;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+      theme = savedTheme;
+    } else {
+      theme = systemPrefersDark ? 'dark' : 'light';
+    }
+
+
+    // Watch for system theme changes (only if no manual preference is set)
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('srible-theme')) {
+        theme = e.matches ? 'dark' : 'light';
+      }
+    };
+    
+    darkModeMediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    return () => {
+      darkModeMediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  });
+  
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
-    setHtmlTheme(theme);
   }
-  onMount(() => {
-    setHtmlTheme(theme);
-  });
 
   // Word/character count
   let wordCount = 0;
@@ -62,14 +115,28 @@
   function promptLink() {
     if (!editor) return;
     const prev = editor.getAttributes('link').href || '';
-    const url = prompt('Enter URL', prev);
-    if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
-    }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    linkUrl = prev;
+    linkModalOpen = true;
+    tick().then(() => {
+      const input = document.getElementById('link-input') as HTMLInputElement | null;
+      input?.focus();
+    });
   }
+
+  function applyLink() {
+    if (!editor) return;
+    if (linkUrl.trim() === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl.trim() }).run();
+    }
+    linkModalOpen = false;
+  }
+
+  function closeLinkModal() {
+    linkModalOpen = false;
+  }
+
   function removeLink() {
     editor?.chain().focus().extendMarkRange('link').unsetLink().run();
   }
@@ -100,6 +167,17 @@
     editor?.chain().focus().clearNodes().unsetAllMarks().run();
   }
 
+  // Focus editor when clicking anywhere in the writing area (outside existing content)
+  function handleContainerClick(event: MouseEvent) {
+    if (!editor) return;
+
+    const target = event.target as HTMLElement;
+    // If the click wasn't inside the editable ProseMirror element, place caret at end
+    if (!target.closest('.ProseMirror')) {
+      editor.commands.focus('end');
+    }
+  }
+
   // Editor setup
   onMount(() => {
     editor = new Editor({
@@ -116,7 +194,7 @@
         }),
         Underline,
         Link.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
-        Image.configure({ inline: false, allowBase64: true }),
+        DraggableImage.configure({ inline: false, allowBase64: true }),
         Placeholder.configure({ placeholder: 'Write something amazing…' }),
         TextAlign.configure({ types: ['heading', 'paragraph'] }),
         CharacterCount.configure({ limit: characterLimit }),
@@ -150,6 +228,7 @@
         onContentChange?.(html);
         dispatch('contentChange', html);
         updateCounts();
+        scheduleAutosave();
       }
     });
     html = editor.getHTML();
@@ -165,14 +244,47 @@
   function isActive(type: string, attrs = {}) {
     return editor?.isActive(type, attrs);
   }
+
+  function handleDiscard() {
+    // Implement discard functionality
+  }
+
+  function handlePublish() {
+    // Implement publish functionality
+  }
 </script>
 
-<div class="relative w-full h-screen" data-theme={theme}>
+<div class="fixed inset-0 w-full h-screen overflow-hidden bg-white dark:bg-zinc-900" data-theme={theme}>
+  <!-- Action Buttons -->
+  <div class="fixed top-2 right-4 z-40 flex items-center gap-2">
+    <button 
+      on:click={handleDiscard}
+      class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 hover:text-zinc-900 dark:hover:text-white transition-all duration-200 shadow-sm border border-zinc-200 dark:border-zinc-700 backdrop-blur-sm"
+    >
+      <span>Discard</span>
+    </button>
+    <button 
+      on:click={handlePublish}
+      class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 shadow-sm border border-blue-600 backdrop-blur-sm"
+    >
+      <span>Publish</span>
+    </button>
+    <button 
+      on:click={() => window.history.back()}
+      class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 hover:text-zinc-900 dark:hover:text-white transition-all duration-200 shadow-sm border border-zinc-200 dark:border-zinc-700 backdrop-blur-sm"
+      title="Back to posts"
+    >
+      <span class="hidden sm:inline">Back to posts</span>
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    </button>
+  </div>
   <!-- Toolbar -->
-  <div class="sticky top-0 z-20 bg-white/90 dark:bg-zinc-900/90 border-b border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-wrap items-center gap-1 px-2 py-1 rounded-t-lg backdrop-blur supports-[backdrop-filter]:backdrop-blur">
+  <div class="sticky top-0 z-20 bg-white/95 dark:bg-zinc-900/95 border-b border-zinc-200/50 dark:border-zinc-800/50 shadow-sm flex flex-wrap items-center justify-center gap-1 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:backdrop-blur-md w-full">
     <!-- Theme toggle -->
     <button
-      class="tt-btn"
+      class="tt-btn bg-transparent dark:bg-transparent"
       aria-label="Toggle theme"
       on:click={toggleTheme}
       title="Toggle dark/light mode"
@@ -253,18 +365,76 @@
   </div>
 
   <!-- Editor with counter inside -->
-  <div class="rounded-b-lg border border-t-0 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 min-h-[300px] transition-colors relative w-full h-[calc(100vh-48px)] overflow-auto">
-    <div bind:this={editorEl} class="bg-white dark:bg-zinc-900 min-h-full transition-colors"></div>
-    <div class="absolute right-3 bottom-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 bg-white/90 dark:bg-zinc-900/90 px-3 py-1 rounded shadow pointer-events-none select-none z-10">
-      Words: {wordCount} | Characters: {charCount}
+  <div class="relative w-full h-[calc(100vh-48px)] transition-all duration-200 overflow-hidden" on:click={handleContainerClick}>
+    <div class="h-full overflow-y-auto custom-scrollbar">
+      <div class="max-w-4xl mx-auto px-4 py-8 w-full min-h-full">
+        <div bind:this={editorEl} class="prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none min-h-[calc(100vh-8rem)] focus:outline-none"></div>
+      </div>
+    </div>
+    <div class="fixed right-3 bottom-3 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50 px-3 py-1.5 rounded-lg shadow-sm pointer-events-auto select-none z-10 transition-all duration-200 hover:bg-white dark:hover:bg-zinc-800 hover:shadow">
+      <span class="font-mono">{wordCount}</span> words • <span class="font-mono">{charCount}</span> chars {#if saveMessage} • <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-green-500" class:animate-pulse={isSaving}></span>{saveMessage}</span>{/if}
     </div>
   </div>
-</div>
+
+  {#if linkModalOpen}
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" on:click|self={closeLinkModal}>
+      <div class="bg-white/70 dark:bg-zinc-800/70 backdrop-blur-lg text-zinc-800 dark:text-zinc-100 rounded-xl shadow-md p-6 w-full max-w-sm" on:click|stopPropagation>
+        <h3 class="text-sm font-semibold mb-3 text-zinc-700 dark:text-zinc-200">Add link</h3>
+        <input id="link-input" class="w-full rounded-md border border-zinc-300/50 dark:border-zinc-700/50 p-2 bg-white/70 dark:bg-zinc-900/50 placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" bind:value={linkUrl} placeholder="https://example.com" on:keydown={(e) => e.key === 'Enter' && applyLink()} />
+        <div class="mt-4 flex justify-end gap-2">
+          <button class="px-3 py-1.5 text-sm rounded-md text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50" on:click={closeLinkModal}>Cancel</button>
+          <button class="px-3 py-1.5 text-sm font-normal rounded-md bg-blue-500/80 text-white/90 hover:bg-blue-500" on:click={applyLink}>Add</button>
+        </div>
+      </div>
+    </div>
+  {/if}
 
 <style>
-  :global(html) {
+  :global(html, body) {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     /* Override any system theme with the component's theme */
     color-scheme: unset !important;
+  }
+  
+  /* Custom scrollbar for the editor */
+  :global(.ProseMirror) {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+  
+  :global(.ProseMirror)::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  :global(.ProseMirror)::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  :global(.ProseMirror)::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+  
+  /* Dark theme scrollbar */
+  [data-theme="dark"] :global(.ProseMirror) {
+    scrollbar-color: #4b5563 transparent;
+  }
+  
+  [data-theme="dark"] :global(.ProseMirror)::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+  
+  /* Ensure the scrollbar is visible in the editor */
+  :global(.ProseMirror) {
+    scrollbar-gutter: stable;
   }
   :global([data-theme="light"]) {
     color-scheme: light;
@@ -273,7 +443,7 @@
     color-scheme: dark;
   }
   .tt-btn {
-    @apply px-2 py-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors text-zinc-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600;
+    @apply p-1.5 rounded bg-transparent text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100/70 dark:hover:bg-zinc-700/30 transition-colors duration-100 ease-in-out transform hover:scale-105 active:scale-95;
     font-weight: 500;
     font-size: 1rem;
     line-height: 1;
@@ -283,15 +453,97 @@
     min-width: 2rem;
     min-height: 2rem;
     user-select: none;
+    border: none;
+    outline: none;
   }
-  .tt-btn.active, .tt-btn:active {
-    @apply bg-zinc-300 dark:bg-zinc-600;
+  .tt-btn:active {
+    @apply bg-transparent dark:bg-transparent;
+  }
+  /* Highlight active formatting buttons (e.g., Code Block) */
+  .tt-btn.active {
+    color: #2563eb; /* blue-600 */
+  }
+  [data-theme="dark"] .tt-btn.active {
+    color: #3b82f6; /* blue-500 */
   }
   .tt-btn svg {
     display: block;
   }
   .prose pre {
-    @apply bg-zinc-100 dark:bg-zinc-800 rounded p-2 font-mono text-sm overflow-x-auto;
+    @apply bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded p-3 font-mono text-sm leading-relaxed text-zinc-800 dark:text-zinc-100 overflow-x-auto;
+  }
+  /* Inline code */
+  .prose code {
+    @apply bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 text-pink-600 dark:text-pink-400 font-medium;
+  }
+  :global(.ProseMirror pre) {
+    white-space: pre-wrap;
+    background-color: #f3f4f6; /* gray-100 */
+    color: #1f2937; /* gray-800 */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 0.75rem 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    overflow-x: auto;
+  }
+  [data-theme="dark"] :global(.ProseMirror pre) {
+    background-color: #374151; /* gray-700 */
+    color: #f1f5f9; /* slate-100 */
+    border-color: #374151; /* gray-700 */
+  }
+    /* Draggable images cursor */
+  .ProseMirror img {
+    cursor: grab;
+  }
+  .ProseMirror img:active {
+    cursor: grabbing;
+  }
+
+  /* Custom scrollbar styling */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f3f4f6;
+    height: 100%;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: #4b5563 #1f2937;
+  }
+
+  /* Webkit scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: #1f2937;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 4px;
+    border: 2px solid #f3f4f6;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #4b5563;
+    border-color: #1f2937;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #6b7280;
   }
   @media (max-width: 640px) {
     .prose {
@@ -301,6 +553,17 @@
       padding: 0.25rem 0.5rem;
       min-width: 1.5rem;
       min-height: 1.5rem;
+      background: transparent !important;
     }
   }
+  /* Link styling */
+  :global(.ProseMirror a) {
+    color: #2563eb; /* blue-600 */
+    text-decoration: underline;
+  }
+  [data-theme="dark"] :global(.ProseMirror a) {
+    color: #3b82f6; /* blue-500 */
+  }
 </style>
+
+</div>

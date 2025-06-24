@@ -118,42 +118,50 @@
 	}
 
 	// Hide the navbar when on dashboard pages
-	onMount(() => {
-		// Add a specific class to the body to handle dashboard layout
-		document.body.classList.add('dashboard-mode');
-
-		// Check window size
+	// Handle window resize
+	const handleResize = () => {
 		windowWidth = window.innerWidth;
+		updateSidebarVisibility();
+	};
 
-		// Load saved sidebar preference
+	onMount(() => {
+		// Start with sidebar hidden by default
+		sidebarVisible = false;
+		sidebarStore.set(false);
+
 		if (browser) {
 			try {
-				const savedPreference = localStorage.getItem('srible_sidebar_visible');
-				if (savedPreference !== null) {
-					sidebarVisible = savedPreference === 'true';
+				// Load saved preference
+				const savedVisibility = localStorage.getItem('srible_sidebar_visible');
+				if (savedVisibility === 'true') {
+					sidebarVisible = true;
+					sidebarStore.set(true);
 				}
 			} catch (e) {
 				console.error('Error loading sidebar preference:', e);
 			}
+
+			// Add window resize listener
+			window.addEventListener('resize', handleResize);
+
+			// Initial update
+			handleResize();
+
+			// Initialize sidebar visibility after a small delay to prevent flash
+			setTimeout(() => {
+				updateSidebarVisibility();
+			}, 10);
 		}
 
-		updateSidebarVisibility();
+		// Add dashboard mode class
+		document.body.classList.add('dashboard-mode');
 
-		// Add window resize listener
-		const handleResize = () => {
-			windowWidth = window.innerWidth;
-			updateSidebarVisibility();
-		};
-
-		window.addEventListener('resize', handleResize);
-
-		// If we're at the root dashboard URL, redirect to overview
+		// Redirect to overview if at root dashboard
 		if ($page.url.pathname === '/dashboard') {
 			goto('/dashboard/overview');
 		}
 
 		return () => {
-			// Remove the class when leaving dashboard pages
 			document.body.classList.remove('dashboard-mode');
 			window.removeEventListener('resize', handleResize);
 		};
@@ -193,9 +201,19 @@
 		body > div > nav {
 			display: none !important;
 		}
-		/* Ensure the dashboard sidebar is visible */
+		/* Hide sidebar and nav by default to prevent flash */
 		.sidebar,
-		.sidebar-nav,
+		.sidebar-nav {
+			display: none !important;
+		}
+
+		/* Show when JS sets sidebar-visible */
+		.sidebar-visible .sidebar,
+		.sidebar-visible .sidebar-nav {
+			display: flex !important;
+		}
+
+		/* Sidebar visibility handled via JS and body classes */
 		.dashboard-container {
 			display: flex !important;
 		}
@@ -206,37 +224,6 @@
 	<aside class="sidebar">
 		<div class="sidebar-header">
 			<h2>Srible</h2>
-			<button on:click={toggleSidebar} class="sidebar-toggle" aria-label="Toggle sidebar">
-				{#if sidebarVisible}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="18"
-						height="18"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<polyline points="15 18 9 12 15 6"></polyline>
-					</svg>
-				{:else}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="18"
-						height="18"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<polyline points="9 18 15 12 9 6"></polyline>
-					</svg>
-				{/if}
-			</button>
 		</div>
 		<nav class="sidebar-nav">
 			<a href="/dashboard/overview" class="nav-item {activeSection === 'overview' ? 'active' : ''}">
@@ -329,23 +316,6 @@
 	</aside>
 
 	<main class="main-content">
-		{#if !sidebarVisible}
-			<button on:click={toggleSidebar} class="floating-sidebar-toggle" aria-label="Show sidebar">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<polyline points="9 18 15 12 9 6"></polyline>
-				</svg>
-			</button>
-		{/if}
 		<slot />
 	</main>
 </div>
@@ -366,16 +336,21 @@
 		position: fixed;
 		top: 0;
 		left: 0;
-		height: 100vh;
-		width: var(--sidebar-width);
+		height: 100%;
+		width: 280px;
+		background-color: #ffffff;
+		border-right: 1px solid rgba(0, 0, 0, 0.05);
 		display: flex;
 		flex-direction: column;
-		background-color: var(--primary-white, #f8f8f5);
-		border-right: 1px solid #e5e7eb;
-		z-index: 10;
-		transition: transform var(--sidebar-transition-time) ease;
-		overflow-x: hidden;
-		box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		z-index: 1100;
+		overflow-y: auto;
+		transform: translateX(0);
+	}
+
+	.dark .sidebar {
+		background-color: #111827;
+		border-right-color: rgba(255, 255, 255, 0.05);
 	}
 
 	.sidebar-header {
@@ -464,13 +439,13 @@
 
 	/* Main Content Area */
 	.main-content {
-		width: calc(100% - var(--sidebar-width));
-		margin-left: var(--sidebar-width);
+		width: calc(100% - 280px);
+		margin-left: 280px;
 		padding: 20px;
 		min-height: 100vh;
 		background-color: var(--primary-white, #f8f8f5);
 		position: relative;
-		transition: width var(--sidebar-transition-time) ease, margin-left var(--sidebar-transition-time) ease;
+		transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		overflow-x: hidden;
 	}
 
@@ -490,13 +465,17 @@
 	:global(body.sidebar-visible) .sidebar,
 	:global(body.sidebar-visible) .sidebar-nav {
 		transform: translateX(0);
-		width: 240px;
+		width: 280px;
 	}
 
 	:global(body.sidebar-hidden) .sidebar,
 	:global(body.sidebar-hidden) .sidebar-nav {
-		transform: translateX(-240px);
+		transform: translateX(-100%);
 		width: 0;
+	}
+
+	.sidebar-hidden .sidebar-toggle {
+		left: 0;
 	}
 
 	:global(body.dashboard-mode .sidebar),
@@ -594,46 +573,41 @@
 
 	/* Sidebar toggle buttons */
 	.sidebar-toggle {
-		background-color: transparent;
-		border: none;
-		border-radius: 4px;
-		padding: 6px;
+		position: fixed;
+		top: 50%;
+		left: 280px;
+		width: 24px;
+	height: 64px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		background: rgba(255, 255, 255, 0.9);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		border-left: none;
+		border-radius: 0 0.5rem 0.5rem 0;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 		cursor: pointer;
-		transition: all 0.2s;
-		color: #4b5563;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		transform: translateY(-50%);
+		z-index: 1100;
+		color: #374151;
+	}
+
+	.dark .sidebar-toggle {
+		background: rgba(17, 24, 39, 0.9);
+		border-color: rgba(255, 255, 255, 0.1);
+		color: #f3f4f6;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 	}
 
 	.sidebar-toggle:hover {
-		background-color: #f3f4f6;
-		color: var(--active-section-color, #3b82f6);
-	}
-
-	/* Floating toggle that appears when sidebar is hidden */
-	.floating-sidebar-toggle {
-		position: fixed;
-		top: 20px;
-		left: 10px;
-		z-index: 40;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		background-color: white;
-		border: 1px solid #eaeaea;
-		color: #4b5563;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-		transition: all 0.2s ease;
-	}
-
-	.floating-sidebar-toggle:hover {
-		background-color: #f3f4f6;
-		color: var(--active-section-color, #3b82f6);
-		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 		transform: translateY(-1px);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	}
+
+	.sidebar-toggle:active {
+		transform: translateY(0);
 	}
 </style>
