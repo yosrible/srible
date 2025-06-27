@@ -697,35 +697,22 @@
       width: 40px;
       height: 40px;
       padding: 0;
-      margin-left: 0.5rem;
-      position: relative;
-      z-index: 1001;
+      position: fixed;
+      right: 1.5rem;
+      top: 0.5rem;
+      z-index: 1002; /* Higher than menu */
       background: none;
       border: none;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-    }
-    
-    .menu-toggle {
-      position: relative;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      margin-left: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 1001;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-backface-visibility: hidden; /* Fix for animation flicker */
+      backface-visibility: hidden; /* Standard property */
     }
 
     .hamburger {
       position: relative;
-      width: 24px;
-      height: 20px;
+      width: 20px;
+      height: 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -733,16 +720,30 @@
     
     .hamburger span {
       display: block;
-      width: 100%;
+      width: 20px;
       height: 2px;
       background-color: #000;
       transition: all 0.3s ease;
+      position: absolute;
+      left: 0;
       transform-origin: center;
+    }
+    
+    .hamburger span:nth-child(1) {
+      top: 0;
+    }
+    
+    .hamburger span:nth-child(2) {
+      top: 6px;
+    }
+    
+    .hamburger span:nth-child(3) {
+      top: 12px;
     }
     
     /* X state when menu is open */
     .menu-toggle.active .hamburger span:nth-child(1) {
-      transform: translateY(9px) rotate(45deg);
+      transform: translateY(6px) rotate(45deg);
     }
     
     .menu-toggle.active .hamburger span:nth-child(2) {
@@ -751,7 +752,7 @@
     }
     
     .menu-toggle.active .hamburger span:nth-child(3) {
-      transform: translateY(-9px) rotate(-45deg);
+      transform: translateY(-6px) rotate(-45deg);
     }
 
     .nav-link {
@@ -776,11 +777,17 @@
       align-items: center;
       margin-left: auto;
       order: 2;
+      position: relative;
+      z-index: 1001;
     }
     
     .signup-btn,
     .login-btn {
       display: none;
+    }
+    .menu-toggle {
+      position: relative;
+      z-index: 1003;
     }
   }
 

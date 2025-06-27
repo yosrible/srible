@@ -177,7 +177,7 @@
 
   h1 {
     font-family: var(--font-primary);
-    font-size: clamp(2rem, 7vw, 4rem);
+    font-size: clamp(3rem, 9vw, 4.5rem);
     font-weight: 600;
     margin: 0 0 var(--space-xs) 0;
     line-height: 1.1;
@@ -187,9 +187,20 @@
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.2s forwards;
     
+    @media (max-width: 768px) {
+      font-size: clamp(2.75rem, 9vw, 4rem);
+      line-height: 1.15;
+    }
+    
     @media (max-width: 480px) {
-      font-size: 2.25rem;
+      font-size: clamp(2.5rem, 10vw, 3.5rem);
       margin-bottom: 0.5rem;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+    
+    @media (max-width: 360px) {
+      font-size: 2.5rem;
     }
   }
 
@@ -325,20 +336,36 @@
   /* Editor window styles removed as they're not being used */
 
   .subtitle {
-    font-family: 'Matter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 400;
     font-size: 1.25rem;
     color: var(--color-text-light);
-    margin: 0 0 var(--space-md) 0;
+    margin: 0 auto var(--space-md) auto;
     max-width: 600px;
-    line-height: 1.5;
+    line-height: 1.6;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.5s forwards;
     
-    @media (max-width: 480px) {
+    @media (max-width: 992px) {
       font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 1.05rem;
+      text-align: center;
+      margin: 0 auto var(--space-md) auto;
+      max-width: 90%;
+      line-height: 1.5;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
       padding: 0 1rem;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      max-width: 100%;
     }
   }
 
