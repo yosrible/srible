@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@tiptap/extension-code-block-lowlight": "^2.22.3",
+    "highlight.js": "^11.11.1",
+    "lowlight": "^3.3.0"
+  }
+}
