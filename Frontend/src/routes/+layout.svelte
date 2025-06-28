@@ -1,3 +1,9 @@
+<svelte:head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</svelte:head>
+
 <script lang="ts">
   import '../app.css';
   import Navbar from '$lib/components/Navbar.fixed.svelte';
@@ -97,12 +103,15 @@
     scroll-behavior: smooth;
     font-size: 16px;
     height: 100%;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   :global(body) {
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    width: 100%;
     background: #f8f8f5;
     color: #000000;
     font-family: Inter, Arial, sans-serif;
@@ -110,6 +119,8 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Minimal layout styles */
@@ -140,7 +151,8 @@
   }
 
   .content {
-    min-height: 100vh;
+    flex: 1;
+    width: 100%;
     padding-top: 80px; /* Space for fixed navbar */
     position: relative;
     z-index: 1;
@@ -148,6 +160,8 @@
     visibility: visible !important;
     will-change: transform;
     backface-visibility: hidden;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   /* Content styles */

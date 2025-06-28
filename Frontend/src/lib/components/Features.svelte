@@ -5,32 +5,32 @@
 		{
 			title: 'Distraction-free Writing',
 			description: 'Clean, minimalist editor to keep you in the flow.',
-			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h16M12 4v16"/></svg>`
+			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="#3B82F6" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h16M12 4v16"/></svg>`
 		},
 		{
 			title: 'Your Space',
 			description: 'Share without social pressure. Your blog, your rules.',
-			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
+			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="#10B981" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
 		},
 		{
 			title: 'Simple Publishing',
 			description: 'One click to publish. No complex settings needed.',
-			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19.5h10m0 0L8.75 17m3.25 2.5L8.75 22m10.25-2.5h-5M9 7.5l3.5-3.5M9 7.5V2m0 5.5l-7 7 7 7 7-7-7-7zm7 7h5a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1h-2"/></svg>`
+			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19.5h10m0 0L8.75 17m3.25 2.5L8.75 22m10.25-2.5h-5M9 7.5l3.5-3.5M9 7.5V2m0 5.5l-7 7 7 7 7-7-7-7zm7 7h5a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1h-2"/></svg>`
 		},
 		{
 			title: 'Custom Domain',
 			description: 'Use your own domain to build your personal brand.',
-			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`
+			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="#8B5CF6" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`
 		},
 		{
 			title: 'Clean Design',
 			description: 'Beautiful themes that put your content first.',
-			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06z"/><path d="M12 8c2 1 3 2.5 3 5"/></svg>`
+			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="#EC4899" stroke="#EC4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06z"/><path d="M12 8c2 1 3 2.5 3 5"/></svg>`
 		},
 		{
 			title: 'Privacy Focused',
 			description: 'No tracking or analytics. We respect your privacy.',
-			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
+			icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
 		}
 	];
 </script>
@@ -113,9 +113,16 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 8px;
-		background-color: #f3f4f6;
+		border-radius: 12px;
+		background-color: rgba(243, 244, 246, 0.3);
 		margin-bottom: 1rem;
+		transform: scale(1);
+		transition: transform 0.2s ease, background-color 0.2s ease;
+	}
+	
+	.feature-card:hover .feature-icon {
+		transform: scale(1.1);
+		background-color: rgba(243, 244, 246, 0.5);
 	}
 
 	.text-content {

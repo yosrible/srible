@@ -47,6 +47,30 @@
         <p class="subtitle">
           A clean, minimal space for your thoughts. No distractions, just writing.
         </p>
+        <div class="badge-container">
+          <div class="product-hunt-badge">
+            <a href="https://www.producthunt.com/products/srible?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-srible" target="_blank" rel="noopener noreferrer">
+              <img 
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=984996&theme=light&t=1751089449700" 
+                alt="Srible - Minimal blogging site | Product Hunt" 
+                width="200" 
+                height="auto" 
+              />
+            </a>
+          </div>
+          <div class="github-badge">
+            <a href="https://github.com/yosrible/srible" target="_blank" rel="noopener noreferrer" class="github-button">
+              <svg class="github-logo" height="20" viewBox="0 0 16 16" width="20" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+              </svg>
+              <span>Star on GitHub</span>
+              <svg class="star-icon" height="16" viewBox="0 0 16 16" width="16" fill="currentColor">
+                <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
         <div class="waitlist-count">
           <span class="green-dot"></span>
           <span class="count-text">Over <strong>{count}+</strong> people have joined the waitlist</span>
@@ -90,44 +114,31 @@
   }
 
   .hero {
+    position: relative;
+    width: 100%;
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding: 0;
-    margin: 0;
+    justify-content: center;
+    padding: 6rem 1rem 4rem;
+    overflow: hidden;
+    box-sizing: border-box;
     background-color: #ffffff;
     background-image: 
       linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
     background-size: 24px 24px;
     background-position: 0 0;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    
-    @media (min-width: 768px) {
-      min-height: 90vh;
-      padding: var(--space-xl) 0;
-    }
-    
-    @media (max-width: 480px) {
-      min-height: 100vh;
-      padding: 0;
-      display: flex;
-      align-items: center;
-    }
   }
-
+  
   .container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 2;
     box-sizing: border-box;
-    
-    @media (min-width: 768px) {
-      padding: 0 max(1rem, 5%);
-    }
   }
 
   .hero-content {
@@ -142,18 +153,6 @@
     text-align: center;
     gap: var(--space-md);
     padding: 2rem 0;
-    
-    @media (min-width: 768px) {
-      justify-content: flex-start;
-      padding: 6rem 0 4rem;
-    }
-    
-    @media (max-width: 480px) {
-      min-height: calc(100vh - 80px);
-      padding: 4rem 0 2rem;
-      justify-content: center;
-      gap: var(--space-md);
-    }
   }
 
   .hero-text {
@@ -165,14 +164,6 @@
     align-items: center;
     padding: 0 var(--space-sm);
     width: 100%;
-    
-    @media (min-width: 768px) {
-      padding: 0;
-    }
-    
-    @media (max-width: 480px) {
-      padding: 0 var(--space-xs);
-    }
   }
 
   h1 {
@@ -186,22 +177,6 @@
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.2s forwards;
-    
-    @media (max-width: 768px) {
-      font-size: clamp(2.75rem, 9vw, 4rem);
-      line-height: 1.15;
-    }
-    
-    @media (max-width: 480px) {
-      font-size: clamp(2.5rem, 10vw, 3.5rem);
-      margin-bottom: 0.5rem;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-    }
-    
-    @media (max-width: 360px) {
-      font-size: 2.5rem;
-    }
   }
 
   .gradient-text {
@@ -218,11 +193,6 @@
     filter: blur(5px);
     transform: translateY(10px);
     animation: fadeInUp 0.8s ease-out 0.4s forwards, gradientShift 8s ease-in-out infinite;
-    
-    @media (max-width: 480px) {
-      display: block;
-      margin-top: 0.25rem;
-    }
   }
 
   @keyframes fadeInUp {
@@ -299,6 +269,115 @@
     transform: translateX(4px);
   }
 
+  .badge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    width: 100%;
+  }
+
+  .product-hunt-badge,
+  .github-badge {
+    transition: transform 0.2s ease;
+    width: 100%;
+    max-width: 200px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .product-hunt-badge {
+    margin-bottom: 0.5rem;
+  }
+
+  .product-hunt-badge a,
+  .github-badge a {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .product-hunt-badge img {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+  }
+
+  .github-badge a {
+    justify-content: center;
+    text-align: center;
+    padding: 0.6rem 1rem;
+  }
+
+  @media (min-width: 480px) {
+    .badge-container {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .product-hunt-badge,
+    .github-badge {
+      width: auto;
+      margin: 0;
+    }
+  }
+
+  .product-hunt-badge:hover,
+  .github-badge:hover {
+    transform: translateY(-2px);
+  }
+
+  .github-badge a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #1a1a1a;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .github-badge a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .github-badge a:active {
+    transform: translateY(0);
+  }
+
+  .github-badge a:hover .star-icon {
+    fill: #ffd700;
+  }
+
+  .github-badge .github-logo {
+    fill: white;
+    height: 1.2rem;
+    width: 1.2rem;
+    transition: transform 0.2s ease;
+  }
+
+  .github-badge .star-icon {
+    fill: #aaa;
+    height: 1rem;
+    width: 1rem;
+    margin-left: 0.25rem;
+    transition: all 0.2s ease;
+  }
+
   .btn.secondary {
     background-color: #f8f8f8;
     color: var(--color-text);
@@ -346,30 +425,48 @@
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.5s forwards;
-    
-    @media (max-width: 992px) {
-      font-size: 1.1rem;
-      line-height: 1.5;
+  }
+
+  .product-hunt-badge {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+    animation: float 6s ease-in-out infinite;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0) rotate(0.5deg);
     }
-    
-    @media (max-width: 768px) {
-      font-size: 1.05rem;
-      text-align: center;
-      margin: 0 auto var(--space-md) auto;
-      max-width: 90%;
-      line-height: 1.5;
+    50% {
+      transform: translateY(-5px) rotate(-0.5deg);
     }
-    
-    @media (max-width: 480px) {
-      font-size: 0.9rem;
-      padding: 0 1rem;
-      line-height: 1.5;
-      margin-bottom: 1.25rem;
-      max-width: 100%;
+    100% {
+      transform: translateY(0) rotate(0.5deg);
     }
   }
 
-  .waitlist-count {
+  
+  .product-hunt-badge:hover {
+    animation-play-state: paused;
+    transform: scale(1.05) translateY(-2px);
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.1));
+  }
+  
+  .product-hunt-badge:active {
+    transform: scale(0.98) translateY(0);
+  }
+  
+  .product-hunt-badge a {
+    display: inline-block;
+    line-height: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+.waitlist-count {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -408,33 +505,42 @@
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.6s forwards;
-    
-    @media (max-width: 480px) {
-      gap: 0.75rem;
-      padding: 0 1rem;
-      gap: 1.5rem;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-      
-      @media (min-width: 480px) {
-        width: auto;
-        min-width: 160px;
-        padding: 0.75rem 1.5rem;
-      }
-    }
   }
 
   @media (max-width: 1024px) {
+    .hero {
+      padding: 5rem 0 3rem;
+      min-height: auto;
+    }
+    
+    .container {
+      padding: 0 1.25rem;
+    }
+    
     .hero-content {
       grid-template-columns: 1fr;
-      gap: var(--space-lg);
+      gap: 2rem;
     }
-
+    
+    .hero-text {
+      text-align: center;
+      max-width: 100%;
+      padding: 0 0.5rem;
+    }
+    
     h1 {
-      font-size: 3rem;
+      font-size: 2.25rem;
+      line-height: 1.2;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    
+    .waitlist-count {
+      justify-content: center;
     }
   }
 
@@ -449,14 +555,15 @@
     }
 
     .subtitle {
-      font-size: 1.125rem;
-      margin-bottom: var(--space-md);
+      font-size: 1.05rem;
+      text-align: center;
+      margin: 0 auto var(--space-md) auto;
+      max-width: 90%;
+      line-height: 1.5;
     }
-
-
+    
     .cta-buttons {
       flex-direction: column;
-      align-items: center;
     }
 
     .btn {
