@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@700&display=swap');
 
+/* Tailwind CSS directives - these are valid and will be processed by Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

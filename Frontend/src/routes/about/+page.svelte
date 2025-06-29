@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import Footer from '$lib/components/Footer.svelte';
+	// Page content
 </script>
 
 <div class="about-container">
@@ -79,8 +78,6 @@
 		</section>
 	</div>
 </div>
-
-<Footer />
 
 <style>
 	.about-container {
@@ -235,18 +232,8 @@
 			grid-template-columns: 1fr;
 			gap: 1.5rem;
 		}
-
 		.value-card {
 			padding: 1.5rem;
-		}
-
-		.team-grid {
-			grid-template-columns: 1fr;
-			gap: 2rem;
-		}
-
-		.team-member {
-			max-width: 100%;
 		}
 	}
 
@@ -268,10 +255,6 @@
 		}
 
 		.value-card {
-			padding: 1rem;
-		}
-
-		.team-member {
 			padding: 1rem;
 		}
 
