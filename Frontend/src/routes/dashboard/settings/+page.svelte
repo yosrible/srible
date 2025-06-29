@@ -13,7 +13,7 @@
 
 	let siteSettings = {
 		favicon: '/favicon.ico',
-		subdomain: 'myblog'
+		subdomain: ''
 	};
 
 	// Flag to check if favicon is the default one
@@ -190,7 +190,7 @@
 					type="text"
 					id="subdomain"
 					bind:value={siteSettings.subdomain}
-					placeholder="myblog"
+					placeholder="your-blog-name"
 					class="input-field"
 				/>
 				<span class="domain-suffix">.srible.com</span>
