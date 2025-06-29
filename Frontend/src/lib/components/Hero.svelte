@@ -120,16 +120,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6rem 1rem 4rem;
-    overflow: hidden;
+    padding: 2rem 1.5rem;
+    margin: 0;
     box-sizing: border-box;
     background-color: #ffffff;
     background-image: 
-      linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
-    background-size: 24px 24px;
-    background-position: 0 0;
+      linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -1px -1px;
+    z-index: 1;
+    flex: 1;
+    isolation: isolate;
   }
+
   
   .container {
     width: 100%;
@@ -143,40 +147,42 @@
 
   .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
-    min-height: calc(100vh - 100px);
+    max-width: 800px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     gap: var(--space-md);
-    padding: 2rem 0;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
   }
 
   .hero-text {
     text-align: center;
-    max-width: 800px;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 var(--space-sm);
-    width: 100%;
+    padding: 0;
   }
 
   h1 {
     font-family: var(--font-primary);
-    font-size: clamp(3rem, 9vw, 4.5rem);
+    font-size: clamp(2.5rem, 8vw, 4rem);
     font-weight: 600;
-    margin: 0 0 var(--space-xs) 0;
+    margin: 0 0 var(--space-sm) 0;
     line-height: 1.1;
     letter-spacing: -0.5px;
     position: relative;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    width: 100%;
   }
 
   .gradient-text {
@@ -229,7 +235,7 @@
     background-color: var(--color-primary);
     color: white;
     overflow: hidden;
-    z-index: 1;
+    z-index: 2; /* Ensure button is above its pseudo-element */
     transition: all 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     border: none;
@@ -246,6 +252,7 @@
       transition: opacity 0.3s ease;
       opacity: 1;
       border-radius: var(--radius);
+      pointer-events: none; /* Ensure clicks pass through to the button */
     }
     
     &:hover::before {
@@ -306,9 +313,21 @@
   }
 
   .github-badge a {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    gap: 0.5rem;
+    background: #1a1a1a;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
     text-align: center;
-    padding: 0.6rem 1rem;
+    box-sizing: border-box;
   }
 
   @media (min-width: 480px) {
@@ -332,22 +351,25 @@
     transform: translateY(-2px);
   }
 
-  .github-badge a {
+  .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    background: #1a1a1a;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
     font-weight: 500;
-    font-size: 0.9rem;
-    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-family: var(--font-secondary);
     position: relative;
     overflow: hidden;
-    white-space: nowrap;
+    z-index: 1;
+    border: 1px solid transparent;
   }
 
   .github-badge a:hover {
@@ -417,14 +439,16 @@
   .subtitle {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 400;
-    font-size: 1.25rem;
+    font-size: clamp(1rem, 4vw, 1.25rem);
     color: var(--color-text-light);
     margin: 0 auto var(--space-md) auto;
-    max-width: 600px;
+    max-width: 90%;
     line-height: 1.6;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.5s forwards;
+    box-sizing: border-box;
+    padding: 0 1rem;
   }
 
   .product-hunt-badge {
@@ -497,61 +521,171 @@
 
   .cta-buttons {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 2.5rem;
-    position: relative;
+    gap: 1rem;
+    margin-top: 1.5rem;
     flex-wrap: wrap;
     justify-content: center;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease-out 0.6s forwards;
+    width: 100%;
   }
-
-  @media (max-width: 1024px) {
+  
+  .btn {
+    min-width: 180px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
     .hero {
-      padding: 5rem 0 3rem;
-      min-height: auto;
-    }
-    
-    .container {
-      padding: 0 1.25rem;
+      min-height: 90vh;
+      padding: 1rem;
     }
     
     .hero-content {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    
-    .hero-text {
-      text-align: center;
-      max-width: 100%;
-      padding: 0 0.5rem;
+      padding: 1rem 0.5rem;
     }
     
     h1 {
       font-size: 2.25rem;
-      line-height: 1.2;
+      margin-bottom: 1rem;
     }
     
     .subtitle {
       font-size: 1.1rem;
-      max-width: 100%;
-      margin: 0 auto;
+      line-height: 1.5;
     }
     
-    .waitlist-count {
+    .cta-buttons {
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+    
+    .btn {
+      width: 100%;
       justify-content: center;
     }
   }
 
+  /* Large tablets and small desktops */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .hero {
+      min-height: calc(100vh - 80px);
+      height: auto;
+      padding: 2rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      margin: 0;
+    }
+    
+    .hero-content {
+      min-height: 0;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      transform: none !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+    
+    h1 {
+      font-size: 2.75rem !important;
+      line-height: 1.2;
+      margin: 0 0 1.5rem 0;
+      padding: 0;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      max-width: 500px;
+      margin: 0 0 2.5rem 0;
+      padding: 0;
+      text-align: center;
+    }
+    
+    .cta-buttons {
+      margin: 0 auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.25rem;
+      max-width: 100%;
+      padding: 0;
+      width: 100%;
+    }
+    
+    .btn {
+      min-width: 180px;
+      margin: 0.5rem;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .hero-text {
+      max-width: 100%;
+      padding: 0 1.5rem;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+    
+    .cta-buttons {
+      margin-top: 3rem;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+    }
+  }
+  
+  /* Tablets and Mobile */
   @media (max-width: 768px) {
     .hero {
-      padding: var(--space-lg) 0;
-      min-height: 60vh;
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      padding: 1.5rem 0.5rem;
     }
-
+    
     h1 {
       font-size: 2.5rem;
+      line-height: 1.2;
+      padding: 0 1rem;
+      text-align: center;
+    }
+    
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 300px;
+      margin: 2rem auto 0;
+      padding: 0 1rem;
+    }
+    
+    .btn {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+      margin: 0 0 1rem 0;
     }
 
     .subtitle {
@@ -561,18 +695,9 @@
       max-width: 90%;
       line-height: 1.5;
     }
-    
-    .cta-buttons {
-      flex-direction: column;
-    }
-
-    .btn {
-      width: 100%;
-      max-width: 300px;
-      margin-bottom: 1rem;
-    }
   }
 
+  /* Small Mobile Devices */
   @media (max-width: 480px) {
     h1 {
       font-size: 2rem;

@@ -1,7 +1,9 @@
 <svelte:head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="HandheldFriendly" content="true">
 </svelte:head>
 
 <script lang="ts">
@@ -101,29 +103,21 @@
 {/if}
 
 <style>
-  /* Global styles */
-  :global(html) {
-    scroll-behavior: smooth;
-    font-size: 16px;
-    height: 100%;
+  /* Content container */
+  .content {
+    flex: 1;
     width: 100%;
-    overflow-x: hidden;
+    position: relative;
+    z-index: 1;
   }
 
-  :global(body) {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    width: 100%;
+  /* Dashboard specific overrides */
+  :global(body.dashboard-mode) {
     background: #f8f8f5;
-    color: #000000;
-    font-family: Inter, Arial, sans-serif;
-    line-height: 1.7;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    display: flex;
-    flex-direction: column;
+  }
+
+  :global(body.dashboard-mode .content) {
+    padding-top: 0;
   }
 
   /* Minimal layout styles */
@@ -133,57 +127,11 @@
   
   :global(html.minimal-layout body) {
     min-height: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
   }
   
-  :global(.content.minimal-layout) {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    margin: 0;
-  }
-  
-  :global(html.minimal-layout #svelte) {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Dashboard layout styles */
-  :global(.content.dashboard-layout) {
-    padding-top: 0; /* Remove top padding since navbar is hidden */
-  }
-
-  .content {
-    flex: 1;
-    width: 100%;
-    padding-top: 80px; /* Space for fixed navbar */
-    position: relative;
-    z-index: 1;
-    opacity: 1 !important;
-    visibility: visible !important;
-    will-change: transform;
-    backface-visibility: hidden;
-    box-sizing: border-box;
-    overflow-x: hidden;
-  }
-
-  /* Content styles */
-
-  /* Prevent scroll when menu is open */
-  :global(body.menu-open) {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
-  
+  /* Mobile menu styles */
   @media (max-width: 768px) {
-    .content {
+    .content:not(.dashboard-layout) {
       padding-top: 70px;
     }
   }

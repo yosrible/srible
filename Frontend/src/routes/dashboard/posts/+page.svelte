@@ -5,6 +5,16 @@
 	// Get sidebar controls from context
 	const sidebar = getContext('sidebar');
 	
+	// Search query state
+	let searchQuery = '';
+	
+	// Filter posts based on search query
+	$: filteredPosts = posts.filter(post => 
+		post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+		post.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+		post.date.includes(searchQuery)
+	);
+	
 	let posts = [
 		{
 			id: 1,
@@ -57,19 +67,27 @@
 </script>
 
 <header class="content-header">
-	<h1>Posts</h1>
-	<button class="create-post-btn" on:click={handleCreatePost}>
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-			<path
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="M12 5v14M5 12h14"
+	<div>
+		<h1>Posts</h1>
+		<div class="search-container">
+			<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<circle cx="11" cy="11" r="8"></circle>
+				<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+			</svg>
+			<input
+				type="text"
+				bind:value={searchQuery}
+				placeholder="Search..."
+				class="search-input"
+				aria-label="Search posts"
 			/>
+		</div>
+	</div>
+	<button class="create-post-btn" on:click={handleCreatePost}>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" class="btn-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M12 5v14M5 12h14"/>
 		</svg>
-		<span>Create New Post</span>
+		<span class="btn-text">New Post</span>
 	</button>
 </header>
 
@@ -82,7 +100,18 @@
 			<div class="th">Views</div>
 			<div class="th">Actions</div>
 		</div>
-		{#each posts as post}
+		{#if filteredPosts.length === 0}
+			<div class="no-results">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="11" cy="11" r="8"></circle>
+					<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+					<line x1="11" y1="8" x2="11" y2="14"></line>
+					<line x1="11" y1="17" x2="11.01" y2="17"></line>
+				</svg>
+				<p>No posts found matching "{searchQuery}"</p>
+			</div>
+		{:else}
+		{#each filteredPosts as post}
 			<div class="table-row">
 				<div class="td title">{post.title}</div>
 				<div class="td status">
@@ -91,7 +120,7 @@
 				<div class="td date">{post.date}</div>
 				<div class="td views">{post.views}</div>
 				<div class="td actions">
-					<button class="action-btn edit">
+					<button class="action-btn edit" aria-label="Edit post">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
 							<path
 								fill="none"
@@ -104,7 +133,7 @@
 							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 						</svg>
 					</button>
-					<button class="action-btn delete">
+					<button class="action-btn delete" aria-label="Delete post">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
 							<path
 								fill="none"
@@ -119,16 +148,89 @@
 				</div>
 			</div>
 		{/each}
+		{/if}
 	</div>
 </div>
 
 <style>
 	.content-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex-wrap: wrap;
+	gap: 1rem;
+
+	> div {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
+		flex-direction: column;
+		gap: 1rem;
 	}
+
+	@media (min-width: 768px) {
+		align-items: center;
+		flex-direction: row;
+
+		> div {
+			flex-direction: row;
+			align-items: center;
+			gap: 2rem;
+		}
+	}
+	margin-bottom: 2rem;
+}
+
+.search-container {
+	position: relative;
+	width: 100%;
+	max-width: 240px;
+}
+
+.search-icon {
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #9ca3af;
+	height: 14px;
+}
+
+.search-input {
+	width: 100%;
+	padding: 0.4rem 0.75rem 0.4rem 2rem;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.375rem;
+	background-color: white;
+	font-size: 0.875rem;
+	transition: all 0.15s ease;
+}
+
+.search-input:focus {
+	outline: none;
+	border-color: #93c5fd;
+	box-shadow: 0 0 0 1px #bfdbfe;
+}
+
+.no-results {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+	text-align: center;
+	color: #6b7280;
+}
+
+.no-results svg {
+	width: 3rem;
+	height: 3rem;
+	margin-bottom: 1rem;
+	color: #9ca3af;
+}
+
+.no-results p {
+	font-size: 1rem;
+	color: #4b5563;
+}
 
 	.content-header h1 {
 		margin: 0;
@@ -139,23 +241,52 @@
 	}
 
 	.create-post-btn {
-		background-color: var(--primary-black, #1a1a1a);
-		color: white;
-		border: none;
-		border-radius: 6px;
-		padding: 0.75rem 1.25rem;
-		font-size: 0.9375rem;
-		font-weight: 500;
-		cursor: pointer;
-		display: flex;
+		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: 0.5rem;
-		transition: background-color 0.2s ease;
-		min-height: 44px; /* Touch-friendly */
+		padding: 0.5rem 1rem;
+		background-color: #000000;
+		color: #ffffff;
+		border: 1px solid #000000;
+		border-radius: 0.5rem;
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-size: 0.875rem;
+		font-weight: 500;
+		line-height: 1.25rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		height: 40px;
 	}
 
 	.create-post-btn:hover {
-		background-color: #333;
+		background-color: #222222;
+		border-color: #222222;
+	}
+
+	.create-post-btn:focus {
+		outline: none;
+		box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+	}
+
+	.create-post-btn .btn-icon {
+		transition: transform 0.2s ease;
+	}
+
+	.create-post-btn:hover .btn-icon {
+		transform: translateX(2px);
+	}
+
+	/* Responsive styles */
+	@media (max-width: 640px) {
+		.create-post-btn {
+			padding: 0.5rem 0.75rem;
+			height: 36px;
+		}
+		
+		.create-post-btn .btn-text {
+			display: none;
+		}
 	}
 
 	/* Dashboard Content */

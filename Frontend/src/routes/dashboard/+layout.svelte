@@ -130,38 +130,35 @@
 	</style>
 </svelte:head>
 
-<div class="flex min-h-screen bg-gray-50" style="--active-section-color: {activeSectionColor}">
+<div class="dashboard-layout flex flex-col md:flex-row min-h-screen bg-gray-50" style="--active-section-color: {activeSectionColor}">
 	<!-- Mobile overlay -->
-	{#if isMobile && isSidebarOpen && showSidebar && !isRootDashboard}
-		<div 
-			class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+	{#if isMobile && showSidebar && !isRootDashboard}
+		<button 
+			class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300 {isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+			   w-full h-full focus:outline-none"
 			on:click={toggleSidebar}
-		></div>
+			on:keydown={(e) => e.key === 'Escape' && toggleSidebar()}
+			aria-label="Close sidebar"
+		>
+			<span class="sr-only">Close sidebar</span>
+		</button>
 	{/if}
 
 	<!-- Sidebar - only render when not on root dashboard and not on create page -->
 	{#if showSidebar && !isRootDashboard}
 		<aside 
-			class="fixed top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out {showSidebar ? 'md:translate-x-0' : 'translate-x-full'} {isSidebarOpen && showSidebar ? 'translate-x-0' : '-translate-x-full'}"
+			class="fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out {isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} {!isMobile ? 'md:translate-x-0' : ''}"
 			style="display: {showSidebar ? 'block' : 'none'}"
+			data-visible={isSidebarOpen}
 		>
-			<div class="flex flex-col h-full">
+			<div class="flex flex-col h-full overflow-y-auto">
 				<!-- Sidebar Header -->
-				<div class="flex items-center justify-between p-6 border-b border-gray-200">
-					<h2 class="text-xl font-bold text-gray-900"><a href="/">Srible</a></h2>
-					<!-- Close button for mobile -->
-					<button 
-						class="md:hidden p-2 text-gray-500 hover:text-gray-700"
-						on:click={toggleSidebar}
-					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-						</svg>
-					</button>
+				<div class="p-6 border-b border-gray-200">
+					<h2 class="text-xl font-bold text-gray-900 font-sans"><a href="/">Srible</a></h2>
 				</div>
 
 				<!-- Navigation -->
-				<nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+				<nav class="flex-1 p-4 space-y-2">
 					<a 
 						href="/dashboard/overview" 
 						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'overview' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
@@ -175,28 +172,47 @@
 
 					<a 
 						href="/dashboard/posts" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'posts' ? 'text-green-600 bg-green-50 border-l-4 border-green-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'posts' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 						</svg>
 						Posts
 					</a>
 
 					<a 
 						href="/dashboard/analytics" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'analytics' ? 'text-purple-600 bg-purple-50 border-l-4 border-purple-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'analytics' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 20V10M12 20V4M6 20v-6"></path>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
 						</svg>
 						Analytics
 					</a>
 
 					<a 
+						href="/dashboard/archive" 
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'archive' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+					>
+						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 3h14v17a1 1 0 01-1 1H6a1 1 0 01-1-1V3z"></path>
+						</svg>
+						Archive
+					</a>
+
+					<a 
+						href="/dashboard/themes" 
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'themes' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+					>
+						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.829 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.486m-5.172-5.172l8.486-8.486"></path>
+						</svg>
+						Themes
+					</a>
+
+					<a 
 						href="/dashboard/settings" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'settings' ? 'text-amber-600 bg-amber-50 border-l-4 border-amber-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'settings' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -204,131 +220,130 @@
 						</svg>
 						Settings
 					</a>
-
-					<a 
-						href="/dashboard/themes" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'themes' ? 'text-pink-600 bg-pink-50 border-l-4 border-pink-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
-					>
-						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3h.393a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992Z"></path>
-						</svg>
-						Themes
-					</a>
-
-					<a 
-						href="/dashboard/archive" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'archive' ? 'text-red-600 bg-red-50 border-l-4 border-red-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
-					>
-						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-						</svg>
-						Archive
-					</a>
 				</nav>
+
+				<!-- User section -->
+				<div class="p-4 border-t border-gray-200">
+					<div class="flex items-center">
+						<div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium">
+							U
+						</div>
+						<div class="ml-3 font-sans">
+							<p class="text-sm font-medium text-gray-900">User Name</p>
+							<p class="text-xs text-gray-500">user@example.com</p>
+						</div>
+					</div>
+				</div>
 			</div>
 		</aside>
 	{/if}
 
 	<!-- Main Content -->
-	<main class="flex-1 transition-all duration-300 ease-in-out" class:ml-64={showSidebar && !isMobile && !isRootDashboard}>
+	<main class="flex-1 transition-all duration-300 ease-in-out overflow-y-auto font-sans h-[calc(100vh-4rem)] md:h-[calc(100vh-1rem)]" class:md:ml-64={showSidebar && !isRootDashboard} style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
 		<!-- Mobile Header - only show when sidebar is available and not on root dashboard -->
 		{#if showSidebar && !isRootDashboard}
 			<div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
 				<div class="flex items-center justify-between">
 					<button 
-						class="p-2 text-gray-500 hover:text-gray-700"
-						on:click={toggleSidebar}
-					>
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-						</svg>
-					</button>
-					<h1 class="text-lg font-semibold text-gray-900">Srible</h1>
-					<div class="w-10"></div> <!-- Spacer for centering -->
+					on:click={toggleSidebar}
+					class="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
+					aria-label="Toggle menu"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+					</svg>
+				</button>
 				</div>
 			</div>
 		{/if}
 
-		<!-- Page Content -->
-		<div class="h-full overflow-y-auto">
+		<!-- Page content -->
+		<div class="min-h-full p-6">
 			<slot />
 		</div>
 	</main>
 </div>
 
 <style>
-	/* Dark mode support */
-	:global(.dark) .sidebar {
-		background-color: #1f2937;
-		border-right-color: #374151;
-	}
-
-	:global(.dark) .nav-item {
-		color: #d1d5db;
-	}
-
-	:global(.dark) .nav-item:hover {
-		background-color: #374151;
-		color: #f9fafb;
-	}
-
-	:global(.dark) .nav-item.active {
-		background-color: #374151;
-		color: var(--active-section-color);
-	}
-
-	/* Hide the main site navbar when in dashboard mode */
-	:global(body.dashboard-mode > nav),
-	:global(body.dashboard-mode .global-navbar),
-	:global(body.dashboard-mode > div > nav),
-	:global(body.dashboard-mode > div > div > nav) {
-		display: none !important;
-	}
-
-	:global(body.dashboard-mode) {
-		overflow-x: hidden;
-		background-color: #f8f8f5;
-	}
-
-	/* Ensure proper scrolling behavior */
-	:global(body.dashboard-mode) {
+	/* Scoped styles specifically for the dashboard layout */
+	.dashboard-layout {
+		/* Ensure the dashboard layout takes full viewport */
+		height: 100vh;
 		overflow: hidden;
 	}
 
-	:global(body.dashboard-mode .main-content) {
-		overflow-y: auto;
-		height: 100vh;
+	/* Ensure the main site navbar is hidden in dashboard */
+	:global(body.dashboard-mode > nav),
+	:global(body.dashboard-mode > footer) {
+		display: none !important;
 	}
 
-	/* Ensure sidebar is always visible on desktop when not on create page */
+	/* Dashboard specific styles */
+	.dashboard-layout aside {
+		height: 100vh;
+		overflow-y: auto;
+	}
+
+	.dashboard-layout main {
+		height: 100vh;
+		overflow-y: auto;
+		overflow-x: hidden;
+		scroll-behavior: smooth;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	/* Sidebar transitions */
+	.dashboard-layout aside {
+		transition: transform 0.3s ease-in-out;
+	}
+
+	/* Mobile styles */
+	@media (max-width: 767px) {
+		.dashboard-layout main {
+			height: calc(100vh - 4rem);
+		}
+
+		.dashboard-layout aside {
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 40;
+			transform: translateX(-100%);
+			transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+		}
+
+		.dashboard-layout aside[data-visible="true"] {
+			transform: translateX(0);
+		}
+
+	}
+
+	/* Desktop styles */
 	@media (min-width: 768px) {
-		aside {
+		.dashboard-layout aside {
 			transform: translateX(0) !important;
 		}
-	}
 
-	/* Ensure main content has proper margin on desktop when sidebar is shown */
-	@media (min-width: 768px) {
-		main.ml-64 {
+		.dashboard-layout main {
 			margin-left: 16rem;
 		}
 	}
 
-	/* Smooth transitions for sidebar visibility */
-	aside {
-		transition: transform 0.3s ease-in-out;
+	/* Custom scrollbar for WebKit browsers */
+	.dashboard-layout main::-webkit-scrollbar {
+		width: 6px;
 	}
 
-	main {
-		transition: margin-left 0.3s ease-in-out;
+	.dashboard-layout main::-webkit-scrollbar-track {
+		background: #f1f1f1;
 	}
 
-	/* Ensure sidebar is properly positioned and visible */
-	aside[style*="display: block"] {
-		display: block !important;
+	.dashboard-layout main::-webkit-scrollbar-thumb {
+		background-color: #c1c1c1;
+		border-radius: 3px;
 	}
 
-	aside[style*="display: none"] {
-		display: none !important;
+	.dashboard-layout main::-webkit-scrollbar-thumb:hover {
+		background: #a8a8a8;
 	}
 </style>
