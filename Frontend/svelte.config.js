@@ -9,10 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    adapter: adapter({
-      // Explicitly specify a compatible Node.js runtime
-      runtime: 'nodejs18.x'
-    }),
+    adapter: adapter(),
     alias: {
       '@': resolve(__dirname, './src')
     }
