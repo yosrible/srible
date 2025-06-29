@@ -91,17 +91,17 @@ main > * {
 }
 
 /* Navbar styles */
-/* Ensure only one navbar is visible */
-body > nav ~ nav,
-body > div > nav ~ nav,
-body > div > div > nav ~ nav {
+/* Ensure only one main navbar is visible (not affecting dashboard sidebar) */
+body > nav:not([class*="dashboard"]) ~ nav:not([class*="dashboard"]),
+body > div > nav:not([class*="dashboard"]) ~ nav:not([class*="dashboard"]),
+body > div > div > nav:not([class*="dashboard"]) ~ nav:not([class*="dashboard"]) {
 	display: none !important;
 }
 
 /* Ensure main navbar is always visible */
-body > nav:first-of-type,
-body > div > nav:first-of-type,
-body > div > div > nav:first-of-type {
+body > nav:first-of-type:not([class*="dashboard"]),
+body > div > nav:first-of-type:not([class*="dashboard"]),
+body > div > div > nav:first-of-type:not([class*="dashboard"]) {
 	display: flex !important;
 	opacity: 1 !important;
 	visibility: visible !important;

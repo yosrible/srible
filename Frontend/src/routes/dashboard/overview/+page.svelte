@@ -42,9 +42,9 @@
 </script>
 
 <header class="content-header">
-	<h1>Dashboard</h1>
+	<h1 class="text-lg font-semibold sm:text-xl ml-2 sm:ml-0">Dashboard</h1>
 	<button 
-		class="create-post-btn" 
+		class="create-post-btn mr-2 sm:mr-0 sm:ml-auto"
 		on:click={() => {
 			// Hide sidebar immediately
 			if (sidebar) {
@@ -56,17 +56,12 @@
 			}, 50);
 		}}
 	>
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-			<path
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="M12 5v14M5 12h14"
-			/>
+		<!-- Pen icon -->
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M12 20h9" />
+			<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z" />
 		</svg>
-		<span>Create New Post</span>
+		<span class="hidden sm:inline">Create New Post</span>
 	</button>
 </header>
 
@@ -271,9 +266,17 @@
 
 	@media (max-width: 640px) {
 		.content-header {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 1rem;
+			flex-direction: row;
+			align-items: center;
+			gap: 0.5rem;
+		}
+		.create-post-btn {
+			margin-left: auto;
+			padding: 0.5rem 0.75rem;
+			font-size: 0.95rem;
+		}
+		.create-post-btn span {
+			display: none;
 		}
 
 		.dashboard-content {
