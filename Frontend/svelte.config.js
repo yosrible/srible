@@ -10,8 +10,8 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
-      // Fallback for SPA routing (optional)
-      fallback: 'index.html'
+      // Explicitly specify a compatible Node.js runtime
+      runtime: 'nodejs18.x'
     }),
     alias: {
       '@': resolve(__dirname, './src')
