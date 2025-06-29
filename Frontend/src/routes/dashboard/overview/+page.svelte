@@ -42,7 +42,7 @@
 </script>
 
 <header class="content-header">
-	<h1 class="text-lg font-semibold sm:text-xl ml-2 sm:ml-0">Dashboard</h1>
+	<h1 class="text-lg font-semibold sm:text-xl" style="margin-left:15px;margin-right:15px;">Dashboard</h1>
 	<button 
 		class="create-post-btn mr-2 sm:mr-0 sm:ml-auto"
 		on:click={() => {
