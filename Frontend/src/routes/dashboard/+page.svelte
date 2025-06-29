@@ -42,6 +42,10 @@
 		// For now, we'll just simulate a non-waitlisted user
 		isWaitlisted = false;
 	});
+
+	let isSidebarOpen = false;
+	function toggleSidebar() { isSidebarOpen = !isSidebarOpen; }
+	function closeSidebar() { isSidebarOpen = false; }
 </script>
 
 {#if isWaitlisted}
@@ -68,93 +72,143 @@
 		</div>
 	</div>
 {:else}
-	<!-- Dashboard Overview Content -->
-	<header class="dashboard-header">
-		<h1>Dashboard</h1>
-		<button class="create-post-button" on:click={handleCreatePost}>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-				<path
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 5v14M5 12h14"
-				/>
-			</svg>
-			<span>Create New Post</span>
-		</button>
-	</header>
+<div class="min-h-screen flex bg-neutral-50">
+	<!-- Sidebar -->
+	<aside class="fixed z-40 inset-y-0 left-0 w-64 bg-white shadow-md transform transition-transform duration-300
+		{isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+		md:translate-x-0 md:sticky md:top-0 md:h-screen md:block">
+		<div class="flex items-center h-16 px-6 border-b">
+			<span class="font-bold text-xl tracking-tight text-black">Srible</span>
+			<button class="ml-auto md:hidden p-2" on:click={closeSidebar} aria-label="Close sidebar">
+				<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+				</svg>
+			</button>
+		</div>
+		<nav class="py-6">
+			<ul class="flex flex-col gap-1">
+				<li>
+					<a href="/dashboard/overview" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+						<!-- Optionally add an icon here -->
+						Overview
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/posts" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+						Posts
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/analytics" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+						Analytics
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/settings" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+						Settings
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/themes" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+						Themes
+					</a>
+				</li>
+				<li>
+					<a href="/dashboard/archive" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+						Archive
+					</a>
+				</li>
+			</ul>
+		</nav>
+	</aside>
 
-	<div class="stats-container">
-		<div class="stat-card">
-			<div class="stat-header">Total Page Views</div>
-			<div class="stat-value">{pageViews}</div>
-		</div>
-		<div class="stat-card">
-			<div class="stat-header">Total Posts</div>
-			<div class="stat-value">{totalPosts}</div>
-		</div>
-		<div class="stat-card">
-			<div class="stat-header">Subscribers</div>
-			<div class="stat-value">{totalSubscribers}</div>
-		</div>
-		<div class="stat-card">
-			<div class="stat-header">Comments</div>
-			<div class="stat-value">{totalComments}</div>
-		</div>
-	</div>
+	<!-- Overlay for mobile sidebar -->
+	{#if isSidebarOpen}
+		<div class="fixed inset-0 z-30 bg-black/20 md:hidden" on:click={closeSidebar}></div>
+	{/if}
 
-	<div class="recent-posts">
-		<h2>Recent Posts</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>Title</th>
-					<th>Date</th>
-					<th>Views</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each recentPosts as post}
-					<tr>
-						<td>{post.title}</td>
-						<td>{post.date}</td>
-						<td>{post.views}</td>
-						<td>
-							<button class="action-button edit" aria-label="Edit post">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-									<path
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-									/>
-									<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-								</svg>
-							</button>
-							<button class="action-button view" aria-label="View post">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-									<path
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-									/>
-									<circle cx="12" cy="12" r="3" />
-								</svg>
-							</button>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+	<!-- Main content area -->
+	<div class="flex-1 flex flex-col min-h-screen md:ml-64 transition-all">
+		<!-- Navbar -->
+		<nav class="bg-white shadow flex items-center justify-between px-4 py-3 sticky top-0 z-10">
+			<div class="flex items-center gap-2">
+				<button class="block md:hidden p-2" on:click={toggleSidebar} aria-label="Open sidebar">
+					<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+					</svg>
+				</button>
+				<span class="font-bold text-lg tracking-tight text-black">Srible</span>
+			</div>
+			<button class="bg-black text-white px-4 py-2 rounded-md font-semibold hover:bg-gray-900 transition flex items-center gap-2" on:click={handleCreatePost}>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
+				</svg>
+				Create New Post
+			</button>
+		</nav>
+
+		<!-- Dashboard Content -->
+		<main class="flex-1 p-4 md:p-8">
+			<div class="stats-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+				<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
+					<div class="stat-header text-gray-500 text-sm font-medium">Total Page Views</div>
+					<div class="stat-value text-3xl font-bold text-black">{pageViews}</div>
+				</div>
+				<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
+					<div class="stat-header text-gray-500 text-sm font-medium">Total Posts</div>
+					<div class="stat-value text-3xl font-bold text-black">{totalPosts}</div>
+				</div>
+				<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
+					<div class="stat-header text-gray-500 text-sm font-medium">Subscribers</div>
+					<div class="stat-value text-3xl font-bold text-black">{totalSubscribers}</div>
+				</div>
+				<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
+					<div class="stat-header text-gray-500 text-sm font-medium">Comments</div>
+					<div class="stat-value text-3xl font-bold text-black">{totalComments}</div>
+				</div>
+			</div>
+
+			<div class="recent-posts bg-white rounded-xl shadow-md p-6">
+				<h2 class="text-xl font-bold mb-4 text-black">Recent Posts</h2>
+				<div class="overflow-x-auto">
+					<table class="min-w-full text-left">
+						<thead>
+							<tr>
+								<th class="py-3 px-4 text-gray-500 font-semibold text-sm">Title</th>
+								<th class="py-3 px-4 text-gray-500 font-semibold text-sm">Date</th>
+								<th class="py-3 px-4 text-gray-500 font-semibold text-sm">Views</th>
+								<th class="py-3 px-4 text-gray-500 font-semibold text-sm">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each recentPosts as post}
+								<tr class="border-t last:border-b hover:bg-neutral-50 transition">
+									<td class="py-3 px-4 font-medium text-black">{post.title}</td>
+									<td class="py-3 px-4 text-gray-600">{post.date}</td>
+									<td class="py-3 px-4 text-gray-600">{post.views}</td>
+									<td class="py-3 px-4">
+										<button class="inline-flex items-center p-2 rounded hover:bg-neutral-100 transition" aria-label="Edit post">
+											<svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+												<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+											</svg>
+										</button>
+										<button class="inline-flex items-center p-2 rounded hover:bg-neutral-100 transition" aria-label="View post">
+											<svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+												<circle cx="12" cy="12" r="3"/>
+											</svg>
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</main>
 	</div>
+</div>
 {/if}
 
 <style>
@@ -215,39 +269,150 @@
 		background-color: #333;
 	}
 
-	/* Dashboard Header */
-	.dashboard-header {
+	/* Dashboard Layout */
+	.min-h-screen {
+		min-height: 100vh;
+	}
+
+	.flex {
 		display: flex;
-		justify-content: space-between;
+	}
+
+	.flex-1 {
+		flex: 1;
+	}
+
+	.gap-2 {
+		gap: 0.5rem;
+	}
+
+	.gap-3 {
+		gap: 0.75rem;
+	}
+
+	.gap-6 {
+		gap: 1.5rem;
+	}
+
+	.mb-8 {
+		margin-bottom: 2rem;
+	}
+
+	/* Sidebar */
+	aside {
+		position: fixed;
+		z-index: 40;
+		inset: 0 0 0 0;
+		left: 0;
+		width: 16rem; /* w-64 */
+		background-color: #fff;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+		transition: transform 0.3s ease;
+	}
+
+	aside .close-btn {
+		margin-left: auto;
+		padding: 0.5rem;
+		display: none;
+	}
+
+	@media (max-width: 768px) {
+		aside .close-btn {
+			display: block;
+		}
+	}
+
+	aside nav {
+		padding-top: 1.5rem;
+		padding-bottom: 1.5rem;
+	}
+
+	aside ul {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	aside a {
+		display: flex;
 		align-items: center;
-		margin-bottom: 1.5rem;
-	}
-
-	.dashboard-header h1 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-	}
-
-	.create-post-button {
-		background-color: var(--primary-black, #1a1a1a);
-		color: white;
-		border: none;
-		border-radius: 6px;
-		padding: 0.75rem 1.25rem;
-		font-size: 0.9375rem;
+		gap: 0.75rem;
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-radius: 0.5rem;
 		font-weight: 500;
-		cursor: pointer;
+		color: #1f2937; /* text-gray-800 */
+		border-left: 2px solid transparent;
+		transition: background 0.2s, border-color 0.2s;
+		text-decoration: none;
+	}
+	aside a:hover {
+		background-color: #f3f4f6; /* hover:bg-gray-100 */
+		border-left: 2px solid #000; /* hover:border-black */
+	}
+
+	/* Overlay for mobile sidebar */
+	.fixed.inset-0.z-30 {
+		position: fixed;
+		inset: 0;
+		z-index: 30;
+		background-color: rgba(0,0,0,0.2);
+	}
+
+	/* Navbar */
+	nav {
+		background-color: #fff;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
+		position: sticky;
+		top: 0;
+		z-index: 10;
+	}
+
+	nav .toggle-sidebar {
+		display: block;
+		padding: 0.5rem;
+	}
+
+	@media (min-width: 768px) {
+		nav .toggle-sidebar {
+			display: none;
+		}
+	}
+
+	nav .brand {
+		font-weight: bold;
+		font-size: 1.125rem;
+		letter-spacing: -0.01em;
+		color: #000;
+	}
+
+	nav .create-post {
+		background-color: #000;
+		color: #fff;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-radius: 0.375rem;
+		font-weight: 600;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		min-height: 44px; /* Touch-friendly */
+		transition: background 0.2s;
+		border: none;
+		cursor: pointer;
 	}
-
-	.create-post-button:hover {
-		background-color: #333;
+	nav .create-post:hover {
+		background-color: #111827; /* hover:bg-gray-900 */
 	}
 
 	/* Stats Container */

@@ -12,7 +12,7 @@
   import { page } from '$app/stores';
   
   // Define routes where navbar and footer should be hidden
-  const minimalLayoutRoutes = ['/error'];
+  const minimalLayoutRoutes = ['/error']; 
   
   // Initialize with default values
   let useMinimalLayout = false;
@@ -30,6 +30,9 @@
       document.body.classList.add('error-page-active');
     }
   }
+  
+  // Reactive statement to check if current route should hide navbar/footer
+  $: isDashboardRoute = $page?.url?.pathname?.startsWith('/dashboard') || false;
   
   // Update layout based on route changes
   $: if (typeof window !== 'undefined') {
@@ -85,15 +88,15 @@
   injectAnalytics();
 </script>
 
-{#if !useMinimalLayout}
+{#if !useMinimalLayout && !isDashboardRoute}
   <Navbar />
 {/if}
 
-<main class="content" class:minimal-layout={useMinimalLayout}>
+<main class="content" class:minimal-layout={useMinimalLayout} class:dashboard-layout={isDashboardRoute}>
   <slot />
 </main>
 
-{#if !useMinimalLayout}
+{#if !useMinimalLayout && !isDashboardRoute}
   <Footer />
 {/if}
 
@@ -148,6 +151,11 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+  }
+
+  /* Dashboard layout styles */
+  :global(.content.dashboard-layout) {
+    padding-top: 0; /* Remove top padding since navbar is hidden */
   }
 
   .content {
