@@ -1,11 +1,6 @@
-// This is a placeholder for the Supabase client
-// You'll need to install the @supabase/supabase-js package with:
-// pnpm add @supabase/supabase-js
-
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables should be set in .env file
-// Add fallback empty strings to prevent build errors
+// Load environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 

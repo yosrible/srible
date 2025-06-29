@@ -3,9 +3,8 @@
 	import ProductDemo from '$lib/components/ProductDemo.svelte';
 	import Features from '$lib/components/Features.svelte';
 	import FAQ from '$lib/components/FAQ.svelte';
-	import Footer from '$lib/components/Footer.svelte';
+	import SectionTitle from '$lib/components/ui/SectionTitle.svelte';
 	import { onMount, onDestroy } from 'svelte';
-	import { page } from '$app/stores';
 	import { syncWaitlistToSupabase } from '$lib/waitlistSync';
 
 	let observer: IntersectionObserver;
@@ -59,25 +58,76 @@
 		// Only run in browser environment
 		if (!isBrowser) return;
 
-		observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('visible');
-					}
-				});
-			},
-			{ rootMargin: '0px 0px -10% 0px' }
-		);
+		// Disconnect existing observer if any
+		if (observer) {
+			observer.disconnect();
+		}
 
-		// Safe DOM manipulation for browser environment
-		const animatedElements = document.querySelectorAll('.scroll-animate');
-		if (animatedElements && animatedElements.length) {
+		// Initialize with a small delay to ensure DOM is ready
+		const initObserver = () => {
+			// Check if elements exist
+			const animatedElements = document.querySelectorAll('.scroll-animate');
+			if (!animatedElements.length) return;
+
+			// Create new observer with more aggressive settings
+			observer = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('visible');
+							// Unobserve after animation completes to improve performance
+							setTimeout(() => {
+								if (entry.isIntersecting) {
+									observer?.unobserve(entry.target);
+								}
+							}, 1000);
+						}
+					});
+				},
+				{ 
+					root: null, // viewport
+					rootMargin: '0px 0px -20px 0px', // Start animation when element is 20px from bottom of viewport
+					threshold: 0.05 // trigger when 5% of the element is visible
+				}
+			);
+
+			// Observe all elements with scroll-animate class
 			animatedElements.forEach((el) => {
-				el.classList.add('will-animate');
+				// Reset animation state
+				el.classList.remove('visible');
+				// Force reflow to reset animation
+				const elAsHTMLElement = el as HTMLElement;
+				void elAsHTMLElement.offsetWidth;
+				// Observe the element
 				observer.observe(el);
 			});
-		}
+
+			// Check immediately if elements are already in view
+			checkElementsInView(animatedElements);
+		};
+
+		// Function to check if elements are already in view
+		const checkElementsInView = (elements: NodeListOf<Element>) => {
+			const check = () => {
+				elements.forEach(el => {
+					const rect = el.getBoundingClientRect();
+					const isVisible = (
+						rect.top <= (window.innerHeight * 0.9) &&
+						rect.bottom >= 0
+					);
+					if (isVisible) {
+						el.classList.add('visible');
+					}
+				});
+			};
+
+			// Check immediately and after a short delay
+			check();
+			setTimeout(check, 100);
+		};
+
+		// Run immediately and with a small delay
+		setTimeout(initObserver, 50);
 	}
 
 	function handleNavigation() {
@@ -220,47 +270,63 @@
 <FAQ />
 
 <section class="pricing-section scroll-animate" id="pricing">
-	<div class="section-decoration"></div>
-	<h2 class="pricing-title">Simple, Transparent Pricing</h2>
-	<p class="pricing-subtitle">Choose the plan that fits your writing journey. No hidden fees.</p>
-	<div class="pricing-cards">
-		<div class="pricing-card faded">
-			<div class="card-decoration"></div>
-			<h3>Pro <span class="badge">Coming Soon</span></h3>
-			<p class="price">$5.99<span>/month</span></p>
-			<ul>
-				<li>Everything in Free</li>
-				<li>Premium themes</li>
-				<li>Custom domain</li>
-				<li>Advanced analytics</li>
-				<li>Priority support</li>
-			</ul>
-			<a href="/signup?plan=pro" class="btn btn-secondary">Coming Soon</a>
-		</div>
-		<div class="pricing-card pricing-card--free">
-			<div class="card-decoration"></div>
-			<h3>Free</h3>
-			<p class="price">$0<span>/month</span></p>
-			<ul>
-				<li>Unlimited posts</li>
-				<li>Basic themes</li>
-				<li>Srible sub domain</li>
-				<li>Community support</li>
-			</ul>
-			<a href="/signup" class="btn btn-primary">Get Started</a>
-		</div>
-		<div class="pricing-card faded">
-			<div class="card-decoration"></div>
-			<h3>Enterprise <span class="badge">Custom</span></h3>
-			<p class="price">Contact Us</p>
-			<ul>
-				<li>Everything in Pro</li>
-				<li>Dedicated support</li>
-				<li>Custom integrations</li>
-			</ul>
-			<button class="btn btn-secondary">Coming Soon</button>
-		</div>
-	</div>
+  <SectionTitle 
+    title="Simple, Transparent Pricing"
+    subtitle="Choose the plan that fits your writing journey"
+  />
+  <div class="pricing-cards">
+    <div class="pricing-card">
+      <div class="pricing-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3B82F6" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3>Enterprise</h3>
+      <p class="price">Custom</p>
+      <div class="coming-soon">Coming Soon</div>
+      <ul>
+        <li>Everything in Pro</li>
+        <li>Dedicated support</li>
+        <li>Custom integrations</li>
+        <li>Team features</li>
+      </ul>
+      <button class="btn btn-coming-soon" disabled>Coming Soon</button>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#10B981" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <h3>Free</h3>
+      <p class="price">$0<span>/month</span></p>
+      <ul>
+        <li>Unlimited posts</li>
+        <li>Basic themes</li>
+        <li>Srible subdomain</li>
+        <li>Community support</li>
+      </ul>
+      <a href="/signup" class="btn btn-primary">Get Started <span class="arrow">→</span></a>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#8B5CF6" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h3>Pro</h3>
+      <p class="price">$5.99<span>/month</span></p>
+      <div class="coming-soon">Coming Soon</div>
+      <ul>
+        <li>Everything in Free</li>
+        <li>Premium themes</li>
+        <li>Custom domain</li>
+        <li>Advanced analytics</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="btn btn-coming-soon" disabled>Coming Soon</button>
+    </div>
+  </div>
 </section>
 
 <section class="waitlist-section scroll-animate" id="waitlist">
@@ -288,294 +354,478 @@
 	{/if}
 </section>
 
-<Footer />
-
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@700&display=swap');
 
 	/* Main page styles */
 
 	.pricing-section {
-		padding: 4rem 0;
-		position: relative;
-		background: #f8f8f5;
-		overflow: hidden;
-	}
+  padding: 3rem 0;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: -1px -1px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+	/* Section title styles are defined in the SectionTitle component */
 
 	.pricing-cards {
-		display: flex;
-		max-width: 1100px;
-		margin: 0 auto;
-		gap: 2rem;
-		justify-content: center;
-		padding: 0 1rem;
-		position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.pricing-cards::-webkit-scrollbar {
+		display: none;
 	}
 
 	.pricing-card {
-		background: white;
-		border-radius: 1rem;
-		padding: 2rem;
-		width: 100%;
-		max-width: 320px;
-		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-		transition: all 0.3s ease;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		position: relative;
-		overflow: hidden;
-	}
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 300px;
+  max-width: 100%;
+  min-width: 0; /* Prevents flex items from overflowing */
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+}
 
-	.pricing-card:hover {
-		transform: translateY(-5px);
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-	}
+.pricing-card.featured {
+  border: 2px solid #000;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
 
-	.pricing-card h3 {
-		font-size: clamp(1.4rem, 4vw, 1.75rem);
-		font-weight: 700;
-		margin-bottom: 1rem;
-		color: #000;
-		font-family: 'Poppins', sans-serif;
-		text-align: center;
-		width: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
-		gap: 0.3rem;
-	}
+.pricing-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  background-color: rgba(243, 244, 246, 0.3);
+  transform: scale(1);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
 
-	.pricing-title {
-		font-family: 'Poppins', sans-serif;
-		font-size: clamp(1.8rem, 5vw, 2.5rem);
-		font-weight: 700;
-		text-align: center;
-		margin-bottom: 0.5rem;
-		color: #000;
-	}
+.pricing-card:hover .pricing-icon {
+  transform: scale(1.1);
+  background-color: rgba(243, 244, 246, 0.5);
+}
 
-	.pricing-subtitle {
-		text-align: center;
-		color: #666;
-		font-size: clamp(0.9rem, 3vw, 1.1rem);
-		margin-bottom: 2.5rem;
-		font-family: 'Inter', sans-serif;
-	}
+.pricing-icon svg {
+  width: 22px;
+  height: 22px;
+}
 
-	.price {
-		font-size: clamp(1.8rem, 5vw, 2.5rem);
-		font-weight: 700;
-		margin-bottom: 1.5rem;
-		color: #000;
-		font-family: 'Poppins', sans-serif;
-		text-align: center;
-	}
+.coming-soon {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.9;
+  text-align: center;
+  margin: 0 0 1.25rem 0;
+  width: 100%;
+  transition: all 0.2s ease;
+}
 
-	.price span {
-		font-size: 1rem;
-		font-weight: 400;
-		color: #666;
-	}
+.pricing-card h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  text-align: center;
+  color: #111827;
+}
 
-	.pricing-card ul {
-		list-style: none;
-		padding: 0;
-		margin: 0 0 1.5rem 0;
-		width: 100%;
-	}
+.price {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0.4rem 0 1.5rem;
+  text-align: center;
+  color: #111827;
+  line-height: 1.2;
+}
 
-	.pricing-card ul li {
-		font-size: 1rem;
-		color: #333;
-		margin-bottom: 0.5rem;
-		text-align: left;
-		position: relative;
-		padding-left: 1.5rem;
-	}
+.price span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-left: 4px;
+}
 
-	.pricing-card ul li::before {
-		content: '✓';
-		position: absolute;
-		left: 0;
-		color: #42e695;
-		font-weight: bold;
-	}
+.pricing-card ul {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1.5rem 0;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
 
-	.btn {
-		display: inline-block;
-		padding: 0.75rem 1.5rem;
-		border-radius: 0.5rem;
-		font-family: 'Inter', sans-serif;
-		font-size: 1rem;
-		font-weight: 500;
-		text-decoration: none;
-		transition: all 0.3s ease;
-		cursor: pointer;
-		border: none;
-		position: relative;
-		overflow: hidden;
-	}
+.pricing-card ul li {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+}
 
-	.btn::before {
-		display: none;
-	}
+.btn {
+	display: inline-block;
+	padding: 0.6rem 1.25rem;
+	border-radius: 6px;
+	font-family: 'Inter', sans-serif;
+	font-weight: 500;
+	font-size: 0.9rem;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	width: 100%;
+	border: none;
+}
 
-	.btn:hover::before {
-		display: none;
-	}
+.btn-coming-soon {
+	background: transparent;
+	color: #666;
+	border: 1px solid #e0e0e0;
+	cursor: not-allowed;
+}
 
-	.btn-primary {
-		background-color: #000;
-		color: white;
-	}
+.btn-coming-soon:hover {
+	background: transparent;
+	color: #666;
+}
 
-	.btn-primary:hover {
-		background-color: #000;
-	}
+.btn-primary {
+	background: #000;
+	color: white;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	padding: 0.6rem 1.25rem;
+	position: relative;
+	overflow: hidden;
+	font-size: 0.9rem;
+}
 
-	.btn-secondary {
-		background: #f5f5f5;
-		color: #333;
-	}
+.arrow {
+  position: relative;
+  right: 0;
+  transition: transform 0.3s ease;
+}
 
-	.btn-secondary:hover {
-		background-color: #f5f5f5;
-	}
+.btn-primary:hover .arrow {
+  transform: translateX(4px);
+}
 
-	.btn:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-		transform: none !important;
-	}
+.btn-primary:hover {
+  background: #333;
+  border-color: #333;
+}
 
-	.badge {
-		display: inline-block;
-		background: #eee;
-		color: #666;
-		font-size: 0.8rem;
-		padding: 0.2em 0.7em;
-		border-radius: 0.5em;
-		vertical-align: middle;
-		white-space: nowrap;
-	}
+/* Responsive adjustments */
+/* 1010px - 901px */
+@media (max-width: 1010px) and (min-width: 901px) {
+  .pricing-section {
+    padding: 2.5rem 0;
+  }
+  
+  .pricing-cards {
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+    max-width: 100%;
+  }
+  
+  .pricing-card {
+    flex: 1 1 calc(50% - 1.5rem);
+    min-width: 320px;
+    max-width: calc(50% - 0.75rem);
+    padding: 1.75rem 1.25rem;
+  }
+  
+  .price {
+    font-size: 1.85rem;
+  }
+}
 
-	.pricing-card--free {
-		position: relative;
-		z-index: 1;
-		background: #fff;
-		border: 1px solid #eee;
-		border-radius: 0.75rem;
-	}
+/* 900px - 801px */
+@media (max-width: 900px) and (min-width: 801px) {
+  .pricing-section {
+    padding: 2.25rem 0;
+  }
+  
+  .pricing-cards {
+    gap: 1.25rem;
+    padding: 0 1.25rem;
+  }
+  
+  .pricing-card {
+    flex: 1 1 calc(50% - 1.25rem);
+    min-width: 300px;
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+  }
+  
+  .price {
+    font-size: 1.75rem;
+  }
+}
 
-	.pricing-card--free::before {
-		display: none;
-	}
+/* 800px - 701px */
+@media (max-width: 800px) and (min-width: 701px) {
+  .pricing-section {
+    padding: 2rem 0;
+  }
+  
+  .pricing-cards {
+    padding: 0 1.25rem;
+    gap: 1.25rem;
+  }
+  
+  .pricing-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 1.5rem 1.25rem;
+  }
+  
+  .pricing-card.featured {
+    transform: none;
+  }
+  
+  .price {
+    font-size: 1.75rem;
+  }
+}
 
-	.pricing-card.faded {
-		opacity: 0.4;
-		pointer-events: none;
-		transform: scale(0.95);
-	}
+/* 700px - 601px */
+@media (max-width: 700px) and (min-width: 601px) {
+  .pricing-section {
+    padding: 1.75rem 0;
+  }
+  
+  .pricing-cards {
+    padding: 0 1.25rem;
+    gap: 1.25rem;
+  }
+  
+  .pricing-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 1.5rem 1.25rem;
+  }
+  
+  .price {
+    font-size: 1.65rem;
+  }
+}
 
-	.pricing-card.faded:hover {
-		transform: scale(0.95);
-		box-shadow: none;
-	}
+/* 600px and below */
+@media (max-width: 600px) {
+  .pricing-section {
+    padding: 1.5rem 0.75rem;
+  }
+  
+  .pricing-cards {
+    padding: 0 0.5rem;
+    gap: 1rem;
+  }
+  
+  .pricing-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .price {
+    font-size: 1.5rem;
+  }
+}
 
-	.pricing-card.faded .btn {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
+@media (max-width: 767px) {
+  .pricing-cards {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+  
+  .pricing-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 1.5rem 1.25rem;
+  }
+  
+  .pricing-card.featured {
+    transform: none;
+  }
+  
+  .pricing-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 1rem;
+  }
+  
+  .price {
+    font-size: 2rem;
+    margin: 0.25rem 0 1.25rem;
+  }
+  
+  .coming-soon {
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .pricing-card ul {
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .pricing-card ul li {
+    font-size: 0.9rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
 
-	.pricing-card.faded .badge {
-		opacity: 0.6;
-	}
+.waitlist-section {
+	padding: 5rem 1.5rem;
+	text-align: center;
+	background: #ffffff;
+}
 
-	.waitlist-section {
-		max-width: 680px;
-		margin: 2.5rem auto;
-		padding: clamp(1.25rem, 5vw, 1.75rem) clamp(0.75rem, 3vw, 1rem);
-		background: #f8f8f5;
-		position: relative;
-		border-radius: clamp(0.75rem, 2vw, 1rem);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-		text-align: center;
-		width: 100%;
-		box-sizing: border-box;
-	}
+.waitlist-title {
+	font-family: 'Inter', sans-serif;
+	font-size: 2.25rem;
+	font-weight: 600;
+	margin: 0 0 1rem;
+	color: #1a1a1a;
+	line-height: 1.2;
+}
+
+.waitlist-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: #4b5563;
+  margin: 0 auto 2.5rem;
+  max-width: 600px;
+  line-height: 1.6;
+}
 
 	.waitlist-title {
-		font-family: 'Poppins', sans-serif;
-		font-size: clamp(1.5rem, 5vw, 2.5rem);
-		font-weight: 700;
-		text-align: center;
-		margin-bottom: clamp(0.25rem, 1vw, 0.5rem);
-		color: #000;
+		font-family: 'Inter', sans-serif;
+		font-size: 2.25rem;
+		font-weight: 600;
+		margin: 0 0 1rem;
+		color: #1a1a1a;
 		line-height: 1.2;
 	}
 
 	.waitlist-subtitle {
-		text-align: center;
-		color: #666;
-		font-size: clamp(0.85rem, 3vw, 1.1rem);
-		margin-bottom: clamp(1rem, 4vw, 1.5rem);
 		font-family: 'Inter', sans-serif;
-		line-height: 1.4;
-		max-width: 90%;
-		margin-left: auto;
-		margin-right: auto;
+		font-size: 1.125rem;
+		font-weight: 400;
+		color: #4b5563;
+		margin: 0 auto 2.5rem;
+		max-width: 600px;
+		line-height: 1.6;
 	}
 
 	.waitlist-form {
 		display: flex;
-		flex-direction: row;
-		gap: clamp(0.5rem, 2vw, 0.75rem);
-		width: 100%;
+		flex-direction: column;
+		gap: 1rem;
 		max-width: 500px;
-		margin: 0 auto clamp(0.75rem, 3vw, 1rem);
+		margin: 0 auto;
 	}
 
 	.waitlist-input {
-		flex: 1;
-		padding: clamp(0.6rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
-		border: 1px solid #eee;
-		border-radius: clamp(0.375rem, 1.5vw, 0.5rem);
+		padding: 0.875rem 1.25rem;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
 		font-family: 'Inter', sans-serif;
-		font-size: clamp(0.875rem, 3vw, 1rem);
-		min-height: 48px;
-		background: white;
-		-webkit-appearance: none;
-		appearance: none;
-		width: 100%;
-		box-sizing: border-box;
+		font-size: 1rem;
+		color: #1f2937;
+		transition: all 0.2s ease;
 	}
 
 	.waitlist-input:focus {
 		outline: none;
-		border-color: #d1d1d1;
+		border-color: #000;
+		box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 	}
 
 	.waitlist-btn {
-		min-height: 48px;
-		min-width: clamp(100px, 30%, 120px);
-		white-space: nowrap;
-		font-size: clamp(0.875rem, 3vw, 1rem);
-		padding: clamp(0.6rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
-		border-radius: clamp(0.375rem, 1.5vw, 0.5rem);
-		touch-action: manipulation;
+		padding: 0.6rem 1.25rem;
+		background: #000;
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-family: 'Inter', sans-serif;
+		font-size: 0.9rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		text-decoration: none;
+		width: 100%;
+		max-width: 200px;
+		margin: 0.5rem auto 0;
+	}
+
+	.waitlist-btn:hover {
+		background: #333;
+		transform: translateY(-1px);
+	}
+
+	.waitlist-btn:active {
+		transform: translateY(0);
 	}
 
 	.waitlist-message {
-		margin-top: clamp(0.5rem, 2vw, 0.75rem);
+		margin: 1rem auto 0;
 		padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.5rem, 2vw, 0.75rem);
 		border-radius: clamp(0.375rem, 1.5vw, 0.5rem);
 		font-family: 'Inter', sans-serif;
 		font-size: clamp(0.8rem, 2.5vw, 0.9rem);
 		max-width: 500px;
-		margin-left: auto;
-		margin-right: auto;
 		line-height: 1.4;
 		width: 100%;
 		box-sizing: border-box;
@@ -596,18 +846,34 @@
 		color: #d32f2f;
 	}
 
-	@media (max-width: 768px) {
-		.pricing-cards {
-			flex-direction: column;
-			gap: 1.5rem;
-			align-items: center;
-		}
+	@media (max-width: 1024px) {
 		.pricing-section {
-			padding: 1.5rem 0.5rem;
+			padding: 2.5rem 1rem;
 		}
-		.pricing-title {
-			font-size: 2rem;
+		.pricing-cards {
+			padding: 0.5rem 1rem;
 		}
+	}
+
+	@media (max-width: 768px) {
+		.pricing-section {
+			padding: 2rem 1rem;
+		}
+		.pricing-cards {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 1.5rem;
+			padding: 1rem 0;
+			overflow: visible;
+		}
+		.pricing-card {
+			width: 100%;
+			max-width: 280px;
+			margin: 0;
+			padding: 1.25rem;
+		}
+		/* Section title styles are defined in the SectionTitle component */
 		.waitlist-section {
 			margin: 1.75rem auto;
 			padding: 1.25rem 0.75rem;
@@ -635,9 +901,37 @@
 	}
 
 	@media (max-width: 480px) {
+		.pricing-card ul {
+			margin: 0.75rem 0;
+			padding-left: 1.25rem;
+		}
+		.pricing-cards {
+			gap: 1.25rem;
+			padding: 0.5rem 0.25rem 1rem;
+		}
+		.pricing-card {
+			width: 100%;
+			max-width: 260px;
+			padding: 1rem;
+		}
+		.pricing-card h3 {
+			font-size: 1.25rem;
+		}
+		.price {
+			font-size: 2rem;
+		}
+		.pricing-card ul {
+			margin: 1rem 0;
+		}
+		.pricing-card li {
+			font-size: 0.9rem;
+			margin-bottom: 0.4rem;
+		}
+		/* Section title styles are defined in the SectionTitle component */
 		.btn {
 			width: 100%;
 			justify-content: center;
+			padding: 0.75rem 1.25rem;
 		}
 		.waitlist-section {
 			margin: 1.25rem auto;
@@ -660,19 +954,12 @@
 	}
 
 	@media (max-width: 320px) {
-		.badge {
-			font-size: 0.65rem;
-			display: block;
-			margin: 0.3rem auto 0;
-		}
 		.waitlist-subtitle {
 			font-size: 0.85rem;
 			max-width: 100%;
 			margin-bottom: 0.875rem;
 		}
 		.waitlist-input, .waitlist-btn {
-			font-size: 0.9rem;
-			padding: 0.6rem 1rem;
 			min-height: 52px;
 		}
 		.waitlist-form {

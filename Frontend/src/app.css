@@ -4,20 +4,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal scroll */
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+/* Ensure full height for app container */
+#svelte {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: hidden;
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+
 /* Base styles */
 html {
 	scroll-behavior: smooth;
 }
 
-/* Hide sidebar by default until JavaScript initializes */
-.sidebar {
-	display: none;
-}
-
-/* Show sidebar only when explicitly toggled */
-.sidebar-visible .sidebar {
-	display: flex;
-}
+/* Sidebar styles removed as they're not being used */
 
 body {
 	font-family: Inter, Arial, sans-serif;
@@ -26,8 +38,105 @@ body {
 	background: #f8f8f5;
 	font-size: 1.08rem;
 	letter-spacing: 0.01em;
-	overflow-x: hidden;
+	margin: 0;
+	padding: 0;
 	text-rendering: optimizeLegibility;
+	width: 100%;
+	min-height: 100vh;
+	position: relative;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Scroll Animation Styles */
+.scroll-animate {
+	opacity: 0;
+	transform: translateY(20px);
+	filter: blur(4px);
+	transition:
+		opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+		transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+		filter 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+	will-change: opacity, transform, filter;
+	backface-visibility: hidden;
+	transform-style: preserve-3d;
+}
+
+.scroll-animate.visible {
+	opacity: 1 !important;
+	transform: translateY(0) !important;
+	filter: blur(0) !important;
+	visibility: visible !important;
+}
+
+/* Add a subtle blur to elements that are about to animate */
+.scroll-animate:not(.visible) {
+	filter: blur(4px);
+	opacity: 0.8;
+}
+
+/* Ensure sections are properly spaced and visible */
+.product-demo,
+.features,
+#faq,
+#pricing,
+main > * {
+	scroll-margin-top: 80px; /* Adjust based on your header height */
+	opacity: 1 !important;
+	visibility: visible !important;
+}
+
+/* Navbar styles */
+/* Ensure only one navbar is visible */
+body > nav ~ nav,
+body > div > nav ~ nav,
+body > div > div > nav ~ nav {
+	display: none !important;
+}
+
+/* Ensure main navbar is always visible */
+body > nav:first-of-type,
+body > div > nav:first-of-type,
+body > div > div > nav:first-of-type {
+	display: flex !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+}
+
+/* Ensure main navbar is on top */
+nav {
+	z-index: 1000;
+}
+
+/* Hide mobile menu by default */
+.nav-links {
+	display: none;
+}
+
+/* Show mobile menu when active */
+.nav-links.active {
+	display: flex;
+}
+
+/* Prevent body scroll when menu is open */
+body.menu-open {
+	overflow: hidden;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+}
+
+/* Hero section specific styles */
+.hero {
+	/* Ensure hero is always visible */
+	opacity: 1 !important;
+	transform: none !important;
+	filter: none !important;
+	padding-top: 80px; /* Add padding to account for fixed navbar */
 }
 
 h1,
@@ -138,20 +247,7 @@ h6 {
 	border-color: #000000;
 }
 
-/* Transition utilities */
-.fade-up {
-	opacity: 0;
-	transform: translateY(20px);
-	transition:
-		opacity 0.6s ease-out,
-		transform 0.6s ease-out;
-}
-
-.fade-up.visible {
-	opacity: 1;
-	transform: translateY(0);
-}
-
+/* Fade in animation */
 .fade-in {
 	opacity: 0;
 	transform: translateY(20px);
@@ -197,7 +293,38 @@ h6 {
 html {
 	scrollbar-width: thin; /* Firefox */
 	scrollbar-color: #aaa #f8f8f5; /* Firefox: thumb and track color */
-	overflow-y: scroll; /* Force scrollbar to appear even on short pages */
+	overflow-y: auto; /* Change to auto to prevent layout shifts */
+	height: 100%;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Error page specific styles */
+body.error-page-active {
+	overflow: hidden;
+	height: 100vh;
+	width: 100vw;
+}
+
+body.error-page-active #svelte {
+	position: relative;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
+/* Only apply these styles when on an error page */
+body.error-page-active .minimal-layout #svelte > :not([class*='error']) {
+	display: none !important;
+}
+
+/* Ensure normal pages can scroll */
+html,
+body {
+	overflow-x: hidden;
+	min-height: 100%;
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
