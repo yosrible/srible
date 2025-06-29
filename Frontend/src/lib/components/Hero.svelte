@@ -42,10 +42,10 @@
       <div class="hero-text">
         <h1 in:fade={{ duration: 800 }}>
           Write freely.
-          <span class="gradient-text">Your Space.</span>
+          <span class="gradient-text">Share beautifully.</span>
         </h1>
         <p class="subtitle">
-          A clean, minimal space for your thoughts. No distractions, just writing.
+          A minimal blogging platform that stays out of your way. Focus on your words, we'll handle the rest.
         </p>
         <div class="badge-container">
           <div class="product-hunt-badge">
@@ -117,19 +117,19 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1.5rem;
-    margin: 0;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
     box-sizing: border-box;
     background-color: #ffffff;
     background-image: 
-      linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
-      linear-gradient(180deg, rgba(0,0,0,0.02) 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-position: -1px -1px;
-    z-index: 1;
+      linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
     flex: 1;
     isolation: isolate;
   }
@@ -139,36 +139,44 @@
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
     position: relative;
     z-index: 2;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
 
   .hero-content {
     position: relative;
     z-index: 2;
     width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    gap: var(--space-md);
-    padding: 2rem 1rem;
+    gap: 1.5rem;
+    padding: 1rem 0;
     box-sizing: border-box;
   }
 
   .hero-text {
     text-align: center;
-    width: 100%;
+    max-width: 800px;
     margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0;
   }
 
   h1 {
@@ -183,6 +191,10 @@
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.2s forwards;
     width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .gradient-text {
@@ -229,48 +241,6 @@
     background-position: 0% center;
   }
 }
-
-  .btn.primary {
-    position: relative;
-    background-color: var(--color-primary);
-    color: white;
-    overflow: hidden;
-    z-index: 2; /* Ensure button is above its pseudo-element */
-    transition: all 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: none;
-    
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, #000000, #333333);
-      z-index: -1;
-      transition: opacity 0.3s ease;
-      opacity: 1;
-      border-radius: var(--radius);
-      pointer-events: none; /* Ensure clicks pass through to the button */
-    }
-    
-    &:hover::before {
-      opacity: 0.9;
-    }
-    
-    &:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-    }
-    border-color: var(--color-primary);
-  }
-
-  .btn.primary .arrow {
-    position: relative;
-    right: 0;
-    transition: transform 0.3s ease;
-  }
 
   .btn.primary:hover .arrow {
     transform: translateX(4px);
@@ -439,16 +409,18 @@
   .subtitle {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 400;
-    font-size: clamp(1rem, 4vw, 1.25rem);
+    font-size: 0.9375rem; /* 15px */
     color: var(--color-text-light);
-    margin: 0 auto var(--space-md) auto;
-    max-width: 90%;
+    margin: 0 auto 1.5rem auto;
+    max-width: 32rem; /* 512px */
     line-height: 1.6;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s ease-out 0.5s forwards;
     box-sizing: border-box;
     padding: 0 1rem;
+    text-align: center;
+    width: 100%;
   }
 
   .product-hunt-badge {
@@ -522,219 +494,232 @@
   .cta-buttons {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin: 1.5rem auto 0;
     flex-wrap: wrap;
     justify-content: center;
     width: 100%;
+    max-width: 100%;
+    padding: 0 1rem;
   }
   
   .btn {
     min-width: 180px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
   }
-  
-  @media (max-width: 480px) {
+
+  /* Mobile (up to 767px) */
+  @media (max-width: 767px) {
     .hero {
-      min-height: 90vh;
-      padding: 1rem;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 3rem 1rem 2rem;
+      overflow-x: hidden;
     }
-    
+
     .hero-content {
-      padding: 1rem 0.5rem;
+      gap: 1rem;
+      padding: 0.5rem 0;
+      width: 100%;
+      box-sizing: border-box;
     }
-    
+
     h1 {
       font-size: 2.25rem;
       margin-bottom: 1rem;
+      line-height: 1.2;
+      padding: 0 0.5rem;
     }
-    
+
     .subtitle {
-      font-size: 1.1rem;
+      font-size: 1rem;
       line-height: 1.5;
+      padding: 0 0.5rem;
+      margin: 0 auto 1.5rem auto;
+      max-width: 90%;
     }
-    
+
     .cta-buttons {
       flex-direction: column;
       gap: 0.75rem;
       width: 100%;
+      max-width: 300px;
+      margin: 1.5rem auto 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    
+
     .btn {
       width: 100%;
       justify-content: center;
+      margin: 0;
     }
   }
 
-  /* Large tablets and small desktops */
-  @media (min-width: 769px) and (max-width: 1024px) {
+  /* Small Tablets (600px - 767px) */
+  @media (min-width: 600px) and (max-width: 767px) {
     .hero {
-      min-height: calc(100vh - 80px);
-      height: auto;
-      padding: 2rem 1rem;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      overflow-y: visible;
-      -webkit-overflow-scrolling: touch;
-      margin: 0;
+      padding: 4rem 2rem 2rem;
     }
-    
+
+    .hero-content {
+      max-width: 90%;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      line-height: 1.2;
+      margin: 0 0 1.25rem 0;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      max-width: 80%;
+      margin: 0 auto 2rem auto;
+      line-height: 1.6;
+    }
+  }
+
+  /* Large Desktops (1025px - 1280px) */
+  @media (min-width: 1025px) and (max-width: 1280px) {
+    .hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 6rem 2rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
     .hero-content {
       min-height: 0;
       width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-      transform: none !important;
+      max-width: 100%;
+      margin: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
+      gap: var(--space-md);
+      padding: 1rem 0;
+      box-sizing: border-box;
       flex: 0 0 auto;
     }
-    
+
     h1 {
-      font-size: 2.75rem !important;
+      font-size: 3.25rem;
       line-height: 1.2;
-      margin: 0 0 1.5rem 0;
-      padding: 0;
+      margin: 0 0 1.75rem 0;
+      padding: 0 2rem;
       text-align: center;
       width: 100%;
     }
-    
+
     .subtitle {
       font-size: 1.2rem;
       line-height: 1.6;
-      max-width: 500px;
-      margin: 0 0 2.5rem 0;
-      padding: 0;
+      max-width: 600px;
+      margin: 0 auto 2.5rem auto;
+      padding: 0 2rem;
       text-align: center;
     }
-    
+
     .cta-buttons {
       margin: 0 auto;
       flex-direction: row;
       flex-wrap: wrap;
+      gap: 1rem;
       justify-content: center;
-      gap: 1.25rem;
-      max-width: 100%;
-      padding: 0;
+      align-items: center;
+      padding: 0 2rem;
       width: 100%;
+      max-width: 500px;
     }
-    
+
     .btn {
       min-width: 180px;
       margin: 0.5rem;
+      padding: 1rem 2rem;
     }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-    
-    .hero-text {
-      max-width: 100%;
-      padding: 0 1.5rem;
-    }
-    
-    h1 {
-      font-size: 3rem;
-      line-height: 1.2;
-      margin-bottom: 1.5rem;
-    }
-    
-    .cta-buttons {
-      margin-top: 3rem;
-      justify-content: center;
-    }
-    
+
     .btn {
       padding: 0.9rem 2rem;
       font-size: 1.1rem;
     }
   }
-  
-  /* Tablets and Mobile */
-  @media (max-width: 768px) {
-    .hero {
-      min-height: calc(100vh - 80px);
-      display: flex;
-      align-items: center;
-      padding: 1.5rem 0.5rem;
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      line-height: 1.2;
-      padding: 0 1rem;
-      text-align: center;
-    }
-    
-    .cta-buttons {
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 300px;
-      margin: 2rem auto 0;
-      padding: 0 1rem;
-    }
-    
-    .btn {
-      width: 100%;
-      text-align: center;
-      justify-content: center;
-      margin: 0 0 1rem 0;
-    }
 
-    .subtitle {
-      font-size: 1.05rem;
-      text-align: center;
-      margin: 0 auto var(--space-md) auto;
-      max-width: 90%;
-      line-height: 1.5;
-    }
-  }
-
-  /* Small Mobile Devices */
+  /* Mobile Devices (up to 480px) */
   @media (max-width: 480px) {
-    h1 {
-      font-size: 2rem;
+    .hero {
+      padding: 3rem 1rem 2rem;
     }
 
-    .hero {
-      padding: 1rem 0;
+    h1 {
+      font-size: 2.25rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      padding: 0 0.5rem;
     }
 
     .subtitle {
       font-size: 1rem;
+      line-height: 1.5;
+      margin: 0 auto 1.5rem;
+      max-width: 90%;
     }
 
+    .cta-buttons {
+      max-width: 300px;
+      margin: 1.5rem auto 0;
+      padding: 0;
+    }
+    
     .btn {
       width: 100%;
       padding: 0.75rem 1.5rem;
+      margin: 0 0 1rem 0;
+      justify-content: center;
     }
   }
-
-  /* Typing container styles removed as they're not being used */
 
   /* Landscape mode optimization */
   @media (max-height: 500px) and (orientation: landscape) {
     .hero {
       min-height: auto;
-      padding: 5rem 1rem 1.5rem;
+      padding: 4rem 1rem 1.5rem;
     }
 
     h1 {
-      font-size: clamp(1.75rem, 5vw, 2.5rem);
+      font-size: 2rem;
       margin-bottom: 0.75rem;
     }
 
     .subtitle {
-      font-size: 1.1rem;
-      margin-bottom: 1.25rem;
-      max-width: 80%;
+      font-size: 1rem;
+      margin: 0 auto 1.25rem;
+      max-width: 90%;
+    }
+
+    .cta-buttons {
+      margin-top: 1rem;
+    }
+  }
+
+  
+  /* Fix for very small mobile devices */
+  @media (max-width: 360px) {
+    h1 {
+      font-size: 2rem;
+    }
+    
+    .subtitle {
+      font-size: 0.9375rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.95rem;
     }
   }
 </style>
