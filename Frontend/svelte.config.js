@@ -9,10 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    adapter: adapter({
-      // Fallback for SPA routing (optional)
-      fallback: 'index.html'
-    }),
+    adapter: adapter(),
     alias: {
       '@': resolve(__dirname, './src')
     }
