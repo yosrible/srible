@@ -94,15 +94,36 @@
   <Navbar />
 {/if}
 
-<main class="content" class:minimal-layout={useMinimalLayout} class:dashboard-layout={isDashboardRoute}>
-  <slot />
-</main>
+<div class="page-container">
+  <main class="content" class:minimal-layout={useMinimalLayout} class:dashboard-layout={isDashboardRoute}>
+    <slot />
+  </main>
+</div>
 
 {#if !useMinimalLayout && !isDashboardRoute}
   <Footer />
 {/if}
 
 <style>
+  /* Page container */
+  :global(html, body) {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  :global(body) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .page-container {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
   /* Content container */
   .content {
     flex: 1;

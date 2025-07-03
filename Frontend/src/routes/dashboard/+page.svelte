@@ -75,12 +75,12 @@
 		</div>
 	</div>
 {:else}
-<div class="min-h-screen bg-neutral-50 flex overflow-hidden">
+<div class="min-h-screen bg-gradient-to-br from-gray-25 to-gray-50 flex overflow-hidden">
 	<!-- Sidebar -->
-	<aside class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 h-screen flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+	<aside class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-2xl transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out z-40 h-screen flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
 		<div class="flex-shrink-0">
 			<div class="flex items-center h-16 px-6 border-b">
-				<span class="font-bold text-xl tracking-tight text-black">Srible</span>
+				<span class="font-bold text-2xl tracking-tight text-white bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">Srible</span>
 				<button class="ml-auto md:hidden p-2" on:click={closeSidebar} aria-label="Close sidebar">
 					<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -91,49 +91,49 @@
 		<nav class="flex-1 overflow-y-auto py-6">
 			<ul class="flex flex-col gap-1">
 				<li>
-					<a href="/dashboard/overview" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+					<a href="/dashboard/overview" class="flex items-center gap-3 px-6 py-3 rounded-xl font-medium text-gray-200 hover:text-white hover:bg-gray-700/50 border-l-4 border-transparent hover:border-indigo-400 transition-all duration-200 group">
 						<!-- Optionally add an icon here -->
 						Overview
 					</a>
 				</li>
 				<li>
-					<a href="/dashboard/posts" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+					<a href="/dashboard/posts" class="flex items-center gap-3 px-6 py-3 rounded-xl font-medium text-gray-200 hover:text-white hover:bg-gray-700/50 border-l-4 border-transparent hover:border-indigo-400 transition-all duration-200 group">
 						Posts
 					</a>
 				</li>
 				<li>
-					<a href="/dashboard/analytics" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+					<a href="/dashboard/analytics" class="flex items-center gap-3 px-6 py-3 rounded-xl font-medium text-gray-200 hover:text-white hover:bg-gray-700/50 border-l-4 border-transparent hover:border-indigo-400 transition-all duration-200 group">
 						Analytics
 					</a>
 				</li>
 				<li>
-					<a href="/dashboard/settings" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+					<a href="/dashboard/settings" class="flex items-center gap-3 px-6 py-3 rounded-xl font-medium text-gray-200 hover:text-white hover:bg-gray-700/50 border-l-4 border-transparent hover:border-indigo-400 transition-all duration-200 group">
 						Settings
 					</a>
 				</li>
 				<li>
-					<a href="/dashboard/themes" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+					<a href="/dashboard/themes" class="flex items-center gap-3 px-6 py-3 rounded-xl font-medium text-gray-200 hover:text-white hover:bg-gray-700/50 border-l-4 border-transparent hover:border-indigo-400 transition-all duration-200 group">
 						Themes
 					</a>
 				</li>
 				<li>
-					<a href="/dashboard/archive" class="flex items-center gap-3 px-6 py-2 rounded-lg font-medium text-gray-800 hover:bg-gray-100 border-l-2 border-transparent hover:border-black transition">
+					<a href="/dashboard/archive" class="flex items-center gap-3 px-6 py-3 rounded-xl font-medium text-gray-200 hover:text-white hover:bg-gray-700/50 border-l-4 border-transparent hover:border-indigo-400 transition-all duration-200 group">
 						Archive
 					</a>
 				</li>
 			</ul>
 		</nav>
 		<!-- User profile section (sticky at bottom) -->
-		<div class="flex-shrink-0 border-t border-gray-200 p-4 bg-white">
+		<div class="flex-shrink-0 border-t border-gray-700/50 p-4 bg-gray-800/50 backdrop-blur-sm">
 			<div class="flex items-center gap-3">
-				<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+				<div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-md">
 					<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
 					</svg>
 				</div>
 				<div>
-					<p class="text-sm font-medium text-gray-900">{userEmail}</p>
-					<p class="text-xs text-gray-500">Admin</p>
+					<p class="text-sm font-medium text-white">{userEmail}</p>
+					<p class="text-xs text-gray-300">Admin</p>
 				</div>
 			</div>
 		</div>
@@ -154,14 +154,14 @@
 	<!-- Main content area -->
 	<div class="flex-1 flex flex-col w-full md:ml-64 h-screen overflow-hidden">
 		<!-- Navbar -->
-		<nav class="bg-white shadow flex items-center justify-between px-4 py-3 z-10 flex-shrink-0">
+		<nav class="bg-white/80 backdrop-blur-sm border-b border-gray-100 shadow-sm flex items-center justify-between px-6 py-4 z-10 flex-shrink-0">
 			<div class="flex items-center gap-2">
 				<button class="block md:hidden p-2" on:click={toggleSidebar} aria-label="Open sidebar">
 					<svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
 					</svg>
 				</button>
-				<span class="font-bold text-lg tracking-tight text-black">Srible</span>
+				<span class="font-bold text-xl tracking-tight bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Srible</span>
 			</div>
 			<button class="create-post-btn" on:click={handleCreatePost}>
 				<svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -176,27 +176,35 @@
 			<main class="p-4 md:p-8">
 				<!-- Stats Cards -->
 				<div class="stats-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
-						<div class="stat-header text-gray-500 text-sm font-medium">Total Page Views</div>
-						<div class="stat-value text-3xl font-bold text-black">{pageViews}</div>
+					<div class="stat-card bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col gap-2 border border-gray-100 hover:border-gray-200">
+						<div class="stat-header text-gray-500 text-xs font-medium uppercase tracking-wider">Total Page Views</div>
+						<div class="stat-value text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">{pageViews}</div>
 					</div>
-					<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
-						<div class="stat-header text-gray-500 text-sm font-medium">Total Posts</div>
-						<div class="stat-value text-3xl font-bold text-black">{totalPosts}</div>
+					<div class="stat-card bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col gap-2 border border-gray-100 hover:border-gray-200">
+						<div class="stat-header text-gray-500 text-xs font-medium uppercase tracking-wider">Total Posts</div>
+						<div class="stat-value text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">{totalPosts}</div>
 					</div>
-					<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
-						<div class="stat-header text-gray-500 text-sm font-medium">Subscribers</div>
-						<div class="stat-value text-3xl font-bold text-black">{totalSubscribers}</div>
+					<div class="stat-card bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col gap-2 border border-gray-100 hover:border-gray-200">
+						<div class="stat-header text-gray-500 text-xs font-medium uppercase tracking-wider">Subscribers</div>
+						<div class="stat-value text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">{totalSubscribers}</div>
 					</div>
-					<div class="stat-card bg-white rounded-xl shadow-md p-6 flex flex-col gap-2">
-						<div class="stat-header text-gray-500 text-sm font-medium">Comments</div>
-						<div class="stat-value text-3xl font-bold text-black">{totalComments}</div>
+					<div class="stat-card bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col gap-2 border border-gray-100 hover:border-gray-200">
+						<div class="stat-header text-gray-500 text-xs font-medium uppercase tracking-wider">Comments</div>
+						<div class="stat-value text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">{totalComments}</div>
 					</div>
 				</div>
 
 				<!-- Recent Posts Table -->
-				<div class="recent-posts bg-white rounded-xl shadow-md p-6">
-					<h2 class="text-xl font-bold mb-4 text-black">Recent Posts</h2>
+				<div class="recent-posts bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 border border-gray-100">
+					<div class="flex items-center justify-between mb-6">
+					<h2 class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Recent Posts</h2>
+					<button class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors duration-200">
+						View All
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+						</svg>
+					</button>
+				</div>
 					<div class="overflow-x-auto">
 						<table class="min-w-full text-left">
 							<thead>

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import Footer from '$lib/components/Footer.svelte';
+	// Page content
 </script>
 
 <div class="privacy-container">
@@ -114,8 +113,6 @@
 		</section>
 	</div>
 </div>
-
-<Footer />
 
 <style>
 	.privacy-container {
