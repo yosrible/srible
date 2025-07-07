@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import Footer from '$lib/components/Footer.svelte';
+	// Page content
 </script>
 
 <div class="security-container">
@@ -115,8 +114,6 @@
 		</section>
 	</div>
 </div>
-
-<Footer />
 
 <style>
 	.security-container {
@@ -245,16 +242,6 @@
 		color: #7873f5;
 	}
 
-	a {
-		color: #7873f5;
-		text-decoration: none;
-		transition: color 0.2s ease;
-	}
-
-	a:hover {
-		color: #ff6ec4;
-	}
-
 	@media (max-width: 1200px) {
 		.security-container {
 			padding: 0 2rem;
@@ -312,11 +299,6 @@
 
 		.security-card {
 			padding: 1rem;
-		}
-
-		.btn {
-			width: 100%;
-			justify-content: center;
 		}
 	}
 
