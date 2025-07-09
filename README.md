@@ -1,10 +1,14 @@
-# 📝 Srible
+<div align = "center">
+<img src="https://raw.githubusercontent.com/yosrible/srible/main/Frontend/srible logo.png" width="100" height = "100">
+</div>
+
+---
+
+# Srible
 
 A **minimalist blogging platform** built with **SvelteKit**, powered by a **Rust backend** and a sleek, modern UI.  
 Designed for writers, by developers who value simplicity.
-<div align = "centre">
-<img src="https://raw.githubusercontent.com/yosrible/srible/main/Frontend/srible logo.png" alt="Srible Logo" width="50"> **Srible**
-</div>
+
 ---
 
 ## 📌 Table of Contents
