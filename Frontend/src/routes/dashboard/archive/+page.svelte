@@ -59,11 +59,11 @@
 	}
 </script>
 
-<header class="content-header">
-	<h1>Archive</h1>
+<header class="content-header flex justify-between items-center mb-8">
+	<h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 m-0">Archive</h1>
 	{#if selectedPostIds.length > 0}
-		<div class="actions">
-			<button class="restore-btn" on:click={restoreSelected}>
+		<div class="actions flex gap-3">
+			<button class="restore-btn bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200" on:click={restoreSelected}>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 					<path
 						fill="none"
@@ -84,7 +84,7 @@
 				</svg>
 				<span>Restore {selectedPostIds.length} {selectedPostIds.length === 1 ? 'post' : 'posts'}</span>
 			</button>
-			<button class="delete-btn" on:click={deleteSelected}>
+			<button class="delete-btn bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200" on:click={deleteSelected}>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 					<path
 						fill="none"
@@ -109,10 +109,10 @@
 	{/if}
 </header>
 
-<div class="dashboard-content">
+<div class="dashboard-content bg-white dark:bg-black rounded-xl shadow-md border border-gray-200 dark:border-gray-800 p-8 mb-8">
 	{#if archivedPosts.length === 0}
-		<div class="empty-state">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48">
+		<div class="empty-state flex flex-col items-center justify-center py-12 text-center">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" class="text-gray-400 dark:text-gray-500 mb-4">
 				<path
 					fill="none"
 					stroke="currentColor"
@@ -138,48 +138,50 @@
 					d="M10 12h4"
 				/>
 			</svg>
-			<h2>No archived posts</h2>
-			<p>When you archive posts, they'll appear here.</p>
+			<h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No archived posts</h2>
+			<p class="text-gray-600 dark:text-gray-400">When you archive posts, they'll appear here.</p>
 		</div>
 	{:else}
 		<div class="posts-table-container">
-			<table class="posts-table">
-				<thead>
+			<table class="posts-table w-full border border-gray-200 dark:border-gray-700 rounded-xl shadow-md overflow-hidden">
+				<thead class="bg-gray-50 dark:bg-gray-700">
 					<tr>
-						<th class="checkbox-cell">
+						<th class="checkbox-cell px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">
 							<input 
 								type="checkbox" 
 								on:change={toggleSelectAll} 
 								checked={selectedPostIds.length === archivedPosts.length && archivedPosts.length > 0}
+								class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400"
 							/>
 						</th>
-						<th>Title</th>
-						<th>Date Archived</th>
-						<th>Views</th>
-						<th>Comments</th>
-						<th class="actions-cell">Actions</th>
+						<th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Title</th>
+						<th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Date Archived</th>
+						<th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Views</th>
+						<th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Comments</th>
+						<th class="actions-cell px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody class="bg-white dark:bg-gray-800">
 					{#each archivedPosts as post}
-						<tr class={selectedPostIds.includes(post.id) ? 'selected' : ''}>
-							<td class="checkbox-cell">
+						<tr class="{selectedPostIds.includes(post.id) ? 'bg-blue-50 dark:bg-blue-900/20' : ''} border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+							<td class="checkbox-cell px-4 py-3">
 								<input 
 									type="checkbox" 
 									checked={selectedPostIds.includes(post.id)} 
 									on:change={() => toggleSelect(post.id)}
+									class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400"
 								/>
 							</td>
-							<td class="title-cell">
-								<a href={`/dashboard/posts/${post.id}`} class="post-title">
+							<td class="title-cell px-4 py-3">
+								<a href={`/dashboard/posts/${post.id}`} class="post-title text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 font-medium">
 									{post.title}
 								</a>
 							</td>
-							<td>{post.date}</td>
-							<td>{post.views.toLocaleString()}</td>
-							<td>{post.comments}</td>
-							<td class="actions-cell">
-								<button class="action-btn restore" on:click={() => toggleSelect(post.id)} aria-label="Restore post">
+							<td class="px-4 py-3 text-gray-600 dark:text-gray-400">{post.date}</td>
+							<td class="px-4 py-3 text-gray-600 dark:text-gray-400">{post.views.toLocaleString()}</td>
+							<td class="px-4 py-3 text-gray-600 dark:text-gray-400">{post.comments}</td>
+							<td class="actions-cell px-4 py-3">
+								<button class="action-btn restore bg-transparent border-none cursor-pointer p-1 rounded flex items-center justify-center transition-colors duration-200 hover:bg-green-100 dark:hover:bg-green-900/20 text-green-600 dark:text-green-400" on:click={() => toggleSelect(post.id)} aria-label="Restore post">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 										<path
 											fill="none"
@@ -199,7 +201,7 @@
 										/>
 									</svg>
 								</button>
-								<button class="action-btn delete" on:click={() => toggleSelect(post.id)} aria-label="Delete post">
+								<button class="action-btn delete bg-transparent border-none cursor-pointer p-1 rounded flex items-center justify-center transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400" on:click={() => toggleSelect(post.id)} aria-label="Delete post">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 										<path
 											fill="none"
@@ -244,6 +246,11 @@
 		font-family: 'Space Grotesk', sans-serif;
 	}
 	
+	/* Dark mode text color override */
+	:global(.dark) .content-header h1 {
+		color: #f3f4f6;
+	}
+	
 	.actions {
 		display: flex;
 		gap: 0.75rem;
@@ -285,11 +292,17 @@
 	/* Dashboard Content */
 	.dashboard-content {
 		background-color: #ffffff;
-		border-radius: 8px;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+		border-radius: 12px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		padding: 2rem;
 		margin-bottom: 2rem;
 		min-height: 400px;
+	}
+	
+	/* Dark mode dashboard content */
+	:global(.dark) .dashboard-content {
+		background-color: #000000;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	}
 	
 	/* Empty State */
@@ -310,9 +323,19 @@
 		color: var(--primary-black, #1a1a1a);
 	}
 	
+	/* Dark mode empty state */
+	:global(.dark) .empty-state h2 {
+		color: #f3f4f6;
+	}
+	
 	.empty-state p {
 		font-size: 0.9375rem;
 		max-width: 300px;
+	}
+	
+	/* Dark mode empty state paragraph */
+	:global(.dark) .empty-state p {
+		color: #9ca3af;
 	}
 	
 	/* Posts Table */
@@ -338,9 +361,19 @@
 		color: var(--gray-dark, #555);
 	}
 	
+	/* Dark mode table headers */
+	:global(.dark) .posts-table th {
+		color: #d1d5db;
+	}
+	
 	.posts-table td {
 		font-size: 0.9375rem;
 		color: var(--primary-black, #1a1a1a);
+	}
+	
+	/* Dark mode table text */
+	:global(.dark) .posts-table td {
+		color: #f3f4f6;
 	}
 	
 	.posts-table tr.selected {
@@ -366,6 +399,11 @@
 		font-weight: 500;
 	}
 	
+	/* Dark mode post title */
+	:global(.dark) .post-title {
+		color: #f3f4f6;
+	}
+	
 	.post-title:hover {
 		text-decoration: underline;
 	}
@@ -379,18 +417,36 @@
 		color: var(--gray-dark, #555);
 	}
 	
+	/* Dark mode action buttons */
+	:global(.dark) .action-btn {
+		color: #9ca3af;
+	}
+	
 	.action-btn:hover {
 		background-color: #f8f8f5;
+	}
+	
+	:global(.dark) .action-btn:hover {
+		background-color: #374151;
 	}
 	
 	.action-btn.delete:hover {
 		color: #B22222;
 	}
 	
+	:global(.dark) .action-btn.delete:hover {
+		color: #ef4444;
+	}
+	
 	.action-btn.restore:hover {
 		color: #006400;
 	}
+	
+	:global(.dark) .action-btn.restore:hover {
+		color: #10b981;
+	}
 
+	/* Responsive styles only - no hardcoded colors */
 	@media (max-width: 768px) {
 		.content-header h1 {
 			font-size: 1.25rem;

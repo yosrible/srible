@@ -11,7 +11,6 @@
 
 	// Get sidebar controls from context with proper typing
 	const sidebar = getContext<Sidebar>('sidebar');
-
 	// Placeholder data for analytics
 	let pageViews = 1245;
 	let totalPosts = 8;
@@ -41,10 +40,10 @@
 	];
 </script>
 
-<header class="content-header">
-	<h1 class="text-lg font-semibold sm:text-xl" style="margin-left:15px;margin-right:15px;">Dashboard</h1>
+<header class="content-header flex justify-between items-center mb-8">
+	<h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 m-0">Dashboard</h1>
 	<button 
-		class="create-post-btn mr-2 sm:mr-0 sm:ml-auto"
+		class="create-post-btn bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 border-none rounded-md px-5 py-3 text-sm font-medium cursor-pointer flex items-center gap-2 transition-colors duration-200 min-h-[44px]"
 		on:click={() => {
 			// Hide sidebar immediately
 			if (sidebar) {
@@ -65,39 +64,39 @@
 	</button>
 </header>
 
-<div class="dashboard-content">
-	<div class="stats-grid">
-		<div class="stat-card">
-			<div class="stat-value">{pageViews}</div>
-			<div class="stat-label">Page Views</div>
+	<div class="dashboard-content bg-white dark:bg-black rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-8 mb-8">
+	<div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center border border-gray-200 dark:border-gray-700 min-h-[100px] flex flex-col justify-center">
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white mb-2">{pageViews}</div>
+			<div class="stat-label text-sm text-gray-600 dark:text-gray-300">Page Views</div>
 		</div>
-		<div class="stat-card">
-			<div class="stat-value">{totalPosts}</div>
-			<div class="stat-label">Posts</div>
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center border border-gray-200 dark:border-gray-700 min-h-[100px] flex flex-col justify-center">
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white mb-2">{totalPosts}</div>
+			<div class="stat-label text-sm text-gray-600 dark:text-gray-300">Posts</div>
 		</div>
-		<div class="stat-card">
-			<div class="stat-value">{totalSubscribers}</div>
-			<div class="stat-label">Subscribers</div>
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center border border-gray-200 dark:border-gray-700 min-h-[100px] flex flex-col justify-center">
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white mb-2">{totalSubscribers}</div>
+			<div class="stat-label text-sm text-gray-600 dark:text-gray-300">Subscribers</div>
 		</div>
-		<div class="stat-card">
-			<div class="stat-value">{totalComments}</div>
-			<div class="stat-label">Comments</div>
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center border border-gray-200 dark:border-gray-700 min-h-[100px] flex flex-col justify-center">
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white mb-2">{totalComments}</div>
+			<div class="stat-label text-sm text-gray-600 dark:text-gray-300">Comments</div>
 		</div>
 	</div>
 
-	<div class="recent-posts-section">
-		<h2>Recent Posts</h2>
-		<div class="posts-table">
-			<div class="table-header">
-				<div class="th">Title</div>
-				<div class="th">Date</div>
-				<div class="th">Views</div>
+	<div class="recent-posts-section mt-8">
+		<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Recent Posts</h2>
+		<div class="posts-table w-full border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
+			<div class="table-header grid grid-cols-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+				<div class="th px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Title</div>
+				<div class="th px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Date</div>
+				<div class="th px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Views</div>
 			</div>
 			{#each recentPosts as post}
-				<div class="table-row">
-					<div class="td title">{post.title}</div>
-					<div class="td date">{post.date}</div>
-					<div class="td views">{post.views}</div>
+				<div class="table-row grid grid-cols-3 border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 last:border-b-0">
+					<div class="td px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium truncate">{post.title}</div>
+					<div class="td px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{post.date}</div>
+					<div class="td px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{post.views}</div>
 				</div>
 			{/each}
 		</div>
@@ -105,149 +104,7 @@
 </div>
 
 <style>
-	.content-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
-
-	.content-header h1 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-	}
-
-	.create-post-btn {
-		background-color: var(--primary-black, #1a1a1a);
-		color: white;
-		border: none;
-		border-radius: 6px;
-		padding: 0.75rem 1.25rem;
-		font-size: 0.9375rem;
-		font-weight: 500;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		transition: background-color 0.2s ease;
-		min-height: 44px; /* Touch-friendly */
-		text-decoration: none;
-	}
-
-	.create-post-btn:hover {
-		background-color: #333;
-	}
-
-	/* Dashboard Content */
-	.dashboard-content {
-		background-color: #ffffff;
-		border-radius: 8px;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-		padding: 2rem;
-		margin-bottom: 2rem;
-	}
-
-	/* Stats Grid */
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 1.5rem;
-		margin-bottom: 2rem;
-	}
-
-	.stat-card {
-		background-color: #fafafa;
-		border-radius: 8px;
-		padding: 1.5rem;
-		text-align: center;
-		border: 1px solid #eaeaea;
-		min-height: 100px;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-	}
-
-	.stat-value {
-		font-size: 1.75rem;
-		font-weight: 700;
-		color: var(--primary-black, #1a1a1a);
-		margin-bottom: 0.5rem;
-	}
-
-	.stat-label {
-		font-size: 0.875rem;
-		color: var(--gray-dark, #555);
-	}
-
-	/* Recent Posts Table */
-	.recent-posts-section {
-		margin-top: 2rem;
-	}
-
-	.recent-posts-section h2 {
-		font-size: 1.25rem;
-		margin-bottom: 1rem;
-		font-weight: 600;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-	}
-
-	.posts-table {
-		width: 100%;
-		border: 1px solid #eaeaea;
-		border-radius: 6px;
-		overflow: hidden;
-	}
-
-	.table-header {
-		display: grid;
-		grid-template-columns: 2fr 1fr 1fr;
-		background-color: #fafafa;
-		border-bottom: 1px solid #eaeaea;
-	}
-
-	.th {
-		padding: 0.75rem 1rem;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--gray-dark, #555);
-	}
-
-	.table-row {
-		display: grid;
-		grid-template-columns: 2fr 1fr 1fr;
-		border-bottom: 1px solid #eaeaea;
-		transition: background-color 0.2s ease;
-	}
-
-	.table-row:hover {
-		background-color: rgba(0, 0, 0, 0.02);
-	}
-
-	.table-row:last-child {
-		border-bottom: none;
-	}
-
-	.td {
-		padding: 0.75rem 1rem;
-		font-size: 0.9375rem;
-		color: var(--primary-black, #1a1a1a);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.td.title {
-		font-weight: 500;
-	}
-
-	.td.date, .td.views {
-		color: var(--gray-dark, #555);
-	}
-
+	/* Responsive styles only - no hardcoded colors */
 	@media (max-width: 992px) {
 		.stats-grid {
 			grid-template-columns: repeat(2, 1fr);
@@ -255,10 +112,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.content-header h1 {
-			font-size: 1.25rem;
-		}
-
 		.dashboard-content {
 			padding: 1.5rem;
 		}

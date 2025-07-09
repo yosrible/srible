@@ -5,6 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { writable } from 'svelte/store';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	// Sidebar state management
 	let isSidebarOpen = true;
@@ -117,9 +118,6 @@
 <!-- Custom dashboard layout without navbar -->
 <svelte:head>
 	<style>
-		body {
-			background-color: #f8f8f5;
-		}
 		/* Hide the main site navbar when in dashboard mode */
 		body > nav,
 		.global-navbar,
@@ -130,7 +128,7 @@
 	</style>
 </svelte:head>
 
-<div class="dashboard-layout flex flex-col md:flex-row min-h-screen bg-gray-50" style="--active-section-color: {activeSectionColor}">
+<div class="dashboard-layout flex flex-col md:flex-row min-h-screen bg-white dark:bg-black text-black dark:text-white" style="--active-section-color: {activeSectionColor}">
 	<!-- Mobile overlay -->
 	{#if isMobile && showSidebar && !isRootDashboard}
 		<button 
@@ -147,21 +145,28 @@
 	<!-- Sidebar - only render when not on root dashboard and not on create page -->
 	{#if showSidebar && !isRootDashboard}
 		<aside 
-			class="fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out {isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} {!isMobile ? 'md:translate-x-0' : ''}"
+			class="fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out {isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} {!isMobile ? 'md:translate-x-0' : ''}"
 			style="display: {showSidebar ? 'block' : 'none'}"
 			data-visible={isSidebarOpen}
 		>
-			<div class="flex flex-col h-full overflow-y-auto">
+			<div class="flex flex-col h-full overflow-y-auto relative">
 				<!-- Sidebar Header -->
-				<div class="p-6 border-b border-gray-200">
-					<h2 class="text-xl font-bold text-gray-900 font-sans"><a href="/">Srible</a></h2>
+				<div class="p-6 border-b border-gray-200 dark:border-gray-800">
+					<div class="flex items-center justify-between">
+						<h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 font-sans m-0 flex items-center">
+							<a href="/">Srible</a>
+						</h2>
+						<div class="ml-3 flex-shrink-0">
+							<ThemeToggle />
+						</div>
+					</div>
 				</div>
 
 				<!-- Navigation -->
 				<nav class="flex-1 p-4 space-y-2">
 					<a 
 						href="/dashboard/overview" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'overview' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'overview' ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -172,7 +177,7 @@
 
 					<a 
 						href="/dashboard/posts" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'posts' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'posts' ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -182,7 +187,7 @@
 
 					<a 
 						href="/dashboard/analytics" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'analytics' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'analytics' ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -192,7 +197,7 @@
 
 					<a 
 						href="/dashboard/archive" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'archive' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'archive' ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 3h14v17a1 1 0 01-1 1H6a1 1 0 01-1-1V3z"></path>
@@ -202,7 +207,7 @@
 
 					<a 
 						href="/dashboard/themes" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'themes' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'themes' ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.829 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.486m-5.172-5.172l8.486-8.486"></path>
@@ -212,7 +217,7 @@
 
 					<a 
 						href="/dashboard/settings" 
-						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'settings' ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}"
+						class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {activeSection === 'settings' ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'}"
 					>
 						<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -223,14 +228,14 @@
 				</nav>
 
 				<!-- User section -->
-				<div class="p-4 border-t border-gray-200">
+				<div class="p-4 border-t border-gray-200 dark:border-gray-800">
 					<div class="flex items-center">
-						<div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium">
+						<div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-200 font-medium">
 							U
 						</div>
 						<div class="ml-3 font-sans">
-							<p class="text-sm font-medium text-gray-900">User Name</p>
-							<p class="text-xs text-gray-500">user@example.com</p>
+							<p class="text-sm font-medium text-gray-900 dark:text-gray-100">User Name</p>
+							<p class="text-xs text-gray-500 dark:text-gray-400">user@example.com</p>
 						</div>
 					</div>
 				</div>
@@ -239,14 +244,14 @@
 	{/if}
 
 	<!-- Main Content -->
-	<main class="flex-1 transition-all duration-300 ease-in-out overflow-y-auto font-sans h-[calc(100vh-4rem)] md:h-[calc(100vh-1rem)]" class:md:ml-64={showSidebar && !isRootDashboard} style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
+	<main class="flex-1 transition-all duration-300 ease-in-out overflow-y-auto font-sans h-[calc(100vh-4rem)] md:h-[calc(100vh-1rem)] bg-white dark:bg-black text-black dark:text-white" class:md:ml-64={showSidebar && !isRootDashboard} style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
 		<!-- Mobile Header - only show when sidebar is available and not on root dashboard -->
 		{#if showSidebar && !isRootDashboard}
-			<div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+			<div class="md:hidden bg-white dark:bg-black px-4 py-3">
 				<div class="flex items-center justify-between">
 					<button 
 					on:click={toggleSidebar}
-					class="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
+					class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
 					aria-label="Toggle menu"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +263,7 @@
 		{/if}
 
 		<!-- Page content -->
-		<div class="min-h-full p-6">
+		<div class="min-h-full p-6 bg-white dark:bg-black text-black dark:text-white">
 			<slot />
 		</div>
 	</main>
@@ -338,12 +343,24 @@
 		background: #f1f1f1;
 	}
 
+	.dark .dashboard-layout main::-webkit-scrollbar-track {
+		background: #374151;
+	}
+
 	.dashboard-layout main::-webkit-scrollbar-thumb {
 		background-color: #c1c1c1;
 		border-radius: 3px;
 	}
 
+	.dark .dashboard-layout main::-webkit-scrollbar-thumb {
+		background-color: #6b7280;
+	}
+
 	.dashboard-layout main::-webkit-scrollbar-thumb:hover {
 		background: #a8a8a8;
+	}
+
+	.dark .dashboard-layout main::-webkit-scrollbar-thumb:hover {
+		background: #9ca3af;
 	}
 </style>
