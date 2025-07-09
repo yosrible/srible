@@ -122,43 +122,43 @@
 		</div>
 	</div>
 {:else}
-	<header class="content-header">
-		<h1>Themes</h1>
-		<div class="active-theme">
+	<header class="content-header flex justify-between items-center mb-8">
+		<h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 m-0">Themes</h1>
+		<div class="active-theme bg-gray-100 dark:bg-gray-700 rounded-md px-4 py-2 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
 			<span>Active:</span>
-			<strong>{activeTheme.name}</strong>
+			<strong class="text-gray-900 dark:text-gray-100">{activeTheme.name}</strong>
 		</div>
 	</header>
 	
-	<div class="dashboard-content">
+	<div class="dashboard-content bg-white dark:bg-black rounded-xl shadow-md border border-gray-200 dark:border-gray-800 p-8 mb-8">
 		<section class="themes-section">
-			<h2>Choose a Theme</h2>
-			<div class="theme-grid">
+			<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100 pb-2 border-b border-gray-200 dark:border-gray-600">Choose a Theme</h2>
+			<div class="theme-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each themes as theme}
-					<div class="theme-card {theme.active ? 'active' : ''}">
-						<div class="theme-preview">
-							<div class="placeholder-preview">
-								<div class="placeholder-header"></div>
-								<div class="placeholder-content">
-									<div class="placeholder-title"></div>
-									<div class="placeholder-text"></div>
-									<div class="placeholder-text"></div>
-									<div class="placeholder-text short"></div>
+					<div class="theme-card border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-md overflow-hidden transition-all duration-200 relative hover:border-gray-900 dark:hover:border-gray-300 {theme.active ? 'border-gray-900 dark:border-gray-300 border-3 shadow-lg' : ''}">
+						<div class="theme-preview h-44 bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
+							<div class="placeholder-preview w-11/12 h-4/5">
+								<div class="placeholder-header h-5 bg-gray-200 dark:bg-gray-600 mb-3 rounded"></div>
+								<div class="placeholder-content p-2.5">
+									<div class="placeholder-title h-4 bg-gray-200 dark:bg-gray-600 mb-3 w-4/5 rounded"></div>
+									<div class="placeholder-text h-2 bg-gray-200 dark:bg-gray-600 mb-2 rounded"></div>
+									<div class="placeholder-text h-2 bg-gray-200 dark:bg-gray-600 mb-2 rounded"></div>
+									<div class="placeholder-text h-2 bg-gray-200 dark:bg-gray-600 mb-2 rounded w-3/5"></div>
 								</div>
 							</div>
 						</div>
-						<div class="theme-info">
-							<h3>{theme.name}</h3>
-							<p>{theme.description}</p>
-							<div class="theme-actions">
-								<button class="preview-btn" on:click|stopPropagation={() => previewTheme(theme.id)}>
+						<div class="theme-info p-5 flex flex-col h-32">
+							<h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{theme.name}</h3>
+							<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed flex-grow">{theme.description}</p>
+							<div class="theme-actions flex gap-3 mt-5">
+								<button class="preview-btn bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors duration-200 flex items-center gap-2 flex-1 justify-center" on:click|stopPropagation={() => previewTheme(theme.id)}>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 										<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
 										<circle cx="12" cy="12" r="3" stroke="currentColor" fill="none" stroke-width="2"/>
 									</svg>
 									Preview
 								</button>
-								<button class="apply-btn" on:click|stopPropagation={() => applyTheme(theme.id)}>
+								<button class="apply-btn bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-md px-3 py-2 text-sm font-medium cursor-pointer transition-colors duration-200 flex items-center gap-2 flex-1 justify-center" on:click|stopPropagation={() => applyTheme(theme.id)}>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 										<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/>
 									</svg>
@@ -167,16 +167,9 @@
 							</div>
 						</div>
 						{#if theme.active}
-							<div class="active-badge">
+							<div class="active-badge absolute top-2.5 right-2.5 bg-pink-500 text-white rounded-full px-3 py-1 text-xs flex items-center gap-1 shadow-lg">
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-									<path
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M22 11.08V12a10 10 0 1 1-5.93-9.14"
-									/>
+									<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
 									<polyline points="22 4 12 14.01 9 11.01" />
 								</svg>
 								<span>Active</span>
@@ -247,228 +240,9 @@
 		line-height: 1.5;
 		margin: 0;
 	}
-	
-	/* Desktop styles */
-	.content-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
 
-	.content-header h1 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-	}
-	
-	.active-theme {
-		padding: 0.5rem 1rem;
-		background-color: #f8f8f5;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		color: var(--gray-dark, #555);
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-	
-	.active-theme strong {
-		color: var(--primary-black, #1a1a1a);
-	}
-
-	/* Dashboard Content */
-	.dashboard-content {
-		background-color: #ffffff;
-		border-radius: 8px;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-		padding: 2rem;
-		margin-bottom: 2rem;
-	}
-	
-	.themes-section {
-		margin-bottom: 2.5rem;
-	}
-	
-	.themes-section:last-child {
-		margin-bottom: 0;
-	}
-	
-	.themes-section h2 {
-		font-size: 1.25rem;
-		margin-bottom: 1.5rem;
-		font-weight: 600;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-		padding-bottom: 0.5rem;
-		border-bottom: 1px solid #eaeaea;
-	}
-	
-	/* Theme Grid */
-	.theme-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 1.5rem;
-	}
-	
-	.theme-card {
-		border: 2px solid #e0e0e0;
-		border-radius: 8px;
-		overflow: hidden;
-		transition: all 0.2s ease;
-		position: relative;
-	}
-	
-	.theme-card:hover {
-		border-color: var(--primary-black, #1a1a1a);
-		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-	}
-	
-	.theme-card.active {
-		border-color: var(--primary-black, #1a1a1a);
-		border-width: 3px;
-		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-	}
-	
-	.theme-preview {
-		height: 180px;
-		background-color: #fafafa;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	
-	.placeholder-preview {
-		width: 90%;
-		height: 80%;
-	}
-	
-	.placeholder-header {
-		height: 20px;
-		background-color: #e6e6e6;
-		margin-bottom: 12px;
-		border-radius: 4px;
-	}
-	
-	.placeholder-content {
-		padding: 10px;
-	}
-	
-	.placeholder-title {
-		height: 16px;
-		background-color: #e6e6e6;
-		margin-bottom: 12px;
-		width: 80%;
-		border-radius: 4px;
-	}
-	
-	.placeholder-text {
-		height: 8px;
-		background-color: #e6e6e6;
-		margin-bottom: 8px;
-		border-radius: 4px;
-	}
-	
-	.placeholder-text.short {
-		width: 60%;
-	}
-	
-	.theme-info {
-		padding: 1.25rem;
-		display: flex;
-		flex-direction: column;
-		height: calc(100% - 180px); /* Subtract preview height */
-	}
-	
-	.theme-info h3 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.125rem;
-		font-weight: 600;
-		color: var(--primary-black, #1a1a1a);
-	}
-	
-	.theme-info p {
-		margin: 0;
-		font-size: 0.875rem;
-		color: var(--gray-dark, #555);
-		line-height: 1.5;
-		flex-grow: 1; /* Push buttons to bottom */
-	}
-	
-	.theme-actions {
-		display: flex;
-		gap: 0.75rem;
-		width: 100%;
-		margin-top: 1.25rem;
-	}
-	
-	.theme-actions button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		padding: 0.65rem 0.5rem;
-		font-size: 0.85rem;
-		font-weight: 500;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		flex: 1;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-	}
-	
-	.preview-btn {
-		background-color: rgba(59, 130, 246, 0.05);
-		border: 1px solid rgba(59, 130, 246, 0.3);
-		color: #3b82f6;
-	}
-	
-	.preview-btn:hover {
-		background-color: rgba(59, 130, 246, 0.1);
-		border-color: rgba(59, 130, 246, 0.5);
-	}
-	
-	.active-badge {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		background-color: rgba(236, 72, 153, 0.85); /* Pink with transparency */
-		color: white;
-		border-radius: 12px;
-		padding: 0.25rem 0.75rem;
-		font-size: 0.75rem;
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-		backdrop-filter: blur(2px);
-		box-shadow: 0 2px 4px rgba(236, 72, 153, 0.2);
-	}
-	
-
-	
-	.apply-btn {
-		background-color: rgba(16, 185, 129, 0.05);
-		color: #10b981;
-		border: 1px solid rgba(16, 185, 129, 0.3);
-		border-radius: 6px;
-		padding: 0.65rem 0.75rem;
-		font-size: 0.85rem;
-		font-weight: 500;
-		cursor: pointer;
-	}
-	
-	.apply-btn:hover {
-		background-color: rgba(16, 185, 129, 0.1);
-		border-color: rgba(16, 185, 129, 0.5);
-	}
-
+	/* Responsive styles only - no hardcoded colors */
 	@media (max-width: 768px) {
-		.content-header h1 {
-			font-size: 1.25rem;
-		}
-
 		.dashboard-content {
 			padding: 1.5rem;
 		}

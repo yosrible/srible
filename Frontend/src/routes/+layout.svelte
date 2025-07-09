@@ -1,4 +1,4 @@
-<svelte:head>
+0<svelte:head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -90,19 +90,22 @@
   injectAnalytics();
 </script>
 
-{#if !useMinimalLayout && !isDashboardRoute}
-  <Navbar />
-{/if}
+<!-- Dark mode wrapper -->
+<div class="min-h-screen bg-white dark:bg-black text-black dark:text-white transition-colors duration-200">
+  {#if !useMinimalLayout && !isDashboardRoute}
+    <Navbar />
+  {/if}
 
-<div class="page-container">
-  <main class="content" class:minimal-layout={useMinimalLayout} class:dashboard-layout={isDashboardRoute}>
-    <slot />
-  </main>
+  <div class="page-container">
+    <main class="content" class:minimal-layout={useMinimalLayout} class:dashboard-layout={isDashboardRoute}>
+      <slot />
+    </main>
+  </div>
+
+  {#if !useMinimalLayout && !isDashboardRoute}
+    <Footer />
+  {/if}
 </div>
-
-{#if !useMinimalLayout && !isDashboardRoute}
-  <Footer />
-{/if}
 
 <style>
   /* Page container */
@@ -135,6 +138,10 @@
   /* Dashboard specific overrides */
   :global(body.dashboard-mode) {
     background: #f8f8f5;
+  }
+  
+  :global(.dark body.dashboard-mode) {
+    background: #000000;
   }
 
   :global(body.dashboard-mode .content) {

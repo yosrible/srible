@@ -104,9 +104,9 @@
 	}
 </script>
 
-<header class="content-header">
-	<h1>Settings</h1>
-	<button class="save-btn" on:click={handleSave}>
+<header class="content-header flex justify-between items-center mb-8">
+	<h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 m-0">Settings</h1>
+	<button class="save-btn bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 border border-gray-900 dark:border-gray-100 rounded-lg px-4 py-2 text-sm font-medium cursor-pointer transition-all duration-200 flex items-center gap-2" on:click={handleSave}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 24 24"
@@ -128,7 +128,7 @@
 </header>
 
 {#if saved}
-	<div class="notification">
+	<div class="notification bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-400 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
 			<path
 				fill="none"
@@ -144,58 +144,64 @@
 	</div>
 {/if}
 
-<div class="dashboard-content">
-	<section class="settings-section profile-section">
-		<h2><span class="section-icon profile-icon"></span>Profile</h2>
-		<div class="form-group">
-			<label for="name">Name</label>
+<div class="dashboard-content bg-white dark:bg-black rounded-xl shadow-md border border-gray-200 dark:border-gray-800 p-8 mb-8">
+	<section class="settings-section profile-section mb-8">
+		<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+			<span class="section-icon profile-icon w-5 h-5 bg-gray-400 dark:bg-gray-500 rounded"></span>
+			Profile
+		</h2>
+		<div class="form-group mb-6">
+			<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
 			<input
 				type="text"
 				id="name"
 				bind:value={userSettings.name}
 				placeholder="Your name"
-				class="input-field"
+				class="input-field w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
 			/>
 		</div>
-		<div class="form-group">
-			<label for="email">Email</label>
+		<div class="form-group mb-6">
+			<label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
 			<input
 				type="email"
 				id="email"
 				bind:value={userSettings.email}
 				placeholder="your.email@example.com"
-				class="input-field"
+				class="input-field w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
 			/>
 		</div>
-		<div class="form-group">
-			<label for="bio">Bio</label>
+		<div class="form-group mb-6">
+			<label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bio</label>
 			<textarea
 				id="bio"
 				rows="4"
 				bind:value={userSettings.bio}
 				placeholder="Writer and web developer passionate about minimal design and clear communication."
-				class="input-field"
+				class="input-field w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
 			></textarea>
-			<div class="help-text">Brief description that will appear on your blog's about page.</div>
+			<div class="help-text text-sm text-gray-500 dark:text-gray-400 mt-1">Brief description that will appear on your blog's about page.</div>
 		</div>
 	</section>
 
 	<section class="settings-section customization-section">
-		<h2><span class="section-icon customization-icon"></span>Site Customization</h2>
+		<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+			<span class="section-icon customization-icon w-5 h-5 bg-gray-400 dark:bg-gray-500 rounded"></span>
+			Site Customization
+		</h2>
 
-		<div class="form-group">
-			<label for="subdomain">Subdomain</label>
-			<div class="subdomain-container">
+		<div class="form-group mb-6">
+			<label for="subdomain" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subdomain</label>
+			<div class="subdomain-container flex items-center">
 				<input
 					type="text"
 					id="subdomain"
 					bind:value={siteSettings.subdomain}
 					placeholder="your-blog-name"
-					class="input-field"
+					class="input-field flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
 				/>
-				<span class="domain-suffix">.srible.com</span>
+				<span class="domain-suffix px-3 py-2 bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-400 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md text-sm">.srible.com</span>
 			</div>
-			<div class="help-text">
+			<div class="help-text text-sm text-gray-500 dark:text-gray-400 mt-1">
 				This is your blog's address on the web. Only lowercase letters, numbers, and hyphens
 				allowed.
 			</div>
@@ -274,211 +280,21 @@
 	</section>
 
 	<section class="settings-section account-section">
-		<h2><span class="section-icon account-icon"></span>Account</h2>
-		<div class="danger-zone">
-			<h3>Danger Zone</h3>
-			<p>Once you delete your account, there is no going back. Please be certain.</p>
-			<button class="delete-account-btn">Delete Account</button>
+		<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+			<span class="section-icon account-icon w-5 h-5 bg-gray-400 dark:bg-gray-500 rounded"></span>
+			Account
+		</h2>
+		<div class="danger-zone bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-6">
+			<h3 class="text-base font-semibold text-red-800 dark:text-red-400 mb-3">Danger Zone</h3>
+			<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+			<button class="delete-account-btn bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white border-none rounded-md px-5 py-3 text-sm font-medium cursor-pointer min-h-[44px]">Delete Account</button>
 		</div>
 	</section>
 </div>
 
 <style>
-	.content-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
-
-	.content-header h1 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-	}
-
-	.save-btn {
-		background-color: #3b82f6; /* Blue */
-		color: white;
-		border: none;
-		border-radius: 6px;
-		padding: 0.75rem 1.25rem;
-		font-size: 0.9375rem;
-		font-weight: 500;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		transition: background-color 0.2s ease;
-		min-height: 44px; /* Touch-friendly */
-	}
-
-	.save-btn:hover {
-		background-color: #2563eb; /* Darker blue */
-	}
-
-	.notification {
-		background-color: #1ac954; /* Green background */
-		color: white;
-		padding: 0.75rem 1rem;
-		border-radius: 6px;
-		margin-bottom: 1.5rem;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	/* Dashboard Content */
-	.dashboard-content {
-		background-color: #f8f8f5;
-		border-radius: 8px;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-		padding: 2rem;
-		margin-bottom: 2rem;
-	}
-
-	.settings-section {
-		margin-bottom: 2.5rem;
-	}
-
-	.settings-section:last-child {
-		margin-bottom: 0;
-	}
-
-	.settings-section h2 {
-		font-size: 1.25rem;
-		margin-bottom: 1.5rem;
-		font-weight: 600;
-		color: var(--primary-black, #1a1a1a);
-		font-family: 'Space Grotesk', sans-serif;
-		padding-bottom: 0.5rem;
-		border-bottom: 1px solid #eaeaea;
-		display: flex;
-		align-items: center;
-	}
-
-	.section-icon {
-		width: 24px;
-		height: 24px;
-		border-radius: 50%;
-		margin-right: 0.75rem;
-		position: relative;
-	}
-
-	.section-icon::before {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 14px;
-		height: 14px;
-		background-size: contain;
-		background-repeat: no-repeat;
-		background-position: center;
-	}
-
-	.profile-icon {
-		background-color: rgba(16, 185, 129, 0.15); /* Green background */
-	}
-
-	.profile-icon::before {
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='12' cy='7' r='4'%3E%3C/circle%3E%3C/svg%3E");
-	}
-
-	.customization-icon {
-		background-color: rgba(139, 92, 246, 0.15); /* Purple background */
-	}
-
-	.customization-icon::before {
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z'%3E%3C/path%3E%3Cpath d='M4.93 4.93l4.24 4.24'%3E%3C/path%3E%3Cpath d='M14.83 14.83l4.24 4.24'%3E%3C/path%3E%3Cpath d='M14.83 9.17l4.24-4.24'%3E%3C/path%3E%3Cpath d='M14.83 9.17l3.53-3.53'%3E%3C/path%3E%3Cpath d='M4.93 19.07l4.24-4.24'%3E%3C/path%3E%3C/svg%3E");
-	}
-
-	.account-icon {
-		background-color: rgba(245, 158, 11, 0.15); /* Amber background */
-	}
-
-	.account-icon::before {
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
-	}
-
-	.form-group {
-		margin-bottom: 1.5rem;
-	}
-
-	.form-group label {
-		display: block;
-		margin-bottom: 0.5rem;
-		font-size: 0.9375rem;
-		font-weight: 500;
-		color: var(--primary-black, #1a1a1a);
-	}
-
-	.input-field {
-		width: 100%;
-		padding: 0.75rem;
-		border: 1px solid #eaeaea;
-		border-radius: 6px;
-		font-size: 0.9375rem;
-		color: var(--primary-black, #1a1a1a);
-		transition: border-color 0.2s ease;
-		font-family: inherit;
-	}
-
-	.input-field:focus {
-		outline: none;
-		border-color: var(--primary-black, #1a1a1a);
-	}
-
-	.help-text {
-		font-size: 0.875rem;
-		color: var(--gray-dark, #555);
-		margin-top: 0.5rem;
-	}
-
-	.danger-zone {
-		background-color: rgba(255, 0, 0, 0.05);
-		border: 1px solid rgba(255, 0, 0, 0.15);
-		border-radius: 8px;
-		padding: 1.5rem;
-	}
-
-	.danger-zone h3 {
-		font-size: 1rem;
-		font-weight: 600;
-		color: #cc0000;
-		margin-bottom: 0.75rem;
-	}
-
-	.danger-zone p {
-		font-size: 0.9375rem;
-		color: #555;
-		margin-bottom: 1rem;
-	}
-
-	.delete-account-btn {
-		background-color: #cc0000;
-		color: white;
-		border: none;
-		border-radius: 6px;
-		padding: 0.75rem 1.25rem;
-		font-size: 0.9375rem;
-		font-weight: 500;
-		cursor: pointer;
-		min-height: 44px; /* Touch-friendly */
-	}
-
-	.delete-account-btn:hover {
-		background-color: #aa0000;
-	}
-
+	/* Responsive styles only - no hardcoded colors */
 	@media (max-width: 768px) {
-		.content-header h1 {
-			font-size: 1.25rem;
-		}
-
 		.dashboard-content {
 			padding: 1.5rem;
 		}
@@ -500,6 +316,7 @@
 			justify-content: center;
 		}
 	}
+
 	/* Subdomain styling */
 	.subdomain-container {
 		display: flex;
@@ -511,17 +328,6 @@
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
 		flex-grow: 1;
-	}
-
-	.domain-suffix {
-		background-color: #f0f0f0;
-		padding: 0.75rem;
-		border: 1px solid #eaeaea;
-		border-left: none;
-		border-top-right-radius: 6px;
-		border-bottom-right-radius: 6px;
-		font-size: 0.9375rem;
-		color: #666;
 	}
 
 	/* Favicon styling */
@@ -643,11 +449,17 @@
 	@media (max-width: 640px) {
 		.favicon-container {
 			flex-direction: column;
-			align-items: center;
-			text-align: center;
+			align-items: flex-start;
 		}
 
 		.favicon-buttons {
+			flex-direction: column;
+		}
+
+		.file-upload-btn,
+		.upload-favicon-btn,
+		.delete-favicon-btn {
+			width: 100%;
 			justify-content: center;
 		}
 	}

@@ -1,6 +1,34 @@
 <script>
+	import { onMount } from 'svelte';
+	
 	// Selected time period
 	let selectedPeriod = '30d';
+	
+	// Theme reactivity
+	let isDarkMode = false;
+	
+	onMount(() => {
+		// Check initial theme
+		isDarkMode = document.documentElement.classList.contains('dark');
+		
+		// Watch for theme changes
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+				if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+					isDarkMode = document.documentElement.classList.contains('dark');
+				}
+			});
+		});
+		
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ['class']
+		});
+		
+		return () => {
+			observer.disconnect();
+		};
+	});
 
 	// Placeholder data for analytics
 	let totalViews = 5873;
@@ -79,35 +107,35 @@
 	});
 </script>
 
-<header class="content-header">
-	<h1>Analytics</h1>
-	<div class="period-filter">
+<header class="content-header flex justify-between items-center mb-8">
+	<h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 m-0">Analytics</h1>
+	<div class="period-filter flex gap-2">
 		<button
-			class="period-btn {selectedPeriod === '24h' ? 'active' : ''}"
+			class="period-btn px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 {selectedPeriod === '24h' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 			on:click={() => (selectedPeriod = '24h')}
 		>
 			24h
 		</button>
 		<button
-			class="period-btn {selectedPeriod === '7d' ? 'active' : ''}"
+			class="period-btn px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 {selectedPeriod === '7d' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 			on:click={() => (selectedPeriod = '7d')}
 		>
 			7d
 		</button>
 		<button
-			class="period-btn {selectedPeriod === '30d' ? 'active' : ''}"
+			class="period-btn px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 {selectedPeriod === '30d' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 			on:click={() => (selectedPeriod = '30d')}
 		>
 			30d
 		</button>
 		<button
-			class="period-btn {selectedPeriod === '3m' ? 'active' : ''}"
+			class="period-btn px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 {selectedPeriod === '3m' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 			on:click={() => (selectedPeriod = '3m')}
 		>
 			3m
 		</button>
 		<button
-			class="period-btn {selectedPeriod === '1y' ? 'active' : ''}"
+			class="period-btn px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 {selectedPeriod === '1y' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 			on:click={() => (selectedPeriod = '1y')}
 		>
 			1y
@@ -115,47 +143,47 @@
 	</div>
 </header>
 
-<div class="dashboard-content">
+<div class="dashboard-content bg-white dark:bg-black rounded-xl shadow-md border border-gray-200 dark:border-gray-800 p-8 mb-8">
 	<!-- Top stats overview -->
-	<div class="stats-grid">
-		<div class="stat-card highlight">
-			<div class="stat-header">
-				<span>Total Page Views</span>
+	<div class="stats-grid grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+			<div class="stat-header mb-2">
+				<span class="text-sm font-medium text-blue-700 dark:text-blue-300">Total Page Views</span>
 			</div>
-			<div class="stat-value">{totalViews}</div>
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white mb-2">{totalViews}</div>
 			<div class="stat-footer">
-				<span class="trend {percentChange > 0 ? 'positive' : 'negative'}">
+				<span class="trend text-sm {percentChange > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
 					{percentChange > 0 ? '+' : ''}{percentChange}% from last week
 				</span>
 			</div>
 		</div>
-		<div class="stat-card">
-			<div class="stat-header">
-				<span>Unique Visitors</span>
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+			<div class="stat-header mb-2">
+				<span class="text-sm font-medium text-gray-600 dark:text-gray-300">Unique Visitors</span>
 			</div>
-			<div class="stat-value">{uniqueVisitors}</div>
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white">{uniqueVisitors}</div>
 		</div>
-		<div class="stat-card">
-			<div class="stat-header">
-				<span>This Week</span>
+		<div class="stat-card bg-gray-50 dark:bg-gray-900 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+			<div class="stat-header mb-2">
+				<span class="text-sm font-medium text-gray-600 dark:text-gray-300">This Week</span>
 			</div>
-			<div class="stat-value">{thisWeek}</div>
+			<div class="stat-value text-3xl font-bold text-gray-900 dark:text-white">{thisWeek}</div>
 		</div>
 	</div>
 
 	<!-- Monthly traffic overview chart -->
-	<div class="analytics-section">
-		<h2>Traffic Overview</h2>
-		<div class="chart-placeholder">
-			<div class="chart-bars">
+	<div class="analytics-section mb-8">
+		<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Traffic Overview</h2>
+		<div class="chart-placeholder bg-gray-50 dark:bg-gray-900 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+			<div class="chart-bars flex items-end justify-between h-48 gap-2">
 				{#each growthData as data, index}
-					<div class="chart-bar-container">
+					<div class="chart-bar-container flex flex-col items-center flex-1">
 						<div
-							class="chart-bar {index > 0 ? (data.growth >= 0 ? 'positive' : 'negative') : ''}"
+							class="chart-bar w-full rounded-t {index > 0 ? (data.growth >= 0 ? 'bg-green-500 dark:bg-green-400' : 'bg-red-500 dark:bg-red-400') : 'bg-blue-500 dark:bg-blue-400'} relative"
 							style="height: {data.views / 12}px;"
 						>
 							{#if index > 0}
-								<div class="growth-indicator">
+								<div class="growth-indicator absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium {data.growth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
@@ -176,7 +204,7 @@
 								</div>
 							{/if}
 						</div>
-						<div class="chart-label">{data.month}</div>
+						<div class="chart-label text-xs text-gray-600 dark:text-gray-400 mt-2">{data.month}</div>
 					</div>
 				{/each}
 			</div>
@@ -184,14 +212,14 @@
 	</div>
 
 	<!-- Visitor time distribution -->
-	<div class="analytics-section">
-		<h2>Visitor Time Distribution</h2>
-		<div class="chart-placeholder">
-			<div class="chart-bars">
+	<div class="analytics-section mb-8">
+		<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Visitor Time Distribution</h2>
+		<div class="chart-placeholder bg-gray-50 dark:bg-gray-900 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+			<div class="chart-bars flex items-end justify-between h-48 gap-2">
 				{#each timeData as data, index}
-					<div class="chart-bar-container">
-						<div class="chart-bar time-bar" style="height: {data.views / 7}px;">
-							<div class="time-icon">
+					<div class="chart-bar-container flex flex-col items-center flex-1">
+						<div class="chart-bar time-bar w-full bg-purple-500 dark:bg-purple-400 rounded-t relative" style="height: {data.views / 7}px;">
+							<div class="time-icon absolute -top-6 left-1/2 -translate-x-1/2 text-xs text-purple-600 dark:text-purple-400">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 24 24"
@@ -204,11 +232,11 @@
 									stroke-linejoin="round"
 								>
 									<circle cx="12" cy="12" r="10"></circle>
-									<polyline points="12 6 12 12 16 14"></polyline>
+									<polyline points="12,6 12,12 16,14"></polyline>
 								</svg>
 							</div>
 						</div>
-						<div class="chart-label">{data.hour}</div>
+						<div class="chart-label text-xs text-gray-600 dark:text-gray-400 mt-2">{data.hour}</div>
 					</div>
 				{/each}
 			</div>
@@ -216,90 +244,51 @@
 	</div>
 
 	<!-- Combined browser & device section -->
-	<div class="analytics-section-row">
+	<div class="analytics-section-row grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 		<!-- Browsers -->
 		<div class="analytics-section">
-			<h2>Browsers</h2>
-			<div class="data-table-container">
-				<table class="data-table">
+			<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Browsers</h2>
+			<div class="data-table-container bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+				<table class="data-table w-full border-collapse">
 					<thead>
-						<tr>
-							<th class="text-left">Browser</th>
-							<th class="text-right">Users</th>
-							<th class="text-right">%</th>
-							<th class="bar-column"></th>
+						<tr class="bg-gray-50 dark:bg-gray-700">
+							<th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">Browser</th>
+							<th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">Users</th>
+							<th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">%</th>
+							<th class="bar-column px-4 py-3 border-b border-gray-200 dark:border-gray-600"></th>
 						</tr>
 					</thead>
 					<tbody>
-						{#each browserData as browser}
-							<tr>
-								<td class="text-left browser-cell">
-									<div class="icon-wrapper browser-icon {browser.name.toLowerCase()}">
+						{#each browserData as browser, index}
+							<tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 {index === browserData.length - 1 ? '' : 'border-b border-gray-200 dark:border-gray-600'}">
+								<td class="text-left px-4 py-3 text-sm text-gray-900 dark:text-gray-100 flex items-center">
+									<div class="icon-wrapper browser-icon w-6 h-6 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mr-3">
 										{#if browser.name === 'Chrome'}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												><path
-													d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-5.344 9.257c.206.01.413.016.621.016 6.627 0 12-5.373 12-12 0-1.54-.29-3.011-.818-4.364zM12 16.364a4.364 4.364 0 1 1 0-8.728 4.364 4.364 0 0 1 0 8.728z"
-													fill="#4285F4"
-												/></svg
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+												<path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-5.344 9.257c.206.01.413.016.621.016 6.627 0 12-5.373 12-12 0-1.54-.29-3.011-.818-4.364zM12 16.364a4.364 4.364 0 1 1 0-8.728 4.364 4.364 0 0 1 0 8.728z" fill="#4285F4"/>
+											</svg>
 										{:else if browser.name === 'Firefox'}
-									<img 
-										src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Firefox_logo%2C_2019.svg/1200px-Firefox_logo%2C_2019.svg.png" 
-										alt="Firefox" 
-										width="16" 
-										height="16"
-									>
+											<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Firefox_logo%2C_2019.svg/1200px-Firefox_logo%2C_2019.svg.png" alt="Firefox" width="16" height="16">
 										{:else if browser.name === 'Safari'}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												><circle cx="12" cy="12" r="12" fill="#1193F2" /><path
-													d="m10.92 11.75 5.65-3.38-3.38 5.65-5.66 3.38 3.39-5.65z"
-													fill="white"
-												/></svg
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+												<circle cx="12" cy="12" r="12" fill="#1193F2" />
+												<path d="m10.92 11.75 5.65-3.38-3.38 5.65-5.66 3.38 3.39-5.65z" fill="white"/>
+											</svg>
 										{:else if browser.name === 'Edge'}
-									<img 
-										src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Microsoft_Edge_logo_%282019%29.png/500px-Microsoft_Edge_logo_%282019%29.png" 
-										alt="Edge" 
-										width="16" 
-										height="16"
-									>
+											<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Microsoft_Edge_logo_%282019%29.png/500px-Microsoft_Edge_logo_%282019%29.png" alt="Edge" width="16" height="16">
 										{:else}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="2"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												><circle cx="12" cy="12" r="10" /><line
-													x1="8"
-													y1="12"
-													x2="16"
-													y2="12"
-												/></svg
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+												<circle cx="12" cy="12" r="10" />
+												<line x1="8" y1="12" x2="16" y2="12" />
+											</svg>
 										{/if}
 									</div>
 									{browser.name}
 								</td>
-								<td class="text-right">{browser.users}</td>
-								<td class="text-right">{browser.percentage}%</td>
-								<td class="bar-column">
-									<div
-										class="percentage-bar"
-										style="width: {(browser.percentage / maxBrowserPercentage) * 100}%"
-									></div>
+								<td class="text-right px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{browser.users}</td>
+								<td class="text-right px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{browser.percentage}%</td>
+								<td class="bar-column px-4 py-3 relative">
+									<div class="percentage-bar bg-gray-200 dark:bg-gray-600 h-2 rounded-full absolute left-4 right-4" style="width: {(browser.percentage / maxBrowserPercentage) * 100}%"></div>
 								</td>
 							</tr>
 						{/each}
@@ -310,80 +299,40 @@
 
 		<!-- Devices -->
 		<div class="analytics-section">
-			<h2>Devices</h2>
-			<div class="data-table-container">
-				<table class="data-table">
+			<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Devices</h2>
+			<div class="data-table-container bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+				<table class="data-table w-full border-collapse">
 					<thead>
-						<tr>
-							<th class="text-left">Device</th>
-							<th class="text-right">Users</th>
-							<th class="text-right">%</th>
-							<th class="bar-column"></th>
+						<tr class="bg-gray-50 dark:bg-gray-700">
+							<th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">Device</th>
+							<th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">Users</th>
+							<th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">%</th>
+							<th class="bar-column px-4 py-3 border-b border-gray-200 dark:border-gray-600"></th>
 						</tr>
 					</thead>
 					<tbody>
-						{#each deviceData as device}
-							<tr>
-								<td class="text-left device-cell">
-									<div class="icon-wrapper device-icon {device.name.toLowerCase()}">
+						{#each deviceData as device, index}
+							<tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 {index === deviceData.length - 1 ? '' : 'border-b border-gray-200 dark:border-gray-600'}">
+								<td class="text-left px-4 py-3 text-sm text-gray-900 dark:text-gray-100 flex items-center">
+									<div class="icon-wrapper device-icon w-6 h-6 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mr-3">
 										{#if device.name === 'Desktop'}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="2"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 												<rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
 												<line x1="8" y1="21" x2="16" y2="21"></line>
 												<line x1="12" y1="17" x2="12" y2="21"></line>
 											</svg>
 										{:else if device.name === 'Mobile'}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="2"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 												<rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
 												<line x1="12" y1="18" x2="12.01" y2="18"></line>
 											</svg>
 										{:else if device.name === 'Tablet'}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="2"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 												<rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
 												<line x1="12" y1="18" x2="12.01" y2="18"></line>
 											</svg>
 										{:else}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												width="16"
-												height="16"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="2"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											>
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 												<circle cx="12" cy="12" r="10"></circle>
 												<line x1="8" y1="12" x2="16" y2="12"></line>
 											</svg>
@@ -391,13 +340,10 @@
 									</div>
 									{device.name}
 								</td>
-								<td class="text-right">{device.users}</td>
-								<td class="text-right">{device.percentage}%</td>
-								<td class="bar-column">
-									<div
-										class="percentage-bar"
-										style="width: {(device.percentage / maxDevicePercentage) * 100}%"
-									></div>
+								<td class="text-right px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{device.users}</td>
+								<td class="text-right px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{device.percentage}%</td>
+								<td class="bar-column px-4 py-3 relative">
+									<div class="percentage-bar bg-gray-200 dark:bg-gray-600 h-2 rounded-full absolute left-4 right-4" style="width: {(device.percentage / maxDevicePercentage) * 100}%"></div>
 								</td>
 							</tr>
 						{/each}
@@ -409,24 +355,24 @@
 
 	<!-- Page visits table -->
 	<div class="analytics-section">
-		<h2>Top Pages</h2>
-		<div class="data-table-container full-width">
-			<table class="data-table">
+		<h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Top Pages</h2>
+		<div class="data-table-container bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+			<table class="data-table w-full border-collapse">
 				<thead>
-					<tr>
-						<th class="text-left page-column">Page</th>
-						<th class="text-left path-column">Path</th>
-						<th class="text-right">Views</th>
-						<th class="text-right">Avg. Time</th>
+					<tr class="bg-gray-50 dark:bg-gray-700">
+						<th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-1/3">Page</th>
+						<th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-1/4">Path</th>
+						<th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">Views</th>
+						<th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">Avg. Time</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each pageVisitData as page}
-						<tr>
-							<td class="text-left page-column">{page.title}</td>
-							<td class="text-left path-column">{page.path}</td>
-							<td class="text-right">{page.views}</td>
-							<td class="text-right">{page.avgTime}</td>
+					{#each pageVisitData as page, index}
+						<tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 {index === pageVisitData.length - 1 ? '' : 'border-b border-gray-200 dark:border-gray-600'}">
+							<td class="text-left px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">{page.title}</td>
+							<td class="text-left px-4 py-3 text-sm text-gray-600 dark:text-gray-400 font-mono">{page.path}</td>
+							<td class="text-right px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{page.views}</td>
+							<td class="text-right px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{page.avgTime}</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -449,6 +395,11 @@
 		font-weight: 700;
 		color: var(--primary-black, #1a1a1a);
 		font-family: 'Space Grotesk', sans-serif;
+	}
+	
+	/* Dark mode header text */
+	:global(.dark) .content-header h1 {
+		color: #f3f4f6;
 	}
 
 	.period-filter {
@@ -484,11 +435,17 @@
 
 	/* Dashboard Content */
 	.dashboard-content {
-		background-color: #f8f8f5;
-		border-radius: 8px;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+		background-color: #ffffff;
+		border-radius: 12px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		padding: 2rem;
 		margin-bottom: 2rem;
+	}
+	
+	/* Dark mode dashboard content */
+	:global(.dark) .dashboard-content {
+		background-color: #000000;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	}
 
 	/* Stats Grid */
@@ -559,6 +516,11 @@
 		font-weight: 600;
 		color: var(--primary-black, #1a1a1a);
 		font-family: 'Space Grotesk', sans-serif;
+	}
+	
+	/* Dark mode section headers */
+	:global(.dark) .analytics-section h2 {
+		color: #f3f4f6;
 	}
 
 	.chart-placeholder {
@@ -643,6 +605,11 @@
 		font-size: 0.875rem;
 		color: var(--gray-dark, #555);
 	}
+	
+	/* Dark mode chart labels */
+	:global(.dark) .chart-label {
+		color: #9ca3af;
+	}
 
 	@media (max-width: 768px) {
 		.content-header h1 {
@@ -692,12 +659,15 @@
 	.data-table th {
 		text-align: left;
 		font-weight: 600;
-		background-color: rgba(0, 0, 0, 0.02);
-		border-bottom: 1px solid #eaeaea;
 	}
 
-	.data-table tr:not(:last-child) td {
-		border-bottom: 1px solid #eaeaea;
+	/* Dark mode table styles */
+	:global(.dark) .data-table th {
+		background-color: #374151;
+	}
+
+	:global(.dark) .data-table td {
+		border-color: #4b5563;
 	}
 
 	.data-table .text-left {

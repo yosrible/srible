@@ -44,6 +44,17 @@
   padding: 0;
 }
 
+/* Dark mode body styles */
+:global(.dark body) {
+  color: #ffffff;
+  background: #000000;
+}
+
+/* Dashboard dark mode body override */
+:global(.dark body.dashboard-mode) {
+  background: #000000;
+}
+
 /* Ensure the main content takes full height */
 :global(#svelte) {
   display: flex;
@@ -172,6 +183,16 @@ h6 {
 	letter-spacing: -0.5px;
 	color: #000000;
 	text-rendering: optimizeLegibility;
+}
+
+/* Dark mode headings */
+:global(.dark) h1,
+:global(.dark) h2,
+:global(.dark) h3,
+:global(.dark) h4,
+:global(.dark) h5,
+:global(.dark) h6 {
+	color: #ffffff;
 }
 
 /* Component styles */

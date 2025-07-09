@@ -190,10 +190,10 @@
 		</div>
 	{/if}
 
-	<div class="editor-header">
+	<div class="editor-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
 		<button
 			on:click={() => goto('/dashboard/posts')}
-			class="px-4 py-2 rounded-md bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center text-sm shadow-sm"
+			class="px-4 py-2 rounded-md bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center text-sm shadow-sm transition-colors duration-200"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -211,13 +211,13 @@
 		<div class="flex gap-2">
 			<button
 				on:click={discardPost}
-				class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 text-sm shadow-sm"
+				class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm shadow-sm transition-colors duration-200"
 			>
 				Discard
 			</button>
 			<button
 				on:click={togglePublishModal}
-				class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm shadow-sm"
+				class="px-4 py-2 rounded-md bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 text-sm shadow-sm transition-colors duration-200"
 			>
 				Publish
 			</button>
@@ -225,7 +225,7 @@
 	</div>
 
 	<!-- Main content area with markdown editor -->
-	<div class="editor-container" bind:this={editorCard}>
+	<div class="editor-container bg-white dark:bg-gray-800" bind:this={editorCard}>
 		<MarkdownEditor 
 			bind:value={content} 
 			on:change={handleEditorChange}
@@ -237,11 +237,11 @@
 	<!-- Publish Modal -->
 	{#if showPublishModal}
 		<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-			<div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
-				<div class="border-b border-gray-100 bg-gray-50 px-6 py-4 flex justify-between items-center">
-					<h3 class="text-lg font-semibold text-gray-800">Finalize Your Post</h3>
+			<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full overflow-hidden">
+				<div class="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-between items-center">
+					<h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Finalize Your Post</h3>
 					<button
-						class="text-gray-500 hover:text-gray-800"
+						class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200"
 						on:click={() => (showPublishModal = false)}
 						aria-label="Close dialog"
 					>
@@ -258,14 +258,14 @@
 				<div class="p-6 space-y-6">
 					<!-- Cover Image URL -->
 					<div>
-						<label for="modal-coverImage" class="block mb-2 text-sm font-medium text-gray-700">
+						<label for="modal-coverImage" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
 							Cover Image URL
 						</label>
 						<div class="relative">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5 text-gray-400"
+									class="h-5 w-5 text-gray-400 dark:text-gray-500"
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke="currentColor"
@@ -282,50 +282,50 @@
 								type="text"
 								id="modal-coverImage"
 								bind:value={coverImage}
-								class="w-full p-3 pl-10 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+								class="w-full p-3 pl-10 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
 								placeholder="https://example.com/your-image.jpg"
 							/>
 						</div>
-						<p class="mt-1 text-xs text-gray-500">Add a captivating image to represent your post</p>
+						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Add a captivating image to represent your post</p>
 					</div>
 
 					<!-- Description textarea -->
 					<div>
-						<label for="modal-description" class="block mb-2 text-sm font-medium text-gray-700">
+						<label for="modal-description" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
 							Post Description
 						</label>
 						<textarea
 							id="modal-description"
 							bind:value={description}
-							class="w-full p-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+							class="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
 							placeholder="Write a brief description that captures your post's essence..."
 							rows="3"
 						></textarea>
-						<p class="mt-1 text-xs text-gray-500">
+						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
 							A good description helps readers find your content
 						</p>
 					</div>
 
 					<!-- Preview title extracted from H1 -->
 					<div>
-						<h4 class="text-sm font-medium text-gray-700 mb-2">Post Title (from H1)</h4>
-						<div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-							<p class="font-medium">{extractTitleFromContent() || 'No H1 heading found in your post'}</p>
+						<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Post Title (from H1)</h4>
+						<div class="p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+							<p class="font-medium text-gray-900 dark:text-gray-100">{extractTitleFromContent() || 'No H1 heading found in your post'}</p>
 						</div>
-						<p class="mt-1 text-xs text-gray-500">
+						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
 							The title is automatically extracted from the first H1 heading in your post
 						</p>
 					</div>
 				</div>
-				<div class="border-t border-gray-100 bg-gray-50 px-6 py-4 flex justify-end gap-3">
+				<div class="border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-end gap-3">
 					<button
-						class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 text-sm"
+						class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm transition-colors duration-200"
 						on:click={() => showPublishModal = false}
 					>
 						Cancel
 					</button>
 					<button
-						class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+						class="px-6 py-2.5 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center gap-2"
 						on:click={handlePublish}
 					>
 						<svg
@@ -364,22 +364,7 @@
 		flex-direction: column;
 	}
 
-	.editor-header {
-		padding: 1rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-	}
-
-	.editor-container {
-		flex: 1;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-	}
-
-	/* Responsive styles */
+	/* Responsive styles only - no hardcoded colors */
 	@media (max-width: 768px) {
 		.editor-header {
 			padding: 0.5rem;
