@@ -267,7 +267,7 @@ export const ContributorsSection = () => {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Box
               component="a"
-              href="https://github.com/your-org/srible"
+              href="https://github.com/yosrible/srible"
               target="_blank"
               rel="noopener noreferrer"
               sx={{
