@@ -1,15 +1,2 @@
-name = "srible"
-main = "dist/index.html"
+pages_build_output_dir = "Frontend/dist"
 compatibility_date = "2024-07-12"
-
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-[build.upload]
-  format = "service-worker"
-
-[[routes]]
-  pattern = "srible.com/*"
-  zone_name = "srible.com"
-  custom_domain = true
