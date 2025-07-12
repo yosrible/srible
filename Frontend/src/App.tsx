@@ -15,7 +15,7 @@ function App() {
         <CssBaseline />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<SignInPage />} />
+          <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />

@@ -201,6 +201,8 @@ export const PricingSection = () => (
               </Box>
 
               <Button
+                component="a"
+                href="/signup"
                 fullWidth
                 variant={plan.highlighted ? "contained" : "outlined"}
                 size="large"
@@ -211,6 +213,7 @@ export const PricingSection = () => (
                   borderRadius: "50px",
                   borderWidth: "1.5px",
                   opacity: plan.highlighted ? 1 : 0.8,
+                  textDecoration: "none",
                   "&:hover": {
                     borderWidth: "1.5px",
                     opacity: plan.highlighted ? 0.9 : 0.7,

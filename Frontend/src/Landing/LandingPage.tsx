@@ -189,7 +189,7 @@ const Navbar = () => {
           >
             <Button
               component={Link}
-              to="/login"
+              to="/signin"
               variant="outlined"
               color="inherit"
               size="small"
@@ -534,7 +534,7 @@ const LandingPage = () => {
                   mx: "auto",
                   mb: 5,
                   px: { xs: 2, sm: 0 },
-                  textAlign: { xs: 'center', sm: 'left' },
+                  textAlign: 'center',
                 }}
               >
                 A minimal blogging platform that stays out of your way. Focus on
