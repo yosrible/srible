@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/kazedevs/srible/main/Frontend/public/srible-logo.png" width="100" height="100">
+<img src="https://raw.githubusercontent.com/kazedevs/srible/main/Frontend/public/srible_logo.png" width="100" height="100">
 </div>
 
 # Srible
