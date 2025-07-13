@@ -155,16 +155,13 @@ export const FeaturesSection = () => (
         sx={{
           display: "grid",
           gridTemplateColumns: {
-            xs: "repeat(auto-fit, minmax(280px, 1fr))",
-            sm: "repeat(2, minmax(0, 1fr))",
-            md: "repeat(3, minmax(0, 1fr))",
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
           },
           gap: { xs: 3, sm: 4 },
-          justifyItems: { xs: "center", sm: "stretch" },
+          justifyItems: "stretch",
           maxWidth: "100%",
-          "& > *": {
-            minWidth: 0, // Prevent flex items from overflowing
-          },
         }}
       >
         {features.map((feature, index) => (

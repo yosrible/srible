@@ -89,6 +89,9 @@ export const Footer = () => (
             ))}
           </SocialLinks>
           <Box sx={{ mt: 2, display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <FooterLink to="/about">
+              About
+            </FooterLink>
             <FooterLink to="/privacy">
               Privacy
             </FooterLink>
