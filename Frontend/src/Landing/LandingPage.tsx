@@ -87,7 +87,7 @@ const Navbar = () => {
         maxWidth: "calc(100% - 48px)",
         height: "62px",
         borderRadius: "31px",
-        border: "none",
+        border: "1px solid rgba(0, 0, 0, 0.25)",
         boxShadow: scrolled
           ? "0 8px 32px rgba(0, 0, 0, 0.05)"
           : "0 4px 16px rgba(0, 0, 0, 0.03)",
@@ -183,96 +183,96 @@ const Navbar = () => {
             ))}
           </Box>
 
-          {/* Auth buttons - always visible */}
+          {/* Auth buttons and mobile menu container */}
           <Box
-            sx={{ display: "flex", alignItems: "center", ml: "auto", gap: 1 }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              ml: "auto",
+              gap: 2,
+            }}
           >
-            <Button
-              component={Link}
-              to="/signin"
-              variant="outlined"
-              color="inherit"
-              size="small"
-              sx={{
-                fontFamily: '"Geist", "Geist Fallback", sans-serif',
-                textTransform: "none",
-                fontWeight: 400,
-                fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                px: { xs: 1.5, sm: 2 },
-                height: { xs: "32px", sm: "36px" },
-                borderRadius: "50px",
-                border: "1px solid",
-                borderColor: "rgba(0, 0, 0, 0.1)",
-                backgroundColor: "transparent",
-                color: "text.primary",
-                minWidth: "auto",
-                whiteSpace: "nowrap",
-                "&:hover, &:active, &:focus, &.Mui-focusVisible": {
+            {/* Desktop - Sign In */}
+            <Box sx={{ display: { xs: "none", md: "block" } }}>
+              <Button
+                component={Link}
+                to="/signin"
+                variant="outlined"
+                color="inherit"
+                size="small"
+                sx={{
+                  fontFamily: '"Geist", "Geist Fallback", sans-serif',
+                  textTransform: "none",
+                  fontWeight: 400,
+                  fontSize: "0.9rem",
+                  borderRadius: "18px",
+                  px: 2,
+                  height: "36px",
                   borderColor: "rgba(0, 0, 0, 0.1)",
-                  backgroundColor: "transparent",
                   color: "text.primary",
-                },
-                "& .MuiButton-label": {
-                  color: "text.primary",
-                },
-                "&:hover .MuiButton-label, &:active .MuiButton-label, &:focus .MuiButton-label":
-                  {
-                    color: "text.primary",
+                  "&:hover": {
+                    borderColor: "rgba(0, 0, 0, 0.2)",
+                    backgroundColor: "rgba(0, 0, 0, 0.02)",
                   },
-                transition: "none",
-              }}
-            >
-              Sign in
-            </Button>
-            <Button
-              component={Link}
-              to="/signup"
-              variant="contained"
-              color="primary"
-              size="small"
-              sx={{
-                fontFamily: '"Geist", "Geist Fallback", sans-serif',
-                textTransform: "none",
-                fontWeight: 400,
-                fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                boxShadow: "none",
-                borderRadius: "18px",
-                px: { xs: 1.5, sm: 2 },
-                height: { xs: "32px", sm: "36px" },
-                minWidth: "auto",
-                whiteSpace: "nowrap",
-                backgroundColor: "primary.main",
-                color: "white", // Force white text color
-                "&:hover, &:active, &:focus, &.Mui-focusVisible": {
-                  backgroundColor: "primary.main",
-                  color: "white", // Keep white text on all states
-                  boxShadow: "none",
-                  transform: "none",
-                },
-                "& .MuiButton-label": {
-                  color: "white", // Target the label directly
-                },
-                "&:hover .MuiButton-label, &:active .MuiButton-label, &:focus .MuiButton-label":
-                  {
-                    color: "white", // Ensure label stays white
-                  },
-                transition: "none",
-              }}
-              disableRipple
-            >
-              Get Started
-            </Button>
+                }}
+                disableRipple
+              >
+                Sign in
+              </Button>
+            </Box>
 
-            {/* Mobile menu button */}
-            <Box
-              sx={{ display: { xs: "flex", md: "none" }, alignItems: "center" }}
-            >
+            {/* Get Started - visible on all sizes */}
+            <Box sx={{ display: { xs: "block", md: "block" } }}>
+              <Button
+                component={Link}
+                to="/signup"
+                variant="contained"
+                color="primary"
+                size="small"
+                sx={{
+                  fontFamily: '"Geist", "Geist Fallback", sans-serif',
+                  textTransform: "none",
+                  fontWeight: 400,
+                  fontSize: "0.9rem",
+                  boxShadow: "none",
+                  borderRadius: "18px",
+                  px: 2,
+                  height: "36px",
+                  minWidth: "auto",
+                  whiteSpace: "nowrap",
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  "&:hover, &:active, &:focus, &.Mui-focusVisible": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    boxShadow: "none",
+                    transform: "none",
+                  },
+                  "& .MuiButton-label": {
+                    color: "white",
+                  },
+                  "&:hover .MuiButton-label, &:active .MuiButton-label, &:focus .MuiButton-label": {
+                    color: "white",
+                  },
+                  transition: "none",
+                }}
+                disableRipple
+              >
+                Get Started
+              </Button>
+            </Box>
+
+            {/* Mobile - Hamburger Menu */}
+            <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center" }}>
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
                 edge="end"
                 onClick={handleDrawerToggle}
-                sx={{ ml: 1 }}
+                sx={{ 
+                  ml: 1,
+                  color: "#000" // Ensure icon is visible on light background
+                }}
               >
                 <MenuIcon />
               </IconButton>
@@ -360,6 +360,42 @@ const Navbar = () => {
               </ListItemButton>
             </ListItem>
           ))}
+          <Box
+            sx={{
+              px: 2,
+              py: 1,
+              mt: "auto",
+              borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+            }}
+          >
+            <Button
+              component={Link}
+              to="/signin"
+              fullWidth
+              variant="outlined"
+              color="inherit"
+              size="small"
+              onClick={() => setMobileOpen(false)}
+              sx={{
+                fontFamily: '"Geist", "Geist Fallback", sans-serif',
+                textTransform: "none",
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                py: 1,
+                borderRadius: "50px",
+                border: "1px solid",
+                borderColor: "rgba(0, 0, 0, 0.1)",
+                color: "text.primary",
+                "&:hover": {
+                  borderColor: "rgba(0, 0, 0, 0.2)",
+                  backgroundColor: "rgba(0, 0, 0, 0.02)",
+                },
+                mt: 1,
+              }}
+            >
+              Sign in
+            </Button>
+          </Box>
         </List>
       </Drawer>
     </AppBar>
@@ -534,7 +570,7 @@ const LandingPage = () => {
                   mx: "auto",
                   mb: 5,
                   px: { xs: 2, sm: 0 },
-                  textAlign: 'center',
+                  textAlign: "center",
                 }}
               >
                 A minimal blogging platform that stays out of your way. Focus on
@@ -572,36 +608,36 @@ const LandingPage = () => {
                   </svg>
                 }
                 sx={{
-                  background: "#000",
+                  background: "#000 !important",
                   color: "#fff",
                   borderRadius: "50px",
-                  px: 5,
+                  px: { xs: 4, sm: 5 },
                   py: 1.8,
                   textTransform: "none",
-                  fontSize: "1.1rem",
-                  fontFamily: 'sans-serif',
-                  fontWeight: 400,
+                  fontSize: { xs: "1rem", sm: "1.1rem" },
+                  fontFamily: '"Geist", "Geist Fallback", sans-serif',
+                  fontWeight: 500,
                   letterSpacing: "0.5px",
                   boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
                   position: "relative",
                   overflow: "visible",
-                  transition:
-                    "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  whiteSpace: "nowrap",
+                  minWidth: { xs: "180px", sm: "auto" },
+                  transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                   transform: "translateZ(0)",
                   willChange: "transform",
                   "&:hover": {
                     transform: "translateY(-4px) scale(1.03)",
                     boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
-                    background: "#fff",
-                    "& .MuiButton-label": {
-                      background: "linear-gradient(90deg, #000 0%, #333 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    },
+                    background: "#000",
+                    color: "#fff",
                   },
                   "&:active": {
                     transform: "translateY(-1px) scale(0.99)",
                     boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                  },
+                  "& .MuiButton-endIcon": {
+                    ml: 0.5,
                   },
                 }}
               >

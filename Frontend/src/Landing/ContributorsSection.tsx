@@ -4,21 +4,21 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 
 const teamMembers = [
   {
-    name: "Kaze",
-    role: "Founder & CEO",
-    avatar: "/static/team/avatars/kaze.jpg",
+    name: "Raj",
+    role: "Frontend Engineer",
+    avatar: "/static/team/avatars/Raj.png",
     twitter: "@kazedevs",
   },
   {
     name: "Shailesh",
-    role: "Co-Founder",
-    avatar: "/static/team/avatars/shailesh.jpg",
+    role: "Backend Engineer",
+    avatar: "/static/team/avatars/shailesh.png",
     twitter: "@sh1lezh",
   },
   {
     name: "Rudra",
-    role: "Founding Engineer",
-    avatar: "/static/team/avatars/rudra.jpg",
+    role: "Frontend Engineer",
+    avatar: "/static/team/avatars/rudra.png",
     twitter: "@SutharRudra_123",
   },
 ];

@@ -48,7 +48,7 @@ const plans = [
     features: [
       "Basic writing tools",
       "3 published blogs",
-      "Basic analytics",
+      "Advanced analytics",
       "Community support",
       "Custom domain support",
     ],
@@ -64,8 +64,9 @@ const plans = [
     features: [
       "Basic writing tools",
       "1 published blog",
-      "Basic analytics",
+      "Advanced analytics",
       "Community support",
+      ".srible.com domain",
     ],
     buttonText: "Get Started",
     comingSoon: false,
