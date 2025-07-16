@@ -8,6 +8,7 @@ import SignUpPage from './pages/auth/SignUpPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AboutPage from './pages/AboutPage';
+import NotFoundPage from './pages/NotFoundPage';
 import DashboardLayout from './dashboard/DashboardLayout';
 import Overview from './dashboard/pages/Overview';
 import Posts from './dashboard/pages/Posts';
@@ -36,6 +37,9 @@ function App() {
             <Route path="themes" element={<Themes />} />
             <Route path="settings" element={<Settings />} />
           </Route>
+          
+          {/* 404 - Not Found Route */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </ThemeProvider>
     </Router>
