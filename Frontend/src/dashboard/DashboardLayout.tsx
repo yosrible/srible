@@ -14,7 +14,6 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  useTheme,
   useMediaQuery,
   ThemeProvider,
   createTheme,
