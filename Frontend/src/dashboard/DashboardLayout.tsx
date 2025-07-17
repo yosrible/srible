@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
@@ -16,7 +16,6 @@ import {
   Divider,
   useMediaQuery,
   ThemeProvider,
-  createTheme,
   Avatar,
   Tooltip,
 } from "@mui/material";
@@ -27,13 +26,13 @@ import {
   Settings as SettingsIcon,
   Menu as MenuIcon,
   Close as CloseIcon,
-  DarkMode as DarkModeIcon,
-  LightMode as LightModeIcon,
   Palette as PaletteIcon,
   Logout as LogoutIcon,
   BugReport as BugReportIcon,
   OpenInNew as OpenInNewIcon,
 } from "@mui/icons-material";
+import { lightTheme, darkTheme } from "../theme/theme";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 const drawerWidth = 240;
 
@@ -52,26 +51,39 @@ const mockUser = {
   email: "john.doe@example.com",
 };
 
-export default function DashboardLayout() {
-  const [dark, setDark] = useState(false);
-  const theme = React.useMemo(() => {
-    const baseTheme = createTheme({
-      palette: {
-        mode: dark ? "dark" : "light",
-      },
-      components: {
-        MuiCssBaseline: {
-          styleOverrides: (themeParam) => ({
-            // Theme transitions removed for instant switching
-            "*, *::before, *::after, body, img, svg, button, a, [role='button'], [tabindex='0']": {
-              transition: 'none !important',
-            }
-          }),
-        },
-      },
-    });
-    return baseTheme;
+interface DashboardLayoutProps {
+  children?: React.ReactNode;
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const [dark, setDark] = useState<boolean>(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") return true;
+    if (stored === "light") return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+
+
+  // Persist theme preference whenever it changes
+  useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
   }, [dark]);
+
+  const toggleTheme = React.useCallback(() => {
+    setDark(prev => !prev);
+  }, []);
+
+  // Memoize the theme to prevent unnecessary recalculations
+  const theme = useMemo(() => {
+    const selectedTheme = dark ? darkTheme : lightTheme;
+    // Force update the body class when theme changes
+    document.body.className = `theme-${dark ? 'dark' : 'light'}`;
+    document.body.style.backgroundColor = selectedTheme.palette?.background?.default || '';
+    document.body.style.color = selectedTheme.palette?.text?.primary || '';
+    return selectedTheme;
+  }, [dark]);
+
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -304,19 +316,7 @@ export default function DashboardLayout() {
                 </IconButton>
               )}
               <Box sx={{ flexGrow: 1 }} />
-              <IconButton
-                color="inherit"
-                onClick={() => setDark((d) => !d)}
-                aria-label={`Switch to ${dark ? "light" : "dark"} mode`}
-                sx={{
-                  mr: { xs: 1, sm: 2 },
-                  "&:hover": {
-                    backgroundColor: "action.hover",
-                  },
-                }}
-              >
-                {dark ? <LightModeIcon /> : <DarkModeIcon />}
-              </IconButton>
+              <ThemeToggle dark={dark} toggleTheme={toggleTheme} />
             </Toolbar>
           </AppBar>
           {/* Main Content */}
@@ -330,7 +330,7 @@ export default function DashboardLayout() {
               mx: "auto",
             }}
           >
-            <Outlet />
+            {children || <Outlet />}
           </Box>
         </Box>
       </Box>

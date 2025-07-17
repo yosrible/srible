@@ -43,21 +43,23 @@ export function SignInForm({ className }: SignInFormProps) {
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
           borderRadius: 3,
-          '&:hover': {
+          "&:hover": {
             boxShadow: theme.shadows[6],
           },
-          transition: 'all 0.3s ease-in-out',
+          transition: "all 0.3s ease-in-out",
         }}
       >
-        <Box sx={{ 
-          p: { xs: 3, md: 6 },
-          '& .MuiButton-root': {
-            borderRadius: 2,
-          },
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 2,
-          }
-        }}>
+        <Box
+          sx={{
+            p: { xs: 3, md: 6 },
+            "& .MuiButton-root": {
+              borderRadius: 2,
+            },
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+            },
+          }}
+        >
           <Typography component="h1" variant="h5" align="center" gutterBottom>
             Welcome back
           </Typography>
@@ -78,7 +80,7 @@ export function SignInForm({ className }: SignInFormProps) {
               startIcon={<GoogleLogo />}
               sx={{
                 borderRadius: 2,
-                textTransform: 'none',
+                textTransform: "none",
               }}
             >
               Google
@@ -89,7 +91,7 @@ export function SignInForm({ className }: SignInFormProps) {
               startIcon={<GitHubIcon />}
               sx={{
                 borderRadius: 2,
-                textTransform: 'none',
+                textTransform: "none",
               }}
             >
               GitHub
@@ -144,7 +146,7 @@ export function SignInForm({ className }: SignInFormProps) {
               }}
               sx={{ mb: 1 }}
             />
-            <Box sx={{ textAlign: 'right', mb: 3 }}>
+            <Box sx={{ textAlign: "right", mb: 3 }}>
               <Link
                 component={RouterLink}
                 to="/forgot-password"
@@ -187,8 +189,7 @@ export function SignInForm({ className }: SignInFormProps) {
           sx={{
             display: { xs: "none", md: "block" },
             position: "relative",
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80)",
+            backgroundImage: "url(/static/auth-pic.jpg)",
             backgroundSize: "cover",
             backgroundPosition: "center",
             "&::before": {

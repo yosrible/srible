@@ -36,8 +36,8 @@ export function SignUpForm({ className }: SignUpFormProps) {
     try {
       // TODO: Replace with actual signup API call
       console.log("Signing up with:", { email, password });
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+
       // Redirect to onboarding after successful signup
       navigate("/onboarding");
     } catch (error) {
@@ -55,22 +55,24 @@ export function SignUpForm({ className }: SignUpFormProps) {
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
           borderRadius: 3,
-          minHeight: '600px', // Set a fixed minimum height
-          '&:hover': {
+          minHeight: "600px", // Set a fixed minimum height
+          "&:hover": {
             boxShadow: theme.shadows[6],
           },
-          transition: 'all 0.3s ease-in-out',
+          transition: "all 0.3s ease-in-out",
         }}
       >
-        <Box sx={{ 
-          p: { xs: 3, md: 6 },
-          '& .MuiButton-root': {
-            borderRadius: 2,
-          },
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 2,
-          }
-        }}>
+        <Box
+          sx={{
+            p: { xs: 3, md: 6 },
+            "& .MuiButton-root": {
+              borderRadius: 2,
+            },
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+            },
+          }}
+        >
           <Typography component="h1" variant="h5" align="center" gutterBottom>
             Create an account
           </Typography>
@@ -208,8 +210,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
           sx={{
             display: { xs: "none", md: "block" },
             position: "relative",
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80)",
+            backgroundImage: "url(/static/auth-pic.jpg)",
             backgroundSize: "cover",
             backgroundPosition: "center",
             "&::before": {
