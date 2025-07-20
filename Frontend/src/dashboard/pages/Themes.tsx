@@ -1,216 +1,235 @@
 import { useState } from "react";
-import {
-  Box,
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  Typography,
-  Button,
-  Chip,
-  Paper,
-  Stack,
-} from "@mui/material";
+import { Box, Card, Typography, Button, Stack } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import BrushIcon from "@mui/icons-material/Brush";
-import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import NightsStayIcon from "@mui/icons-material/NightsStay";
 
 const themes = [
   {
+    id: "minimal",
     name: "Minimal",
-    description: "A clean, distraction-free look for focused writing.",
-    preview: "🌿",
-    colors: ["#f5f5f5", "#e0e0e0", "#333"],
-    icon: <BrushIcon color="success" />,
+    description: "Clean and distraction-free interface",
+    colors: {
+      primary: "#3182CE",
+      background: "#FFFFFF",
+      surface: "#F7FAFC",
+      text: "#1A202C",
+    },
   },
   {
-    name: "Retro",
-    description: "Old-school vibes with a modern twist.",
-    preview: "🕹️",
-    colors: ["#fffbe6", "#ffd700", "#222"],
-    icon: <SportsEsportsIcon color="warning" />,
+    id: "dark",
+    name: "Dark",
+    description: "Elegant dark theme for comfortable viewing",
+    colors: {
+      primary: "#63B3ED",
+      background: "#1A202C",
+      surface: "#2D3748",
+      text: "#E2E8F0",
+    },
   },
   {
-    name: "Dark Knight",
-    description: "A sleek, dark theme for night owls.",
-    preview: "🌑",
-    colors: ["#18181b", "#23272f", "#fff"],
-    icon: <NightsStayIcon color="primary" />,
+    id: "nature",
+    name: "Nature",
+    description: "Calming green tones inspired by nature",
+    colors: {
+      primary: "#38A169",
+      background: "#F0FFF4",
+      surface: "#C6F6D5",
+      text: "1A202C",
+    },
   },
 ];
 
 export default function ThemesPage() {
-  const [activeTheme, setActiveTheme] = useState("Minimal");
-  const [applying, setApplying] = useState<string | null>(null);
+  const [activeTheme, setActiveTheme] = useState("minimal");
 
   return (
-    <Box maxWidth="md" mx="auto" p={{ xs: 1, sm: 2 }}>
-      <Typography variant="h4" fontWeight={700} mb={1} fontSize={{ xs: 24, sm: 32 }}>
-        Choose Your Style
+    <Box maxWidth="lg" mx="auto" p={{ xs: 2, sm: 3 }}>
+      <Typography variant="h5" fontWeight={600} mb={1}>
+        Theme Settings
       </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        mb={4}
-        maxWidth={500}
-        fontSize={{ xs: 14, sm: 16 }}
-      >
-        Personalize your dashboard with a theme that matches your vibe. Preview and apply instantly!
+      <Typography variant="body1" color="text.secondary" mb={4}>
+        Select your preferred theme
       </Typography>
-      <Box
-        display="flex"
-        flexDirection={{ xs: "column", md: "row" }}
-        flexWrap="wrap"
-        gap={{ xs: 2, sm: 3 }}
-        alignItems="stretch"
-        justifyContent="center"
+      
+      <Stack 
+        spacing={3} 
+        direction={{ xs: 'column', md: 'row' }}
+        alignItems={{ xs: 'center', md: 'stretch' }}
+        justifyContent={{ xs: 'center', md: 'flex-start' }}
+        width="100%"
       >
         {themes.map((theme) => (
-          <Box
-            key={theme.name}
-            flex={{ xs: "1 1 100%", md: "1 1 45%" }}
-            minWidth={{ xs: "100%", md: 320 }}
-            maxWidth={{ xs: "100%", md: 400 }}
-            display="flex"
+          <Card
+            key={theme.id}
+            variant="outlined"
+            sx={{
+              width: { xs: '100%', sm: 280 },
+              maxWidth: '100%',
+              border: activeTheme === theme.id ? `2px solid ${theme.colors.primary}` : '1px solid #e2e8f0',
+              borderRadius: 2,
+              overflow: 'hidden',
+              transition: 'all 0.2s',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+              },
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+            }}
+            onClick={() => setActiveTheme(theme.id)}
           >
-            <Card
-              elevation={3}
+            <Box
               sx={{
-                borderRadius: 3,
-                transition: "box-shadow 0.2s",
-                cursor: "pointer",
-                "&:hover": { boxShadow: 6 },
-                minHeight: { xs: 220, sm: 260, md: 320 },
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
+                height: 120,
+                bgcolor: theme.colors.background,
+                borderBottom: `1px solid ${theme.colors.surface}`,
+                p: 2,
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
-              <CardHeader
-                avatar={
-                  <Box fontSize={{ xs: 24, sm: 32 }} mr={1}>
-                    {theme.icon}
-                  </Box>
-                }
-                title={
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="h6" fontWeight={600} fontSize={{ xs: 16, sm: 20 }}>
-                      {theme.name}
-                    </Typography>
-                    {activeTheme === theme.name && (
-                      <Chip
-                        icon={<CheckCircleIcon color="success" />}
-                        label="Active"
-                        color="success"
-                        size="small"
-                        sx={{ fontWeight: 500 }}
-                      />
-                    )}
-                  </Stack>
-                }
-                subheader={
-                  <Typography variant="body2" color="text.secondary" fontSize={{ xs: 12, sm: 14 }}>
-                    {theme.description}
-                  </Typography>
-                }
-                sx={{ pb: 0 }}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  right: 12,
+                  height: 8,
+                  borderRadius: 4,
+                  bgcolor: theme.colors.surface,
+                }}
               />
-              <CardContent
+              <Box
                 sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  px: { xs: 1, sm: 2 },
-                  py: { xs: 1, sm: 2 },
+                  position: 'absolute',
+                  top: 28,
+                  left: 12,
+                  width: '40%',
+                  height: 8,
+                  borderRadius: 4,
+                  bgcolor: theme.colors.surface,
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: 12,
+                  right: 12,
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  bgcolor: theme.colors.primary,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-              <Box mb={1} mt={{ xs: 0, sm: 1 }}>
-                <Typography fontSize={{ xs: 32, sm: 48 }} aria-label={theme.name}>
-                  {theme.preview}
-                </Typography>
-              </Box>
-              <Stack
-                  direction="row"
-                  spacing={1}
-                  mb={1}
-                  sx={{
-                    width: "100%",
-                    justifyContent: { xs: "center", sm: "flex-start" },
-                  }}
-              >
-                  {theme.colors.map((color) => (
-                    <Box
-                      key={color}
-                      sx={{
-                        width: { xs: 20, sm: 28 },
-                        height: { xs: 20, sm: 28 },
-                        borderRadius: 1,
-                        bgcolor: color,
-                        border: "1px solid #e0e0e0",
-                        boxShadow: 1,
-                      }}
-                    />
-                  ))}
-                </Stack>
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    width: "100%",
-                    height: { xs: 28, sm: 36 },
-                    mt: 1,
-                    bgcolor: theme.colors[0],
-                    borderColor: theme.colors[1],
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: theme.colors[2],
-                    fontWeight: 500,
-                    fontSize: { xs: 12, sm: 14 },
-                  }}
-                  elevation={0}
-                >
-                  Dashboard Preview
-                </Paper>
-              </CardContent>
-              <CardActions
-                sx={{
-                  justifyContent: "flex-end",
-                  gap: 1,
-                  mt: "auto",
-                  pb: { xs: 1, sm: 2 },
-                  pr: { xs: 1, sm: 2 },
-                }}
-              >
-                {activeTheme !== theme.name && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={() => setActiveTheme(theme.name)}
-                  >
-                    Set Active
-                  </Button>
+                {activeTheme === theme.id && (
+                  <CheckCircleIcon sx={{ color: 'white', fontSize: 16 }} />
                 )}
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={() => {
-                    setApplying(theme.name);
-                    setTimeout(() => setApplying(null), 1200);
-                  }}
-                  disabled={applying === theme.name}
-                >
-                  {applying === theme.name ? "Applying..." : "Apply"}
-                </Button>
-              </CardActions>
-            </Card>
-          </Box>
+              </Box>
+            </Box>
+            
+            <Box p={3} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Typography variant="subtitle1" fontWeight={600}>
+                  {theme.name}
+                </Typography>
+                {activeTheme === theme.id && (
+                  <Box
+                    sx={{
+                      bgcolor: '#E6FFFA',
+                      color: '#00B5D8',
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 4,
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Active
+                  </Box>
+                )}
+              </Box>
+              <Typography variant="body2" color="text.secondary" mb={2}>
+                {theme.description}
+              </Typography>
+              
+              <Stack direction="row" spacing={1} mt="auto" pt={2}>
+                {Object.entries(theme.colors).map(([key, color]) => (
+                  <Box
+                    key={key}
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: '4px',
+                      bgcolor: color,
+                      border: '1px solid rgba(0,0,0,0.05)',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        transform: 'scale(1.1)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      },
+                      transition: 'all 0.2s',
+                    }}
+                    title={`${key}: ${color}`}
+                  />
+                ))}
+              </Stack>
+              
+              <Button
+                fullWidth
+                variant={activeTheme === theme.id ? 'contained' : 'outlined'}
+                sx={(muiTheme) => ({
+                  mt: 3,
+                  bgcolor: activeTheme === theme.id 
+                    ? muiTheme.palette.mode === 'dark' ? '#4a4a4a' : '#333333' 
+                    : 'transparent',
+                  color: activeTheme === theme.id 
+                    ? muiTheme.palette.common.white 
+                    : muiTheme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.7)' 
+                      : 'rgba(0, 0, 0, 0.7)',
+                  borderColor: muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                  '&:hover': {
+                    bgcolor: activeTheme === theme.id 
+                      ? muiTheme.palette.mode === 'dark' ? '#5a5a5a' : '#4a4a4a' 
+                      : muiTheme.palette.mode === 'dark' 
+                        ? 'rgba(255, 255, 255, 0.08)' 
+                        : 'rgba(0, 0, 0, 0.04)',
+                    borderColor: muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                    boxShadow: 'none',
+                    color: activeTheme === theme.id 
+                      ? muiTheme.palette.common.white 
+                      : muiTheme.palette.mode === 'dark' 
+                        ? 'rgba(255, 255, 255, 0.9)' 
+                        : 'rgba(0, 0, 0, 0.8)',
+                  },
+                  '&:active': {
+                    transform: 'scale(0.98)',
+                    bgcolor: activeTheme === theme.id 
+                      ? muiTheme.palette.mode === 'dark' ? '#3a3a3a' : '#292929' 
+                      : muiTheme.palette.mode === 'dark' 
+                        ? 'rgba(255, 255, 255, 0.12)' 
+                        : 'rgba(0, 0, 0, 0.06)',
+                  },
+                  transition: 'all 0.2s ease',
+                  fontWeight: 500,
+                  letterSpacing: '0.5px',
+                  textTransform: 'none',
+                  fontSize: '0.875rem',
+                  opacity: activeTheme === theme.id ? 1 : 0.8,
+                })}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveTheme(theme.id);
+                }}
+              >
+                {activeTheme === theme.id ? 'Selected' : 'Select Theme'}
+              </Button>
+            </Box>
+          </Card>
         ))}
-      </Box>
+      </Stack>
     </Box>
   );
 }

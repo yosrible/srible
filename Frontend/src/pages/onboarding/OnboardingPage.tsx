@@ -1,7 +1,12 @@
 import { Box } from "@mui/material";
-import { SignInForm } from "@/components/auth/SignInForm";
+import { OnboardingForm } from "@/components/onboarding/OnboardingForm";
 
-const SignInPage = () => {
+export function OnboardingPage() {
+  const handleOnboardingComplete = () => {
+    // TODO: Update user state to mark onboarding as complete
+    console.log("Onboarding completed!");
+  };
+
   return (
     <Box
       sx={{
@@ -17,9 +22,9 @@ const SignInPage = () => {
         p: 3,
       }}
     >
-      <SignInForm />
+      <OnboardingForm onComplete={handleOnboardingComplete} />
     </Box>
   );
-};
+}
 
-export default SignInPage;
+export default OnboardingPage;
