@@ -195,9 +195,9 @@ export const FeaturesSection = () => (
                     >
                       <FeatureIcon>{feature.icon}</FeatureIcon>
                     </motion.div>
-                    <Typography variant="cardTitle">{feature.title}</Typography>
+                    <Typography variant="h6" component="h3" sx={{ fontWeight: 600, mb: 1 }}>{feature.title}</Typography>
                   </Box>
-                  <Typography variant="cardBody">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {feature.description}
                   </Typography>
                 </CardContentStyled>
