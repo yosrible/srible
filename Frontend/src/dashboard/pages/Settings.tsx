@@ -7,7 +7,6 @@ import {
   Paper,
   Avatar,
   Switch,
-  FormControl,
   FormControlLabel,
   MenuItem,
   InputAdornment,
