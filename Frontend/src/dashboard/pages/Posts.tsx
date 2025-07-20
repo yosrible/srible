@@ -17,7 +17,6 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
-  RadioGroup,
   FormControlLabel,
   Dialog,
   DialogContent,
@@ -101,49 +100,6 @@ interface Post {
   views: number;
   selected?: boolean;
 }
-
-const posts: Post[] = [
-  {
-    id: "1",
-    title: "Getting Started with React Development",
-    status: "published",
-    author: "John Doe",
-    publishDate: "2024-01-15",
-    views: 1247,
-  },
-  {
-    id: "2",
-    title: "Advanced TypeScript Patterns",
-    status: "draft",
-    author: "Jane Smith",
-    publishDate: "2024-01-20",
-    views: 0,
-  },
-  {
-    id: "3",
-    title: "Building Scalable APIs with Node.js",
-    status: "published",
-    author: "Mike Johnson",
-    publishDate: "2024-01-10",
-    views: 892,
-  },
-  {
-    id: "4",
-    title: "CSS Grid Layout Mastery",
-    status: "archived",
-    author: "Sarah Wilson",
-    publishDate: "2024-01-05",
-    views: 567,
-  },
-  {
-    id: "5",
-    title: "State Management with Redux Toolkit",
-    status: "published",
-    author: "Alex Brown",
-    publishDate: "2024-01-18",
-    views: 1103,
-  },
-];
 
 const statusOptions = [
   { value: "all", label: "All Status" },
