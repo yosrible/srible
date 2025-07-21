@@ -16,6 +16,7 @@ import Posts from "./dashboard/pages/Posts";
 import Analytics from "./dashboard/pages/Analytics";
 import Themes from "./dashboard/pages/Themes";
 import Settings from "./dashboard/pages/Settings";
+import PostCreate from "./dashboard/pages/PostCreate";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
                 <Routes>
                   <Route index element={<Overview />} />
                   <Route path="posts" element={<Posts />} />
+                  <Route path="posts/create" element={<PostCreate />} />
                   <Route path="analytics" element={<Analytics />} />
                   <Route path="themes" element={<Themes />} />
                   <Route path="settings" element={<Settings />} />
