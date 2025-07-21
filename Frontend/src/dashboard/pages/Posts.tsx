@@ -325,7 +325,7 @@ export default function Posts() {
           <Button
             variant="contained"
             startIcon={!isMobile && <AddIcon />}
-            onClick={() => navigate("/dashboard/posts/new")}
+            onClick={() => navigate("/dashboard/posts/create")}
             sx={({ palette }) => ({
               bgcolor: palette.mode === "dark" ? "#ffffff" : "text.primary",
               color:

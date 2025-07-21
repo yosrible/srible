@@ -228,6 +228,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     </Box>
   );
 
+  const hideSidebar = location.pathname === "/dashboard/posts/create";
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -247,42 +249,44 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       >
         <CssBaseline />
         {/* Sidebar */}
-        <Box
-          component="nav"
-          sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-          aria-label="sidebar navigation"
-        >
-          {/* Mobile Drawer */}
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{ keepMounted: true }}
-            sx={{
-              display: { xs: "block", md: "none" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: drawerWidth,
-              },
-            }}
+        {!hideSidebar && (
+          <Box
+            component="nav"
+            sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+            aria-label="sidebar navigation"
           >
-            {drawer}
-          </Drawer>
-          {/* Desktop Drawer */}
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: "none", md: "block" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: drawerWidth,
-              },
-            }}
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Box>
+            {/* Mobile Drawer */}
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{ keepMounted: true }}
+              sx={{
+                display: { xs: "block", md: "none" },
+                "& .MuiDrawer-paper": {
+                  boxSizing: "border-box",
+                  width: drawerWidth,
+                },
+              }}
+            >
+              {drawer}
+            </Drawer>
+            {/* Desktop Drawer */}
+            <Drawer
+              variant="permanent"
+              sx={{
+                display: { xs: "none", md: "block" },
+                "& .MuiDrawer-paper": {
+                  boxSizing: "border-box",
+                  width: drawerWidth,
+                },
+              }}
+              open
+            >
+              {drawer}
+            </Drawer>
+          </Box>
+        )}
         {/* Main Area */}
         <Box
           sx={{
